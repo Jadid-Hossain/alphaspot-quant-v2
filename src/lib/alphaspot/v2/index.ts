@@ -38,6 +38,7 @@ export * from './connectivity' // Exchange connector + subscription manager + co
 export * from './market-data' // Canonical market events + bounded ring buffer + schema/timestamp/sequence/duplicate validation + normalization + integrity verification + publication + replay (Chapter 3.2)
 export * from './market-state' // Market state cache — partitioned, atomic, versioned, immutable snapshots, quality tracking, recovery (Chapter 3.3)
 export * from './historical-data' // Historical data manager — immutable datasets, versioned, UTC epoch, gap detection + repair, columnar payload store, stitching (Chapter 3.4)
+export * from './candle-engine' // Candle construction engine — canonical OHLCV, timeframe dependency graph, incremental aggregation, watermark completion, late-event v+1, checkpoint recovery (Chapter 3.5)
 export * from './lanes/lane-a-realtime'
 export * from './lanes/lane-b-analytical'
 export * from './lanes/lane-c-research'

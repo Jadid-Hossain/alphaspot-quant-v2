@@ -1334,3 +1334,122 @@ Rule 15 — Historical datasets shall declare feature compatibility versions.
 The Historical Data Manager provides a validated, versioned, immutable, reproducible historical market repository. It separates historical analytics from live market processing while guaranteeing dataset integrity, version traceability, repairability, and long-term reproducibility across every analytical workflow.
 
 END OF CHAPTER 3.4
+
+---
+
+# CHAPTER 3.5 — CANDLE CONSTRUCTION ENGINE
+
+## 1. Purpose
+
+The Candle Construction Engine (CCE) transforms validated market events into canonical OHLCV candles. Guarantees deterministic candle generation across live execution, historical replay, model training, feature engineering, and backtesting. Performs: candle construction, timeframe aggregation, candle validation, gap handling, candle versioning. Performs NO indicators, feature engineering, AI inference, or trading decisions.
+
+## 2. Design Philosophy
+
+Candles are deterministic facts. Given identical market events, the CCE must always produce identical candles. Live execution, replay, backtesting, training must generate mathematically identical candles.
+
+## 3. Input Contract
+
+The CCE consumes only Canonical Market Events from Chapter 3.2. Raw exchange messages are prohibited.
+
+## 4. Output Contract
+
+Every candle follows the Canonical Candle Schema. Permanent Primary Identity: Exchange + Symbol + Timeframe + Open Time. Required fields: Primary Identity, Symbol, Exchange, Timeframe, Open Time, Close Time, Open, High, Low, Close, Volume, Trade Count, VWAP, Buy Volume, Sell Volume, Completion Status, Candle Version, Data Quality. Provenance: Construction Start/Finish Time, Engine Version, Replay Flag, Recovery Flag, Parent Candle Count.
+
+## 4.1 Market Microstructure Extension
+
+Optional extension: Average/Max/Min/Time-Weighted Spread, Average/Max Order Book Imbalance, Bid/Ask Depth, Liquidity Score, Microstructure Quality. Independent from core OHLCV. Consumers requiring only traditional candles may ignore.
+
+## 5. Candle Lifecycle
+
+OPEN → UPDATING → FINALIZED. Only FINALIZED candles become historical facts.
+
+## 6. Timeframe Dependency Graph
+
+Configuration-driven dependency graph (not hardcoded hierarchy). Each higher timeframe specifies its canonical parent. Examples: 15m←5m, 1H←15m, 4H←1H, 1D←1H, 1W←1D, 1M←1D. New timeframes introduced dynamically via config mapping. Circular dependencies strictly prohibited.
+
+## 6.1 Temporal Boundary Policy
+
+All construction follows globally defined UTC boundaries. 1m: HH:MM:00 UTC. 1H: HH:00:00 UTC. 1D: 00:00:00 UTC. 1W: 00:00:00 UTC every Monday. 1M: 00:00:00 UTC on first day of month. No local timezone may influence construction. All exchanges normalized onto same temporal boundaries.
+
+## 7. Incremental Aggregation
+
+Higher timeframe candles constructed using incremental aggregation. One active accumulator per Asset+Timeframe. Accumulator updates: High, Low, Close, Volume, Trade Count, VWAP, Buy Volume, Sell Volume, optional microstructure. Completed lower-timeframe candles merged into accumulator immediately. After aggregation, eligible for persistence + removal from volatile memory. Memory consumption constant w.r.t. candle duration. Aggregation deterministic and mathematically equivalent to full replay.
+
+## 8. Candle Completion
+
+FINALIZED only when: timeframe expires, event watermark passes candle boundary, late-arrival tolerance window expires, validation succeeds, sequence integrity confirmed. Once met, accumulator locks. Incomplete candles remain mutable.
+
+## 9. Gap Handling
+
+No Trades → Valid Zero-Volume Candle. Missing Data → Gap Event. These are never equivalent.
+
+## 9.1 Late Event Policy
+
+Late events (after watermark + FINALIZED) do NOT modify finalized candle directly. Instead: event queued for historical reconstruction, repaired candle (Version+1) generated asynchronously, live execution continues using original finalized candle. Downstream domains notified of Version+1 correction via event bus.
+
+## 10. Candle Versioning
+
+Every finalized candle is immutable. Corrections create Version+1. Originals archived.
+
+## 11. Data Quality
+
+Each candle records: Validation Status, Construction Method, Gap Status, Repair Status, Source Dataset, Quality Score. Consumers may reject low-quality candles.
+
+## 12. Live Construction
+
+Live candles update incrementally. Incoming events may modify: High, Low, Close, Volume, Trade Count. Open never changes.
+
+## 13. Replay Construction
+
+Replay uses identical aggregation logic. No replay-specific rules. Only event delivery differs.
+
+## 14. Multi-Asset Isolation
+
+Every asset owns an independent construction pipeline. BTC cannot affect ETH.
+
+## 15. Failure Recovery
+
+Construction failures: Pause → Reload Last Valid Candle → Replay Missing Events → Reconstruct → Resume. No partially reconstructed candle published.
+
+## 15.1 Recovery from Persistent State
+
+Active accumulators periodically checkpointed. After shutdown: restore latest checkpoint, replay missing finalized lower timeframe candles from HDM, reconstruct accumulator state before resuming. Recovery never duplicates volume/trades/events. Consumers never observe partial reconstruction.
+
+## 16. Candle Snapshots
+
+Consumers may request immutable snapshots of Current Open Candle or Historical Finalized Candle. Read-only.
+
+## 17. Observability
+
+Metrics: Candles Built, Aggregation Latency, Completion Time, Gap Count, Repair Count, Version Count, Construction Errors, Quality Distribution.
+
+## 18. Scalability
+
+Supports: additional exchanges, assets, timeframes, distributed workers without redesign.
+
+## 19. Architectural Rules
+
+Rule 1 — Only Canonical Market Events may construct candles.
+Rule 2 — Finalized candles are immutable.
+Rule 3 — Higher timeframes originate only from finalized lower timeframes.
+Rule 4 — Replay and live use identical construction algorithms.
+Rule 5 — Zero-volume candles and missing-data gaps are distinct.
+Rule 6 — Construction remains partitioned per asset.
+Rule 7 — Open price never changes.
+Rule 8 — Finalized candles cannot be modified.
+Rule 9 — Every candle records quality metadata.
+Rule 10 — Construction must be deterministic.
+Rule 11 — All candle boundaries shall follow canonical UTC.
+Rule 12 — Higher timeframe construction shall use incremental accumulators.
+Rule 13 — Aggregation memory shall remain constant w.r.t. candle duration.
+Rule 14 — Active accumulators shall support checkpoint-based recovery.
+Rule 15 — Market microstructure data shall remain logically separate from core OHLCV.
+Rule 16 — Every candle must possess a permanent Primary Identity.
+Rule 17 — Candle completion must be governed by event watermarks, not assumed delivery.
+Rule 18 — Late events must generate a new candle version and never mutate a finalized candle.
+
+## 20. Chapter Summary
+
+The CCE provides the deterministic temporal foundation of AlphaSpot. Guarantees every candle used for feature engineering, ML, backtesting, validation, and live decision making is mathematically reproducible, versioned, auditable, and exchange-independent.
+
+END OF CHAPTER 3.5
