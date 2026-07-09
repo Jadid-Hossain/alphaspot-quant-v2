@@ -1766,3 +1766,90 @@ Rule 16 — Every Canonical Trade Event has globally unique Event ID. Bounded de
 The TFI converts executed transactions into deterministic, statistically normalized market participation representation. Analyzes Volume Delta, CVD, block trades, execution imbalance, velocity, institutional participation, exhaustion, and optional derivatives. Combined with Microstructure (Ch 3.6) and OBI (Ch 3.7), completes AlphaSpot's institutional-grade market interpretation layer with deterministic replay, bounded memory, scalable multi-asset processing, and production-ready fault tolerance.
 
 END OF CHAPTER 3.8
+
+---
+
+# CHAPTER 3.9 — FEATURE EXTRACTION ENGINE
+
+## 1. Purpose
+
+The Feature Extraction Engine (FEE) transforms deterministic market intelligence into machine-readable quantitative features. Exclusive bridge between Market Intelligence and AI. Converts canonical market information into structured numerical representations while preserving deterministic replay, temporal integrity, statistical correctness. Performs: Price/Volume/Volatility/Market Structure/Microstructure/Order Book/Trade Flow/Statistical/Regime/Cross-Asset/Risk Feature Extraction. Performs NO scaling, selection, normalization, imputation, ML, AI inference, or trading decisions.
+
+## 2. Design Philosophy
+
+ML must never consume raw market data or raw market intelligence. ML consumes only deterministic quantitative features. Identical market history → identical feature vectors.
+
+## 3. Input Contract
+
+Consumes only canonical outputs: Canonical Candles (Ch 3.5), Microstructure Snapshots (Ch 3.6), OBI (Ch 3.7), TFI (Ch 3.8), HDM (Ch 3.4), Market State Cache (Ch 3.3), Cross-Asset Ranking, Market Regime State. Raw exchange messages prohibited.
+
+## 4. Output Contract
+
+Immutable Feature Vector: Symbol, Timestamp, Feature Version, Feature Set Version, Feature Count, Feature Values, Feature Quality Score, Feature Metadata Reference, Dependency Version. Only numerical or categorical ML-ready values. No business logic.
+
+## 4.1 Extraction Triggers & Synchronization
+
+Strict deterministic clock. NOT triggered on every raw event. Triggered by: Canonical Timeframe Boundaries (candle closes) OR Configurable Polling Epochs (e.g. every 1000ms). On trigger: capture synchronous atomic snapshot of ALL upstream engines. If upstream hasn't produced new value since last epoch → Forward Fill most recent deterministic state. Guarantees perfectly aligned, synchronous Feature Vectors across all 441 assets regardless of individual event arrival rates.
+
+## 5. Feature Categories
+
+Price, Trend, Momentum, Volume, Volatility, Liquidity, Spread, Market Microstructure, Order Book, Trade Flow, Statistical, Relative Strength, Cross-Asset, Regime, Time, Risk, Meta. New categories may be added without redesign.
+
+## 6. Price Features
+
+Returns, Log Returns, Price Acceleration, Price Velocity, Gap Size, Relative Close Position, Candle Body Ratio, Upper/Lower Shadow Ratio, Range Expansion, Range Compression.
+
+## 7. Volume Features
+
+Relative Volume, Rolling Volume, Volume Acceleration, Volume Decay, Buy/Sell Volume Ratio, VWAP Distance, Volume Persistence.
+
+## 8. Market Microstructure Features (from Ch 3.6)
+
+Spread Z-Score, Liquidity Score, Bid/Ask Imbalance, Execution Pressure, Queue Pressure, Spread Expansion Rate, Liquidity Stability.
+
+## 9. Order Book Features (from Ch 3.7)
+
+Liquidity Wall Score, Spoofing Probability, Iceberg Probability, Absorption Score, Queue Dynamics, Liquidity Migration, Support/Resistance Strength.
+
+## 10. Trade Flow Features (from Ch 3.8)
+
+Session CVD, Rolling CVD, CVD Momentum, Volume Delta, Trade Velocity, Institutional Activity Score, Buying/Selling Exhaustion, Derivatives Pressure (optional).
+
+## 11. Volatility Features
+
+ATR, Realized Volatility, Parkinson Volatility, Garman-Klass Volatility, Rolling Std Dev, EWMA Volatility.
+
+## 12. Cross-Asset Features
+
+Relative Strength Rank, Sector Strength, BTC Relative Performance, Market Breadth, Dominance Metrics, Correlation Rank. Computed by dedicated background workers.
+
+## 13. Temporal Integrity
+
+Every feature computable using ONLY information available at extraction timestamp. Future information prohibited. Look-ahead bias prohibited. Data leakage prohibited. Deterministic under live + replay.
+
+## 14. Observability
+
+Features Generated, Extraction Latency, Feature Errors, Invalid Feature Count, Missing Dependencies, Worker Utilization, Feature Throughput.
+
+## 15. Scalability
+
+Additional exchanges, assets, new feature families, parallel worker pools, distributed execution without redesign.
+
+## 16. Architectural Rules
+
+Rule 1 — Only canonical data from previous chapters.
+Rule 2 — Deterministic.
+Rule 3 — Identical inputs → identical feature vectors.
+Rule 4 — Temporal integrity.
+Rule 5 — Look-ahead bias prohibited.
+Rule 6 — Data leakage prohibited.
+Rule 7 — Extraction only. Normalization/scaling/preprocessing → Chapter 3.10.
+Rule 8 — Independent of ML models.
+Rule 9 — Cross-asset features on dedicated worker pools.
+Rule 10 — Feature vectors immutable.
+
+## 17. Chapter Summary
+
+The FEE converts canonical market intelligence into deterministic quantitative features — the exclusive input to AlphaSpot's ML pipeline. Separates extraction from preprocessing and training, ensuring temporal purity, deterministic replay, bounded computation, and modular extensibility.
+
+END OF CHAPTER 3.9

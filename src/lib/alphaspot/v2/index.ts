@@ -42,6 +42,7 @@ export * from './candle-engine' // Candle construction engine — canonical OHLC
 export * from './microstructure' // Market microstructure engine — liquidity, execution pressure, spread dynamics, order book imbalance, bounded depth, EMA/EWMA rolling metrics (Chapter 3.6)
 export * from './order-book-intel' // Order book intelligence — liquidity walls, spoofing (adaptive Z-score), icebergs, absorption, queue dynamics, migration, structural S/R with distance-to-mid decay (Chapter 3.7)
 export * from './trade-flow' // Trade flow intelligence — volume delta, session/rolling CVD, block trades (adaptive), execution imbalance (Maker/Taker), velocity, exhaustion, derivatives overlay (Chapter 3.8)
+export * from './feature-extraction' // Feature extraction — 17 feature categories, deterministic triggers, forward-fill, immutable vectors, temporal integrity (Chapter 3.9)
 export * from './lanes/lane-a-realtime'
 export * from './lanes/lane-b-analytical'
 export * from './lanes/lane-c-research'
