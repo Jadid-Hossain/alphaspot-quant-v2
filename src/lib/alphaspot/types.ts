@@ -1,6 +1,37 @@
 // AlphaSpot shared types — used by both the Next.js API routes and the socket.io mini-service
 
-export type Symbol = 'BTC/USDT' | 'ETH/USDT' | 'SOL/USDT'
+// A trading pair string, e.g. "BTC/USDT". Relaxed to string so the watchlist
+// can be extended without touching type definitions.
+export type Symbol = string
+
+// The full watchlist — top 24 USDT spot pairs on Binance by liquidity.
+// 24 symbols × 3 timeframes = 72 WS streams (well under Binance's 200-stream limit).
+export const SUPPORTED_SYMBOLS: Symbol[] = [
+  'BTC/USDT',
+  'ETH/USDT',
+  'BNB/USDT',
+  'SOL/USDT',
+  'XRP/USDT',
+  'ADA/USDT',
+  'AVAX/USDT',
+  'DOGE/USDT',
+  'DOT/USDT',
+  'LINK/USDT',
+  'LTC/USDT',
+  'ATOM/USDT',
+  'UNI/USDT',
+  'ETC/USDT',
+  'NEAR/USDT',
+  'APT/USDT',
+  'ARB/USDT',
+  'OP/USDT',
+  'FIL/USDT',
+  'INJ/USDT',
+  'SUI/USDT',
+  'SEI/USDT',
+  'TIA/USDT',
+  'RUNE/USDT',
+]
 
 export type Timeframe = '15m' | '1h' | '4h'
 

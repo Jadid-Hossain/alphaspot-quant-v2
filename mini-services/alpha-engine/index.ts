@@ -15,6 +15,7 @@ import {
   fetchFearGreed,
   connectKlineStream,
 } from './binance'
+import { SUPPORTED_SYMBOLS } from '../../src/lib/alphaspot/types'
 import { computeIndicators } from '../../src/lib/alphaspot/indicators'
 import { detectPatterns, summarizePatterns } from '../../src/lib/alphaspot/patterns'
 import { calculateConfluenceScore } from '../../src/lib/alphaspot/confluence'
@@ -62,42 +63,30 @@ const config: RiskConfig = {
   maxRecoveries: 2,
 }
 
-const candleBuffers: Record<Symbol, Record<Timeframe, Candle[]>> = {
-  'BTC/USDT': { '15m': [], '1h': [], '4h': [] },
-  'ETH/USDT': { '15m': [], '1h': [], '4h': [] },
-  'SOL/USDT': { '15m': [], '1h': [], '4h': [] },
+// Build per-symbol state maps dynamically from the watchlist so adding a
+// new coin only requires editing SUPPORTED_SYMBOLS.
+function buildRecord<T>(fn: (s: Symbol) => T): Record<string, T> {
+  const r: Record<string, T> = {}
+  for (const s of SYMBOLS) r[s] = fn(s)
+  return r
 }
 
-const positions: Record<Symbol, Position> = {
-  'BTC/USDT': emptyPosition('BTC/USDT'),
-  'ETH/USDT': emptyPosition('ETH/USDT'),
-  'SOL/USDT': emptyPosition('SOL/USDT'),
-}
+const candleBuffers: Record<string, Record<Timeframe, Candle[]>> = buildRecord(() => ({
+  '15m': [],
+  '1h': [],
+  '4h': [],
+}))
+
+const positions: Record<string, Position> = buildRecord((s) => emptyPosition(s))
 
 // last computed 4h indicators (for macro-breakdown detection)
-const prev4hInd: Record<Symbol, Indicators | null> = {
-  'BTC/USDT': null,
-  'ETH/USDT': null,
-  'SOL/USDT': null,
-}
+const prev4hInd: Record<string, Indicators | null> = buildRecord(() => null)
 
-const ticker24h: Record<Symbol, { changePct: number | null; volume: number | null; lastPrice: number | null }> = {
-  'BTC/USDT': { changePct: null, volume: null, lastPrice: null },
-  'ETH/USDT': { changePct: null, volume: null, lastPrice: null },
-  'SOL/USDT': { changePct: null, volume: null, lastPrice: null },
-}
+const ticker24h: Record<string, { changePct: number | null; volume: number | null; lastPrice: number | null }> = buildRecord(() => ({ changePct: null, volume: null, lastPrice: null }))
 
-const orderBooks: Record<Symbol, SymbolSnapshot['orderBook']> = {
-  'BTC/USDT': null,
-  'ETH/USDT': null,
-  'SOL/USDT': null,
-}
+const orderBooks: Record<string, SymbolSnapshot['orderBook']> = buildRecord(() => null)
 
-const funding: Record<Symbol, SymbolSnapshot['funding']> = {
-  'BTC/USDT': null,
-  'ETH/USDT': null,
-  'SOL/USDT': null,
-}
+const funding: Record<string, SymbolSnapshot['funding']> = buildRecord(() => null)
 
 let sentimentShared: SentimentData = {
   fearGreed: null,
@@ -107,13 +96,9 @@ let sentimentShared: SentimentData = {
 }
 
 // per-symbol sentiment from LLM commentary
-const sentimentPerSymbol: Record<Symbol, { score: number | null; commentary: string | null }> = {
-  'BTC/USDT': { score: null, commentary: null },
-  'ETH/USDT': { score: null, commentary: null },
-  'SOL/USDT': { score: null, commentary: null },
-}
+const sentimentPerSymbol: Record<string, { score: number | null; commentary: string | null }> = buildRecord(() => ({ score: null, commentary: null }))
 
-const lastEvalAt: Record<Symbol, number> = { 'BTC/USDT': 0, 'ETH/USDT': 0, 'SOL/USDT': 0 }
+const lastEvalAt: Record<string, number> = buildRecord(() => 0)
 let engineEnabled = true
 
 // ---------- Helpers ----------
@@ -352,11 +337,7 @@ function getEngineState(): EngineState {
       strongBuyScore: config.strongBuyScore,
       strongSellScore: config.strongSellScore,
     },
-    snapshots: {
-      'BTC/USDT': null,
-      'ETH/USDT': null,
-      'SOL/USDT': null,
-    },
+    snapshots: buildRecord(() => null),
     lastTickAt: nowMs(),
   }
 }
@@ -490,7 +471,7 @@ async function boot() {
       }
     },
     (connected) => {
-      logEntry('BTC/USDT', 'SYSTEM', connected ? 'INFO' : 'WARN', connected ? 'Binance stream connected.' : 'Binance stream disconnected — reconnecting.')
+      logEntry(SUPPORTED_SYMBOLS[0], 'SYSTEM', connected ? 'INFO' : 'WARN', connected ? `Binance stream connected (${SYMBOLS.length * TIMEFRAMES.length} streams).` : 'Binance stream disconnected — reconnecting.')
     },
   )
 
@@ -507,7 +488,7 @@ async function boot() {
 
   httpServer.listen(PORT, () => {
     console.log(`[io] AlphaSpot engine listening on port ${PORT}`)
-    logEntry('BTC/USDT', 'SYSTEM', 'INFO', `AlphaSpot engine online. Allocated capital $${config.allocatedCapital}. Scanning BTC, ETH, SOL on 15m/1h/4h.`)
+    logEntry('BTC/USDT', 'SYSTEM', 'INFO', `AlphaSpot engine online. Allocated capital $${config.allocatedCapital}. Scanning ${SUPPORTED_SYMBOLS.length} coins on 15m/1h/4h: ${SUPPORTED_SYMBOLS.map((s) => s.split('/')[0]).join(', ')}.`)
   })
 }
 

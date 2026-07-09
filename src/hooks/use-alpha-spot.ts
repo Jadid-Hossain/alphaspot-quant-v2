@@ -2,12 +2,13 @@
 
 import { create } from 'zustand'
 import { io, type Socket } from 'socket.io-client'
-import type {
-  Symbol,
-  SymbolSnapshot,
-  EngineState,
-  ServerToClientEvents,
-  ClientToServerEvents,
+import {
+  SUPPORTED_SYMBOLS,
+  type Symbol,
+  type SymbolSnapshot,
+  type EngineState,
+  type ServerToClientEvents,
+  type ClientToServerEvents,
 } from '@/lib/alphaspot/types'
 
 export interface LogEntry {
@@ -37,12 +38,12 @@ export interface TradeEntry {
 interface AlphaSpotState {
   connected: boolean
   engine: EngineState | null
-  snapshots: Record<Symbol, SymbolSnapshot | null>
+  snapshots: Record<string, SymbolSnapshot | null>
   logs: LogEntry[]
   trades: TradeEntry[]
   selectedSymbol: Symbol
   socket: Socket<ServerToClientEvents, ClientToServerEvents> | null
-  lastPriceFlash: Record<Symbol, 'up' | 'down' | null>
+  lastPriceFlash: Record<string, 'up' | 'down' | null>
 
   connect: () => void
   setSelectedSymbol: (s: Symbol) => void
@@ -56,23 +57,23 @@ interface AlphaSpotState {
 const MAX_LOGS = 200
 const MAX_TRADES = 100
 
+// Build initial snapshots/flash maps from the watchlist
+const emptySnapshots: Record<string, SymbolSnapshot | null> = {}
+const emptyFlash: Record<string, 'up' | 'down' | null> = {}
+for (const s of SUPPORTED_SYMBOLS) {
+  emptySnapshots[s] = null
+  emptyFlash[s] = null
+}
+
 export const useAlphaSpot = create<AlphaSpotState>((set, get) => ({
   connected: false,
   engine: null,
-  snapshots: {
-    'BTC/USDT': null,
-    'ETH/USDT': null,
-    'SOL/USDT': null,
-  },
+  snapshots: { ...emptySnapshots },
   logs: [],
   trades: [],
   selectedSymbol: 'BTC/USDT',
   socket: null,
-  lastPriceFlash: {
-    'BTC/USDT': null,
-    'ETH/USDT': null,
-    'SOL/USDT': null,
-  },
+  lastPriceFlash: { ...emptyFlash },
 
   connect: () => {
     if (get().socket) return
@@ -150,4 +151,4 @@ export const useAlphaSpot = create<AlphaSpotState>((set, get) => ({
   },
 }))
 
-export const SYMBOLS: Symbol[] = ['BTC/USDT', 'ETH/USDT', 'SOL/USDT']
+export const SYMBOLS: Symbol[] = SUPPORTED_SYMBOLS

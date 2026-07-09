@@ -1,19 +1,25 @@
 // AlphaSpot Data Ingestion Engine — Binance public API + WebSocket
-// 100% free: no auth, no paid APIs. Streams real-time OHLCV for BTC/ETH/SOL
-// on 15m / 1h / 4h, plus order book depth, futures funding rates, and open interest.
+// 100% free: no auth, no paid APIs. Streams real-time OHLCV for the full
+// SUPPORTED_SYMBOLS watchlist on 15m / 1h / 4h, plus order book depth,
+// futures funding rates, and open interest.
 
 import WebSocket from 'ws'
-import type { Candle, Timeframe, Symbol, OrderBookImbalance, FundingData } from '../../src/lib/alphaspot/types'
+import { SUPPORTED_SYMBOLS, type Candle, type Timeframe, type Symbol, type OrderBookImbalance, type FundingData } from '../../src/lib/alphaspot/types'
 
 const REST = 'https://api.binance.com'
 const FAPI = 'https://fapi.binance.com'
 const WS_BASE = 'wss://stream.binance.com:9443/stream'
 
-export const SYMBOLS: Symbol[] = ['BTC/USDT', 'ETH/USDT', 'SOL/USDT']
+export const SYMBOLS: Symbol[] = SUPPORTED_SYMBOLS
 export const TIMEFRAMES: Timeframe[] = ['15m', '1h', '4h']
 
 export const toBinanceSymbol = (s: Symbol): string => s.replace('/', '').toUpperCase()
 export const toBinanceLower = (s: Symbol): string => s.replace('/', '').toLowerCase()
+
+// Build a lookup from Binance's lowercase stream prefix (e.g. "btcusdt") back
+// to our canonical pair string ("BTC/USDT"). Built once from SUPPORTED_SYMBOLS.
+const STREAM_TO_SYMBOL: Record<string, Symbol> = {}
+for (const s of SUPPORTED_SYMBOLS) STREAM_TO_SYMBOL[toBinanceLower(s)] = s
 
 const TF_TO_MS: Record<Timeframe, number> = {
   '15m': 15 * 60 * 1000,
@@ -158,12 +164,7 @@ export function connectKlineStream(
         const parts = msg.stream.split('@kline_')
         const symLow = parts[0]
         const tf = parts[1] as Timeframe
-        const symbolMap: Record<string, Symbol> = {
-          btcusdt: 'BTC/USDT',
-          ethusdt: 'ETH/USDT',
-          solusdt: 'SOL/USDT',
-        }
-        const symbol = symbolMap[symLow]
+        const symbol = STREAM_TO_SYMBOL[symLow]
         if (!symbol || !tf) return
         const k = msg.data.k
         const candle: Candle = {

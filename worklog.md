@@ -42,3 +42,25 @@ Stage Summary:
 - 100% free stack: no paid APIs, no paid cloud, runs locally.
 - LLM (z-ai-web-dev-sdk) powers both per-decision reasoning and periodic market commentary.
 - Paper trading mode (clearly labeled in UI + footer).
+
+---
+Task ID: EXPAND-24
+Agent: main (Z.ai Code)
+Task: Expand from 3 coins to a comprehensive watchlist of 24 major cryptocurrencies
+
+Work Log:
+- Relaxed `Symbol` type from a 3-member literal union to `string` in `types.ts`, and added a `SUPPORTED_SYMBOLS` constant listing 24 top USDT spot pairs (BTC, ETH, BNB, SOL, XRP, ADA, AVAX, DOGE, DOT, LINK, LTC, ATOM, UNI, ETC, NEAR, APT, ARB, OP, FIL, INJ, SUI, SEI, TIA, RUNE).
+- Updated `binance.ts`: SYMBOLS now references SUPPORTED_SYMBOLS; built a dynamic `STREAM_TO_SYMBOL` lookup map (replaces hardcoded 3-coin map) so the WS handler can resolve any coin. 24 coins × 3 timeframes = 72 streams (well under Binance's 200-stream limit).
+- Updated engine `index.ts`: replaced all hardcoded per-symbol state maps (candleBuffers, positions, prev4hInd, ticker24h, orderBooks, funding, sentimentPerSymbol, lastEvalAt) with a generic `buildRecord()` helper that initializes state for every coin in SUPPORTED_SYMBOLS. Updated boot log and engine-state broadcast to reference the dynamic list.
+- Updated Zustand store (`use-alpha-spot.ts`): snapshots and lastPriceFlash now built dynamically from SUPPORTED_SYMBOLS; `selectedSymbol` is a string. Exported SYMBOLS = SUPPORTED_SYMBOLS.
+- Built new `Watchlist` component: persistent left sidebar (desktop) / Sheet (mobile) showing all 24 coins with live price, 24h %, AI signal dot (color-coded by label, pulsing for STRONG signals), and an "IN"/"R" badge for active positions. Includes a search filter. Rows are `React.memo`-ized with primitive props for performance (only changed rows re-render on snapshot updates).
+- Redesigned `Header`: removed the 3-button symbol tabs; added a compact coin-picker button (mobile) that opens a Sheet with the watchlist; shows selected symbol + live price + 24h% inline on desktop.
+- Updated `page.tsx` layout: added a 240px persistent watchlist sidebar (lg+) alongside the main dashboard area; main content max-width adjusted to 1500px.
+- Verified end-to-end: engine boots and seeds 24 coins × 3 timeframes = 21,600 candles, connects 72 WS streams, broadcasts snapshots for all coins. DB confirms signals + logs being recorded across all 24 symbols. Agent Browser + VLM confirm: watchlist sidebar visible with all 24 coins, signal dots present, no overlaps, mobile Sheet works with search filter, coin switching updates the full dashboard. No console errors.
+
+Stage Summary:
+- Watchlist expanded from 3 → 24 coins (8x increase).
+- UI redesigned with a professional trading-terminal watchlist sidebar (desktop) + Sheet picker (mobile) with search.
+- All 5 blueprint modules (ingestion, confluence, risk, backend, frontend) now operate across 24 coins simultaneously.
+- Performance optimized with memoized watchlist rows; no jank with 24 coins streaming at ~12 snapshots/sec.
+- Adding more coins in the future only requires editing the SUPPORTED_SYMBOLS array — everything else is dynamic.
