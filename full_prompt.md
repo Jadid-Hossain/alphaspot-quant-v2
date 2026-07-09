@@ -1669,3 +1669,100 @@ Rule 13 — Liquidity wall classification shall continuously cross-reference Exe
 The OBI transforms normalized market microstructure into institutional-grade liquidity intelligence by identifying genuine support/resistance, liquidity walls, vacuums, spoofing, iceberg activity, absorption, queue dynamics, and liquidity migration. Through adaptive statistical normalization, bounded computation, and deterministic processing, it provides high-quality structural features for Feature Engineering and ML while filtering transient market noise.
 
 END OF CHAPTER 3.7
+
+---
+
+# CHAPTER 3.8 — TRADE FLOW INTELLIGENCE
+
+## 1. Purpose
+
+The Trade Flow Intelligence (TFI) Engine interprets executed market trades to estimate the true behavior of aggressive buyers and sellers. Analyzes completed transactions (not resting liquidity). Transforms trade flow into deterministic statistical representations for Feature Engineering, ML, Market Regime Detection, Risk Engine, Explainable AI. Performs: Volume Delta Analysis, Session & Rolling CVD, Aggressive Buying/Selling Analysis, Block Trade Detection, Trade Velocity, Derivatives Flow Intelligence (optional), Execution Imbalance, Buying/Selling Exhaustion, Institutional Activity Estimation. Performs NO indicators, AI inference, trading decisions, or portfolio optimization.
+
+## 2. Design Philosophy
+
+Executed trades reveal what participants actually did. Order books reveal intentions. Trade flow reveals commitments. Estimates institutional participation and execution pressure from completed transactions.
+
+## 3. Input Contract
+
+Consumes only canonical events: Trade Events, Maker/Taker Flags, Execution Price/Quantity/Timestamp, Market Microstructure Snapshot, Execution Pressure, Order Book Imbalance, Liquidity Score. Optional: Futures Liquidation Events, Funding Rate, Open Interest, Mark Price, Basis Spread. Raw exchange payloads prohibited.
+
+## 4. Output Contract
+
+Immutable Trade Flow Intelligence Snapshot: Symbol, Timestamp, Session CVD, Rolling CVD, Volume Delta, Aggressive Buy/Sell Volume, Block Trade Score, Trade Velocity, Execution Imbalance, Buying/Selling Exhaustion, Institutional Activity Score, Flow Confidence, Snapshot Version. Optional Derivatives: Long/Short Liquidation Score, Open Interest Delta, Funding Divergence, Derivatives Pressure.
+
+## 5. Volume Delta
+
+Aggressive Buy Volume, Aggressive Sell Volume, Net Volume Delta, Rolling Delta, Delta Acceleration, Delta Persistence. Represents imbalance between aggressive buyers and sellers.
+
+## 6. Cumulative Volume Delta (CVD)
+
+Internal Absolute CVD for deterministic replay/recovery ONLY — never exposed to ML. Publishes: Session CVD (resets at UTC daily boundary Ch 3.5), Rolling CVD (configurable windows), CVD Momentum, CVD Slope, Price-CVD Divergence. Guarantees stationary statistical features for ML while preserving deterministic reconstruction.
+
+## 7. Block Trade Detection
+
+Large Trade Score, Block Trade Frequency, Average Block Size, Block Direction Bias, Institutional Participation Score. Adapts dynamically to each asset's rolling trade size distribution. Fixed volume thresholds PROHIBITED.
+
+## 8. Execution Imbalance
+
+Buyer/Seller Dominance, Execution Concentration, Trade Density, Directional Persistence, Execution Efficiency. Aggressor classification EXCLUSIVELY exchange Maker/Taker.
+
+## 9. Trade Velocity
+
+Trades Per Second, Volume Per Second, Execution Burst Score, Market Activity Score, Velocity Acceleration/Deceleration. Bounded-memory rolling algorithms.
+
+## 10. Derivatives Flow Intelligence
+
+Optional. When available: Long/Short Liquidation Pressure, Liquidation Cascade Probability, Funding Rate Divergence, OI Expansion/Compression, Derivatives Pressure Score. When unavailable → all derivatives outputs NULL, spot pipeline continues normally.
+
+## 11. Buying & Selling Exhaustion
+
+Buying/Selling Exhaustion, Momentum Decay, Volume Fatigue, Participation Decline, Execution Saturation. Estimates whether aggressive participation is weakening.
+
+## 12. Flow Confidence
+
+Trade Coverage, Market Activity, Synchronization, Data Completeness, Execution Stability, Microstructure Agreement. Consumers may reject low-confidence.
+
+## 13. Multi-Asset Isolation
+
+Each asset owns independent TFI Engine. No shared runtime state.
+
+## 14. Failure Recovery
+
+Pause → Reload Latest Snapshot → Replay Canonical Trade Events → Recompute → Resume. No incomplete snapshots.
+
+## 15. Performance
+
+Constant-time updates, bounded memory, incremental computation, worker-based, lock-free reads, cache-friendly. All rolling stats use EWMA, EMA, or fixed-size circular buffers. Unbounded arrays PROHIBITED.
+
+## 16. Observability
+
+Trade Throughput, Volume Delta Stability, Session CVD, Rolling CVD, Execution Latency, Flow Update Rate, Worker Utilization, Recovery Count, Duplicate Event Count, Processing Errors.
+
+## 17. Scalability
+
+Multiple exchanges, additional assets, distributed workers, exchange-specific execution models, optional derivatives streams, future market types without redesign.
+
+## 18. Architectural Rules
+
+Rule 1 — Only Canonical Trade Events and Microstructure Snapshots may be consumed.
+Rule 2 — Trade Flow Snapshots are immutable.
+Rule 3 — Replay and live shall produce identical statistics.
+Rule 4 — Execution imbalance relies exclusively on exchange Maker/Taker.
+Rule 5 — All computations incremental.
+Rule 6 — Memory strictly bounded.
+Rule 7 — Historical replay reproduces identical cumulative statistics.
+Rule 8 — Each asset owns independent TFI Engine.
+Rule 9 — Probability outputs never interpreted as trading signals.
+Rule 10 — Engine performs market interpretation only.
+Rule 11 — All anomaly detection uses dynamic baseline normalization (rolling Z-score), not fixed thresholds.
+Rule 12 — All rolling metrics use constant-memory algorithms (EWMA, EMA, circular buffers).
+Rule 13 — Institutional activity estimation compares against each asset's rolling distribution, not fixed thresholds.
+Rule 14 — Derivatives Intelligence is optional. If unavailable, spot pipeline continues normally.
+Rule 15 — Fully deterministic. Identical events → identical snapshots regardless of replay speed/worker/deployment.
+Rule 16 — Every Canonical Trade Event has globally unique Event ID. Bounded dedup cache keyed by Event ID/Trade ID. Duplicates never modify cumulative statistics.
+
+## 19. Chapter Summary
+
+The TFI converts executed transactions into deterministic, statistically normalized market participation representation. Analyzes Volume Delta, CVD, block trades, execution imbalance, velocity, institutional participation, exhaustion, and optional derivatives. Combined with Microstructure (Ch 3.6) and OBI (Ch 3.7), completes AlphaSpot's institutional-grade market interpretation layer with deterministic replay, bounded memory, scalable multi-asset processing, and production-ready fault tolerance.
+
+END OF CHAPTER 3.8
