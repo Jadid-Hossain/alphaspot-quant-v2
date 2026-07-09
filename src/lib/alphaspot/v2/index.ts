@@ -8,6 +8,7 @@
 //   Chapter 2.2: Event-driven communication + Workflow Orchestrator + snapshot lifecycle
 //   Chapter 2.3: Runtime architecture — write coordination, worker pool, cache hierarchy, backpressure, fault tolerance, watchdogs
 //   Chapter 2.4: Engineering standards & governance — source-of-truth, dependency governance, error classification, config, security, model/feature governance, plugins, quality gates, constitution
+//   Chapter 2.5: AI governance — model lifecycle, prediction traceability, confidence calibration, performance monitoring, drift detection, model decay policy, shadow evaluation, recommendation validity, operational safety, explainability, governance alerts, audit trail, continuous improvement
 //
 // The 10-stage pipeline (Chapter 1) maps onto the 14 domains (Chapter 2.1):
 //   • Market Observation           → Domain 03 (Gateway) + 04 (Data)

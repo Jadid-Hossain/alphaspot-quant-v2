@@ -793,3 +793,112 @@ These principles override implementation convenience.
 Chapter 2 establishes the permanent engineering rules of AlphaSpot Quant. Every future module, service, model, API, and feature must comply with these standards. The architecture is designed to remain stable, extensible, and maintainable as the platform grows in complexity.
 
 END OF CHAPTER 2.4
+
+---
+
+# CHAPTER 2.5 — AI GOVERNANCE, OPERATIONAL INTELLIGENCE & CONTINUOUS VALIDATION
+
+## 1. Purpose
+
+The objective is to ensure AlphaSpot Quant continuously evaluates the quality, reliability, and safety of its own recommendations. The platform must never assume a model remains accurate forever. Every recommendation, prediction, trade outcome, and market regime becomes evidence used to evaluate the system itself. The platform continuously asks: "Can this recommendation still be trusted?"
+
+## 2. AI Governance Philosophy
+
+The AI is an advisor, not an authority. Predictions represent statistical estimates, not certainty. No model receives permanent trust. Trust must be earned continuously through measurable performance.
+
+## 3. Model Lifecycle
+
+Every production model follows a controlled lifecycle:
+Research → Training → Validation → Calibration → Shadow Evaluation → Production → Monitoring → Revalidation → Upgrade → Archive.
+A model may never move directly from training into production.
+
+## 4. Model Registry
+
+Every deployed model has a unique identity. Required metadata: Model ID, Version, Training Dataset Version, Feature Version, Training Date, Validation Metrics, Supported Market Types, Supported Time Horizons, Supported Asset Classes, Deployment Date, Retirement Date. No anonymous models permitted.
+
+## 5. Prediction Traceability
+
+Every recommendation must be traceable. Each stores: Snapshot ID, Model Version, Feature Version, Prediction Timestamp, Confidence Score, Expected Value, Market Regime, Supporting Evidence, Final Outcome. Historical recommendations must always remain reproducible.
+
+## 6. Confidence Governance
+
+Confidence is not probability. Confidence measures the model's trust in its own prediction. The platform continuously calibrates confidence against actual historical outcomes. Poorly calibrated confidence reduces recommendation priority.
+
+## 7. Model Performance Monitoring
+
+The platform continuously measures: prediction accuracy, directional accuracy, precision, recall, calibration quality, expected value realization, win rate, loss rate, average return, average drawdown. Performance measured over rolling evaluation windows.
+
+## 8. Market Drift Detection
+
+Financial markets evolve. The platform monitors: volatility shifts, liquidity changes, structural breaks, sentiment changes, correlation changes, feature distribution changes. Significant drift triggers model review.
+
+## 9. Feature Drift Detection
+
+Statistical properties of input features must remain stable. The platform monitors: distribution shifts, missing value increases, abnormal ranges, feature correlations, feature quality. Unexpected drift generates governance alerts.
+
+## 10. Model Drift Detection
+
+Model quality may degrade over time. The platform compares Expected Performance → Observed Performance → Deviation Analysis → Governance Decision. Outcomes: Continue, Recalibrate, Retrain, Suspend, Retire.
+
+## 10.1 Model Decay Policy
+
+Every production model continuously compares live performance against validated baseline. Governance evaluation includes: calibration error, directional accuracy, expected value realization, prediction stability, confidence calibration. Governance Configuration defines acceptable deviation limits (max calibration degradation, max confidence miscalibration, max directional accuracy decline, min rolling evaluation window). When limits exceeded: generate governance alert, reduce recommendation confidence, suspend recommendation publication, move model into observation mode, retire production model. Thresholds are configurable and version-controlled. Governance policies evolve independently of model implementations.
+
+## 11. Shadow Evaluation
+
+New models initially operate silently — generate predictions without influencing recommendations. Historical comparison determines whether the new model outperforms production. Only validated improvements may replace production.
+
+## 11.1 Shadow Model Promotion Policy
+
+Shadow models evaluated using identical market conditions as active production model. Promotion requires evidence during a configurable evaluation period: minimum evaluation duration, minimum completed paper trades, minimum statistical confidence, minimum expected value improvement, maximum allowable drawdown, calibration quality requirements. Default: at least 14 evaluation days, at least 50 completed paper trades. Promotion is never automatic solely because of higher raw return. Candidate must demonstrate superior risk-adjusted performance while maintaining acceptable calibration and governance metrics. Every promotion decision permanently recorded for auditability.
+
+## 12. Recommendation Validity
+
+Every recommendation has a limited lifetime. Recommendations automatically expire when: market structure changes, confidence falls, snapshot expires, risk limits change, volatility changes significantly. Expired recommendations become invalid.
+
+## 13. Self-Evaluation Loop
+
+Every completed trade produces feedback: Prediction → Execution → Outcome → Evaluation → Performance Database → Future Improvement. The platform continuously learns from historical outcomes.
+
+## 14. Operational Safety
+
+Recommendations may be suspended when: exchange instability, abnormal market volatility, severe model degradation, insufficient data quality, corrupted feature generation, infrastructure instability. Safety overrides prediction frequency.
+
+## 15. Human Oversight
+
+The platform always exposes: recommendation reasoning, supporting evidence, confidence, expected value, risk assessment. Users remain responsible for final trading decisions. The system assists. It does not decide.
+
+## 16. Explainability
+
+Every recommendation includes: Why the recommendation exists, why alternatives were rejected, major contributing factors, dominant risk factors, recommendation expiration reason, confidence explanation. No recommendation should appear as an unexplained black box.
+
+## 17. Governance Alerts
+
+The platform generates alerts for: Model degradation, confidence collapse, feature drift, market drift, pipeline instability, prediction anomalies, repeated recommendation failures, risk threshold violations. Governance alerts never trigger trades.
+
+## 18. Auditability
+
+Every important AI decision is permanently recorded: Prediction generated, recommendation published, recommendation rejected, recommendation expired, model replaced, confidence recalibrated, governance intervention. Historical audits must always be possible.
+
+## 19. Continuous Improvement
+
+Platform improvement follows evidence: Observation → Measurement → Analysis → Validation → Controlled Improvement → Deployment. No modification is based solely on intuition.
+
+## 20. Architectural Rules
+
+Rule 1 — Every prediction is measurable.
+Rule 2 — Every recommendation is explainable.
+Rule 3 — Every model is versioned.
+Rule 4 — Every prediction is traceable.
+Rule 5 — Every recommendation expires.
+Rule 6 — Confidence must be calibrated continuously.
+Rule 7 — Market drift must be monitored.
+Rule 8 — Model drift must be monitored.
+Rule 9 — Performance determines trust.
+Rule 10 — No AI model receives permanent authority.
+
+## 21. Chapter Summary
+
+AlphaSpot Quant governs its AI as carefully as it governs its trading recommendations. Models are versioned. Predictions are traceable. Confidence is continuously calibrated. Market drift is monitored. Recommendation quality is continuously measured. The platform continuously evaluates itself, allowing trust to be earned through measurable performance rather than assumed indefinitely.
+
+END OF CHAPTER 2.5
