@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// AlphaSpot trading AI models
+
+model Trade {
+  id            String   @id @default(cuid())
+  symbol        String   // e.g. BTC/USDT
+  side          String   // BUY | SELL
+  kind          String   // INITIAL | RECOVERY | TAKE_PROFIT | EMERGENCY_EXIT
+  price         Float
+  quantity      Float
+  quoteValue    Float    // price * quantity (USDT notional)
+  avgEntryPrice Float?   // weighted average entry after this trade
+  positionQty   Float?   // total position quantity after this trade
+  state         String   // FLAT | IN_TRADE | RECOVERY_MODE
+  realizedPnl   Float?   // realized profit/loss in USDT (only on SELL)
+  score         Int      // confluence score at the time of trade
+  reason        String   // human/LLM-readable reason
+  createdAt     DateTime @default(now())
+
+  @@index([symbol, createdAt])
+  @@index([createdAt])
+}
+
+model Signal {
+  id            String   @id @default(cuid())
+  symbol        String
+  score         Int      // -100 to +100
+  label         String   // STRONG_BUY | BUY | HOLD | SELL | STRONG_SELL | RECOVERY_BUY | TAKE_PROFIT
+  state         String   // FLAT | IN_TRADE | RECOVERY_MODE
+  price         Float
+  indicatorsJson String  // JSON blob of all indicator values
+  patternsJson  String   // JSON blob of detected patterns
+  sentiment     Float?   // -1 to 1
+  fearGreed     Int?     // 0 to 100
+  createdAt     DateTime @default(now())
+
+  @@index([symbol, createdAt])
+  @@index([createdAt])
+}
+
+model ReasoningLog {
+  id        String   @id @default(cuid())
+  symbol    String
+  source    String   // ENGINE | LLM | SYSTEM
+  level     String   // INFO | WARN | SIGNAL | TRADE | ERROR
+  message   String
+  createdAt DateTime @default(now())
+
+  @@index([symbol, createdAt])
+  @@index([createdAt])
+}
+
+model EngineConfig {
+  id                String  @id @default("singleton")
+  allocatedCapital  Float   @default(10000) // total USDT allocated to this engine
+  initialPct        Float   @default(0.20)  // 20% for initial entry
+  recoveryPct       Float   @default(0.30)  // 30% for recovery buy
+  dropThresholdPct  Float   @default(2.0)   // % drop to trigger recovery
+  takeProfitPct     Float   @default(1.0)   // % profit to take profit (1%)
+  strongBuyScore    Int     @default(75)
+  strongSellScore   Int     @default(-75)
+  enabled           Boolean @default(true)
+}
