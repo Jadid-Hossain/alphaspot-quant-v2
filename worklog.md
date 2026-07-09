@@ -88,3 +88,40 @@ Stage Summary:
 - Price is now real-time: instant priceTick broadcasts on every kline update, matching Binance's live price within sub-second.
 - Architecture scales: chunked WS (7 connections), round-robin eval queue, per-row React subscriptions, LLM rate limiting.
 - Adding new Binance listings requires zero code changes — the engine discovers them automatically at boot.
+
+---
+Task ID: MDS-CH1
+Agent: main (Z.ai Code)
+Task: Chapter 1 of the Master Design Specification — Vision, Design Philosophy & System Architecture. Establish the V2 architectural foundation.
+
+Work Log:
+- Created `full_prompt.md` and appended Chapter 1 verbatim (the MDS accumulator file — all future chapters append to it in sequence).
+- Analyzed Chapter 1: it is a vision/architecture chapter mandating (1) multi-lane processing, (2) a 10-stage recommendation pipeline no module may bypass, (3) immutable Market Snapshots, (4) Trade Candidate lifecycle with expiration, (5) structural validation as a hard gate, (6) ranking not isolated evaluation, (7) 8 design principles.
+- Built the V2 type system (`src/lib/alphaspot/v2/types.ts`): Asset, AssetMeta, MarketRegime, MarketContext, StructuralConstraints (+ DEFAULT_CONSTRAINTS), AssetEligibility, EngineeredFeatures, StatisticalMetrics, ExpectedValue (+ components), RiskMetrics, TradeCandidate (+ stage/action enums), Recommendation (+ rank enum), MarketSnapshot, PortfolioAnalysis, PipelineStageResult, PipelineContext, Lane A/B/C contracts, PIPELINE_VERSION, PIPELINE_STAGES, DEFAULT_RECOMMENDATION_TTL_MS, RANK_THRESHOLDS.
+- Built the 3 lanes (Chapter 1 §8):
+  • Lane A (`lanes/lane-a-realtime.ts`): registry/provider pattern — thin read-only adapter over the existing engine's in-memory state. Exposes getPrice/getOrderBook/getFunding/get24hStats/getCandles/subscribe. No analytical work.
+  • Lane B (`lanes/lane-b-analytical.ts`): orchestrator that runs the full 10-stage pipeline on demand and publishes immutable Market Snapshots. Keeps a 100-snapshot history. Subscribers notified on each publication.
+  • Lane C (`lanes/lane-c-research.ts`): research/validation scaffold (backtest, validatePrediction, getPerformanceMetrics) as stubs — later MDS chapters will implement. Runs independently, never blocks production.
+- Built the 10-stage recommendation pipeline (Chapter 1 §6, §11):
+  1. Market Observation — reads from Lane A
+  2. Structural Validation (`structural-validation.ts`) — FULLY IMPLEMENTED: checks minHistoryBars (200), minQuoteVolume24h ($1M), valid price, 4h history depth. Returns AssetEligibility with failedChecks. Hard gate — no ML runs on failed assets.
+  3. Feature Engineering (`feature-engineering.ts`) — wraps V1 indicators/patterns + derives momentumScore, volatilityScore, trendAlignment, liquidityScore.
+  4. Market Context (`market-context.ts`) — classifies regime (TRENDING_UP/DOWN, RANGING, HIGH/LOW_VOLATILITY, TRANSITIONAL), confidence, volatility, liquidity, spread, market structure, relative strength.
+  5. Statistical Evaluation (`statistical-evaluation.ts`) — synthesizes 6 evidence sources (RSI, MACD, trend, regime, relative strength, patterns) into probabilityOfSuccess, expectedReturnPct, expectedDrawdownPct, confidence, edgeScore, sampleQuality. Principle 3: no single-indicator recommendations.
+  6. Expected Value (`expected-value.ts`) — synthesizes 7 EV components (statistical edge, return−drawdown, regime alignment, relative strength, trend alignment, liquidity, confidence penalty) into a unified signed EV.
+  7. Candidate Generator (`candidate-generator.ts`) — creates TradeCandidate objects with action (BUY/SELL/WATCH/HOLD), risk metrics (ATR-based stop/target, Kelly sizing, VaR), rationale (explainable), expiration (15min TTL). Principle 1: never recommend in HIGH_VOLATILITY. Principle 2: WATCH for moderate EV.
+  8. Portfolio Optimizer (`portfolio-optimizer.ts`) — ranks candidates by EV, caps at 8 concurrent BUY candidates, caps total capital at 60%, downgrades losers to WATCH. Principle 4: assets compete.
+  9. Recommendation Validator (`recommendation-validator.ts`) — enforces Rule 1 (pipeline order), Rule 3 (explainable), Rule 4 (measurable, ≥3 evidence), Rule 5 (expires), Principle 1 (risk ≤5%), R/R ≥1.0. Rejects or publishes.
+  10. Ranking Engine (`ranking-engine.ts`) — ranks all eligible assets by EV then edge score, assigns tier A/B/C/D based on RANK_THRESHOLDS.
+  11. Snapshot Generator (`snapshot-generator.ts`) — publishes an immutable (deep-frozen) MarketSnapshot with portfolio analysis, stage timings, monotonic version counter. Rule 2: reproducible.
+- Created barrel export (`src/lib/alphaspot/v2/index.ts`) for clean imports.
+- Lint passes cleanly. Both services (Next.js + engine) still running — V2 is purely additive, V1 untouched.
+
+Stage Summary:
+- V2 architectural foundation complete per Chapter 1. Every concept mandated by the chapter now has a concrete module + typed interface.
+- The 10-stage pipeline is wired together in Lane B with correct sequencing (Rule 1: no bypassing).
+- Structural validation is fully implemented as a hard gate (Chapter 1 §7-A).
+- Market Snapshots are immutable + deep-frozen + versioned (Chapter 1 §9, Rule 2).
+- Trade Candidates carry asset, metrics, EV, risk, rationale, expiration, version (Chapter 1 §10).
+- Recommendations expire (Principle 7, Rule 5) and are tiered A/B/C/D.
+- Later MDS chapters will: (a) wire Lane A to the real engine via registerLaneAProvider, (b) specify exact regime/probability algorithms, (c) build the research/backtest lane, (d) replace the V1 dashboard with a snapshot-driven V2 dashboard.
