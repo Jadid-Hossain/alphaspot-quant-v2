@@ -1,52 +1,118 @@
 // AlphaSpot Data Ingestion Engine — Binance public API + WebSocket
-// 100% free: no auth, no paid APIs. Streams real-time OHLCV for the full
-// SUPPORTED_SYMBOLS watchlist on 15m / 1h / 4h, plus order book depth,
-// futures funding rates, and open interest.
+// 100% free: no auth, no paid APIs. Dynamically discovers ALL tradeable USDT
+// spot pairs from Binance's exchangeInfo API and streams real-time OHLCV
+// for every coin on 15m / 1h / 4h, plus order book depth, futures funding
+// rates, and the market-wide miniTicker array for instant price updates.
 
 import WebSocket from 'ws'
-import { SUPPORTED_SYMBOLS, type Candle, type Timeframe, type Symbol, type OrderBookImbalance, type FundingData } from '../../src/lib/alphaspot/types'
+import type { Candle, Timeframe, Symbol, OrderBookImbalance, FundingData } from '../../src/lib/alphaspot/types'
 
 const REST = 'https://api.binance.com'
 const FAPI = 'https://fapi.binance.com'
 const WS_BASE = 'wss://stream.binance.com:9443/stream'
 
-export const SYMBOLS: Symbol[] = SUPPORTED_SYMBOLS
 export const TIMEFRAMES: Timeframe[] = ['15m', '1h', '4h']
+
+// Max streams per combined WS connection. Binance allows up to 1024 streams
+// per connection, but the URL length is the practical limit (~8KB). We chunk
+// at 200 to stay safely under the limit and allow independent reconnection.
+const MAX_STREAMS_PER_CONN = 200
 
 export const toBinanceSymbol = (s: Symbol): string => s.replace('/', '').toUpperCase()
 export const toBinanceLower = (s: Symbol): string => s.replace('/', '').toLowerCase()
 
-// Build a lookup from Binance's lowercase stream prefix (e.g. "btcusdt") back
-// to our canonical pair string ("BTC/USDT"). Built once from SUPPORTED_SYMBOLS.
-const STREAM_TO_SYMBOL: Record<string, Symbol> = {}
-for (const s of SUPPORTED_SYMBOLS) STREAM_TO_SYMBOL[toBinanceLower(s)] = s
+// Stablecoins and fiat tokens to exclude as BASE assets (boring ~$1 pairs).
+const STABLE_BASES = new Set([
+  'USDC', 'BUSD', 'TUSD', 'FDUSD', 'USDP', 'DAI', 'EURS', 'USDD', 'PAXG',
+  'SUSD', 'GUSD', 'USDS', 'USDT', 'USD1', 'BFUSD', 'XUSD',
+])
 
-const TF_TO_MS: Record<Timeframe, number> = {
-  '15m': 15 * 60 * 1000,
-  '1h': 60 * 60 * 1000,
-  '4h': 4 * 60 * 60 * 1000,
+export interface SymbolInfo {
+  symbol: Symbol        // "BTC/USDT"
+  binanceSymbol: string // "BTCUSDT"
+  base: string          // "BTC"
+  quote: string         // "USDT"
 }
 
-export interface KlinePayload {
-  stream: string
-  data: {
-    e: string
-    E: number
-    s: string
-    k: {
-      t: number
-      T: number
-      s: string
-      i: string
-      o: string
-      h: string
-      l: string
-      c: string
-      v: string
-      x: boolean
-      q: string
-    }
+/**
+ * Fetch ALL tradeable USDT spot pairs from Binance's exchangeInfo API.
+ * Filters out leveraged tokens (UP/DOWN/BULL/BEAR) and stablecoin-base pairs.
+ */
+export async function fetchAllSpotSymbols(): Promise<SymbolInfo[]> {
+  const res = await fetch(`${REST}/api/v3/exchangeInfo`)
+  if (!res.ok) throw new Error(`exchangeInfo: ${res.status}`)
+  const j = (await res.json()) as {
+    symbols: {
+      symbol: string
+      status: string
+      baseAsset: string
+      quoteAsset: string
+      isSpotTradingAllowed: boolean
+      permissions: string[]
+    }[]
   }
+
+  const out: SymbolInfo[] = []
+  for (const s of j.symbols) {
+    if (s.quoteAsset !== 'USDT') continue
+    if (s.status !== 'TRADING') continue
+    if (!s.isSpotTradingAllowed) continue
+    // Skip leveraged tokens (BTCUP, BTCDOWN, ETHBULL, ETHBEAR, etc.)
+    const b = s.baseAsset
+    if (/(UP|DOWN|BULL|BEAR)$/.test(b)) continue
+    // Skip stablecoin-base pairs (USDC/USDT etc.)
+    if (STABLE_BASES.has(b)) continue
+    out.push({
+      symbol: `${b}/USDT`,
+      binanceSymbol: s.symbol,
+      base: b,
+      quote: 'USDT',
+    })
+  }
+  // Sort by base asset name for deterministic ordering
+  out.sort((a, b) => a.base.localeCompare(b.base))
+  return out
+}
+
+export interface Ticker24h {
+  symbol: Symbol
+  changePct: number
+  volume: number
+  quoteVolume: number
+  lastPrice: number
+}
+
+/**
+ * Fetch 24h ticker stats for ALL symbols in a single REST call (weight 80).
+ * Used to seed the initial volume ranking and price/change data.
+ */
+export async function fetchAll24hTickers(): Promise<Map<Symbol, Ticker24h>> {
+  const res = await fetch(`${REST}/api/v3/ticker/24hr`)
+  if (!res.ok) throw new Error(`ticker24hr: ${res.status}`)
+  const j = (await res.json()) as {
+    symbol: string
+    priceChangePercent: string
+    volume: string
+    quoteVolume: string
+    lastPrice: string
+  }[]
+  const map = new Map<Symbol, Ticker24h>()
+  for (const t of j) {
+    // Only keep USDT pairs; reconstruct canonical "BASE/USDT" form
+    if (!t.symbol.endsWith('USDT')) continue
+    const base = t.symbol.slice(0, -4)
+    if (STABLE_BASES.has(base)) continue
+    if (/(UP|DOWN|BULL|BEAR)$/.test(base)) continue
+    const sym = `${base}/USDT` as Symbol
+    map.set(sym, {
+      symbol: sym,
+      changePct: Number(t.priceChangePercent),
+      volume: Number(t.volume),
+      quoteVolume: Number(t.quoteVolume),
+      lastPrice: Number(t.lastPrice),
+    })
+  }
+  return map
 }
 
 /** Fetch historical klines to seed the indicator buffers */
@@ -64,19 +130,6 @@ export async function fetchHistoricalKlines(symbol: Symbol, interval: Timeframe,
     close: Number(r[4]),
     volume: Number(r[5]),
   }))
-}
-
-/** Fetch 24h ticker stats */
-export async function fetch24hTicker(symbol: Symbol): Promise<{ changePct: number; volume: number; lastPrice: number }> {
-  const s = toBinanceSymbol(symbol)
-  const res = await fetch(`${REST}/api/v3/ticker/24hr?symbol=${s}`)
-  if (!res.ok) throw new Error(`ticker ${symbol}: ${res.status}`)
-  const j = (await res.json()) as { priceChangePercent: string; volume: string; lastPrice: string }
-  return {
-    changePct: Number(j.priceChangePercent),
-    volume: Number(j.volume),
-    lastPrice: Number(j.lastPrice),
-  }
 }
 
 /** Fetch order book depth and compute bid/ask volume imbalance */
@@ -105,7 +158,7 @@ export async function fetchFundingData(symbol: Symbol): Promise<FundingData> {
       nextFundingMs = j.nextFundingTime
     }
   } catch {
-    /* ignore */
+    /* ignore — not all spot symbols have futures */
   }
   try {
     const r2 = await fetch(`${FAPI}/fapi/v1/openInterest?symbol=${s}`)
@@ -127,9 +180,58 @@ export async function fetchFearGreed(): Promise<{ value: number; label: string }
   return { value: Number(j.data[0].value), label: j.data[0].value_classification }
 }
 
+export interface KlinePayload {
+  stream: string
+  data: {
+    e: string
+    E: number
+    s: string
+    k: {
+      t: number
+      T: number
+      s: string
+      i: string
+      o: string
+      h: string
+      l: string
+      c: string
+      v: string
+      x: boolean
+      q: string
+    }
+  }
+}
+
+export interface MiniTickerPayload {
+  stream: string
+  data:
+    | Array<{
+        e: string
+        s: string
+        c: string // close (last price)
+        o: string // open
+        h: string
+        l: string
+        v: string // volume
+        q: string // quote volume
+      }>
+    | {
+        e: string
+        s: string
+        c: string
+        o: string
+        h: string
+        l: string
+        v: string
+        q: string
+      }
+}
+
 /**
  * Connect to Binance's combined kline WebSocket for all symbols + timeframes.
- * Calls onKline for every update. Auto-reconnects with backoff.
+ * Automatically chunks into multiple connections (MAX_STREAMS_PER_CONN each)
+ * to stay under URL length limits. Calls onKline for every update.
+ * Returns a cleanup function that closes all connections.
  */
 export function connectKlineStream(
   symbols: Symbol[],
@@ -137,15 +239,97 @@ export function connectKlineStream(
   onKline: (symbol: Symbol, tf: Timeframe, candle: Candle, isFinal: boolean) => void,
   onStatus?: (connected: boolean) => void,
 ): () => void {
-  const streams: string[] = []
+  // Build the full list of stream names
+  const allStreams: string[] = []
   for (const s of symbols) {
     const sl = toBinanceLower(s)
     for (const tf of timeframes) {
-      streams.push(`${sl}@kline_${tf}`)
+      allStreams.push(`${sl}@kline_${tf}`)
     }
   }
-  const url = `${WS_BASE}?streams=${streams.join('/')}`
 
+  // Chunk into groups
+  const chunks: string[][] = []
+  for (let i = 0; i < allStreams.length; i += MAX_STREAMS_PER_CONN) {
+    chunks.push(allStreams.slice(i, i + MAX_STREAMS_PER_CONN))
+  }
+
+  console.log(`[binance] kline WS: ${allStreams.length} streams across ${chunks.length} connection(s)`)
+
+  const cleanups: (() => void)[] = []
+  let connectedCount = 0
+
+  for (const chunk of chunks) {
+    const url = `${WS_BASE}?streams=${chunk.join('/')}`
+    let ws: WebSocket | null = null
+    let closedByUser = false
+    let reconnectDelay = 1000
+
+    const connect = () => {
+      ws = new WebSocket(url)
+      ws.on('open', () => {
+        reconnectDelay = 1000
+        connectedCount++
+        onStatus?.(connectedCount > 0)
+        console.log(`[binance] WS chunk connected (${chunk.length} streams, ${connectedCount}/${chunks.length} chunks up)`)
+      })
+      ws.on('message', (raw) => {
+        try {
+          const msg = JSON.parse(raw.toString()) as KlinePayload
+          const parts = msg.stream.split('@kline_')
+          const symLow = parts[0]
+          const tf = parts[1] as Timeframe
+          if (!tf) return
+          // Reconstruct canonical symbol: "btcusdt" -> "BTC/USDT"
+          const base = symLow.replace(/usdt$/, '').toUpperCase()
+          const symbol = `${base}/USDT` as Symbol
+          const k = msg.data.k
+          const candle: Candle = {
+            time: Math.floor(k.t / 1000),
+            open: Number(k.o),
+            high: Number(k.h),
+            low: Number(k.l),
+            close: Number(k.c),
+            volume: Number(k.v),
+          }
+          onKline(symbol, tf, candle, k.x)
+        } catch (e) {
+          console.error('[binance] kline parse error', e)
+        }
+      })
+      ws.on('error', (err) => {
+        console.error('[binance] WS error', err.message)
+      })
+      ws.on('close', () => {
+        connectedCount = Math.max(0, connectedCount - 1)
+        if (connectedCount === 0) onStatus?.(false)
+        if (closedByUser) return
+        console.log(`[binance] WS chunk closed, reconnecting in ${reconnectDelay}ms`)
+        setTimeout(connect, reconnectDelay)
+        reconnectDelay = Math.min(reconnectDelay * 2, 15000)
+      })
+    }
+
+    connect()
+    cleanups.push(() => {
+      closedByUser = true
+      ws?.close()
+    })
+  }
+
+  return () => cleanups.forEach((fn) => fn())
+}
+
+/**
+ * Connect to Binance's `!miniTicker@arr` stream — a single stream that pushes
+ * an array of mini-tickers for ALL symbols every ~1 second. Extremely efficient
+ * for updating 24h change % and volume across hundreds of coins with one socket.
+ */
+export function connectMiniTickerStream(
+  onTickers: (tickers: Map<Symbol, { price: number; changePct: number; volume: number }>) => void,
+  onStatus?: (connected: boolean) => void,
+): () => void {
+  const url = `${WS_BASE}?streams=!miniTicker@arr`
   let ws: WebSocket | null = null
   let closedByUser = false
   let reconnectDelay = 1000
@@ -155,49 +339,53 @@ export function connectKlineStream(
     ws.on('open', () => {
       reconnectDelay = 1000
       onStatus?.(true)
-      console.log(`[binance] WS connected (${streams.length} streams)`)
+      console.log('[binance] miniTicker WS connected')
     })
     ws.on('message', (raw) => {
       try {
-        const msg = JSON.parse(raw.toString()) as KlinePayload
-        // stream format: "btcusdt@kline_15m" -> ["btcusdt", "15m"]
-        const parts = msg.stream.split('@kline_')
-        const symLow = parts[0]
-        const tf = parts[1] as Timeframe
-        const symbol = STREAM_TO_SYMBOL[symLow]
-        if (!symbol || !tf) return
-        const k = msg.data.k
-        const candle: Candle = {
-          time: Math.floor(k.t / 1000),
-          open: Number(k.o),
-          high: Number(k.h),
-          low: Number(k.l),
-          close: Number(k.c),
-          volume: Number(k.v),
+        const msg = JSON.parse(raw.toString()) as MiniTickerPayload
+        const arr = Array.isArray(msg.data) ? msg.data : [msg.data]
+        const map = new Map<Symbol, { price: number; changePct: number; volume: number }>()
+        for (const t of arr) {
+          if (!t.s || !t.s.endsWith('USDT')) continue
+          const base = t.s.slice(0, -4)
+          if (STABLE_BASES.has(base) || /(UP|DOWN|BULL|BEAR)$/.test(base)) continue
+          const sym = `${base}/USDT` as Symbol
+          const close = Number(t.c)
+          const open = Number(t.o)
+          map.set(sym, {
+            price: close,
+            changePct: open > 0 ? ((close - open) / open) * 100 : 0,
+            volume: Number(t.v),
+          })
         }
-        onKline(symbol, tf, candle, k.x)
+        if (map.size > 0) onTickers(map)
       } catch (e) {
-        console.error('[binance] parse error', e)
+        console.error('[binance] miniTicker parse error', e)
       }
     })
     ws.on('error', (err) => {
-      console.error('[binance] WS error', err.message)
+      console.error('[binance] miniTicker WS error', err.message)
     })
     ws.on('close', () => {
       onStatus?.(false)
       if (closedByUser) return
-      console.log(`[binance] WS closed, reconnecting in ${reconnectDelay}ms`)
+      console.log(`[binance] miniTicker WS closed, reconnecting in ${reconnectDelay}ms`)
       setTimeout(connect, reconnectDelay)
       reconnectDelay = Math.min(reconnectDelay * 2, 15000)
     })
   }
 
   connect()
-
   return () => {
     closedByUser = true
     ws?.close()
   }
 }
 
+const TF_TO_MS: Record<Timeframe, number> = {
+  '15m': 15 * 60 * 1000,
+  '1h': 60 * 60 * 1000,
+  '4h': 4 * 60 * 60 * 1000,
+}
 export { TF_TO_MS }

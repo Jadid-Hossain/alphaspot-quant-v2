@@ -6,13 +6,15 @@ import { cn } from '@/lib/utils'
 import { TrendingDown, TrendingUp, Gauge, BarChart3 } from 'lucide-react'
 
 export function TickerStrip() {
-  const { selectedSymbol, snapshots, lastPriceFlash } = useAlphaSpot()
-  const snap = snapshots[selectedSymbol]
-  const flash = lastPriceFlash[selectedSymbol]
+  const selectedSymbol = useAlphaSpot((s) => s.selectedSymbol)
+  const snap = useAlphaSpot((s) => s.snapshots[s.selectedSymbol])
+  const live = useAlphaSpot((s) => s.livePrices[s.selectedSymbol])
+  const flash = useAlphaSpot((s) => s.lastPriceFlash[s.selectedSymbol])
 
-  const price = snap?.price ?? null
-  const change = snap?.change24hPct ?? null
-  const volume = snap?.volume24h ?? null
+  // Prefer live price (instant priceTick updates) over snapshot price
+  const price = live?.price ?? snap?.price ?? null
+  const change = live?.change24hPct ?? snap?.change24hPct ?? null
+  const volume = live?.volume24h ?? snap?.volume24h ?? null
   const fg = snap?.sentiment.fearGreed ?? null
   const fgLabel = snap?.sentiment.fearGreedLabel ?? null
 

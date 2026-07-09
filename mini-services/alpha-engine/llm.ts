@@ -2,6 +2,10 @@
 // Uses z-ai-web-dev-sdk to generate natural-language explanations of the
 // engine's decisions and periodic market commentary. Runs entirely in the
 // backend (mini-service) — never on the client.
+//
+// Rate limiting: with 400+ coins, many trade decisions can fire simultaneously.
+// We enforce a minimum interval between LLM calls and drop calls when the
+// queue is full (the engine's deterministic reason is already logged).
 
 import ZAI from 'z-ai-web-dev-sdk'
 import type { SymbolSnapshot, Position, ConfluenceResult } from '../../src/lib/alphaspot/types'
@@ -10,6 +14,28 @@ let zaiPromise: Promise<ZAI> | null = null
 function getZAI(): Promise<ZAI> {
   if (!zaiPromise) zaiPromise = ZAI.create()
   return zaiPromise
+}
+
+// Simple rate limiter: at most 1 LLM call every 5 seconds. With 400+ coins
+// generating trade signals, we must strictly throttle to avoid 429 errors.
+// Calls that can't be served are dropped (the engine reason is already logged).
+const LLM_MIN_INTERVAL_MS = 5000
+let llmBusy = false
+let lastLlmAt = 0
+
+function canCallLlm(): boolean {
+  if (llmBusy) return false
+  if (Date.now() - lastLlmAt < LLM_MIN_INTERVAL_MS) return false
+  return true
+}
+
+function llmStart() {
+  llmBusy = true
+  lastLlmAt = Date.now()
+}
+
+function llmDone() {
+  llmBusy = false
 }
 
 interface DecisionContext {
@@ -54,6 +80,8 @@ Engine note: ${ctx.reasoning}
 Reply with only the 1-2 sentence analyst-style explanation. Be specific, mention the key signals. No preamble.`
 
   try {
+    if (!canCallLlm()) return ctx.reasoning // rate-limited — use engine reason
+    llmStart()
     const zai = await getZAI()
     const completion = await zai.chat.completions.create({
       messages: [
@@ -67,6 +95,8 @@ Reply with only the 1-2 sentence analyst-style explanation. Be specific, mention
   } catch (e) {
     console.error('[llm] explainDecision failed:', e)
     return ctx.reasoning
+  } finally {
+    llmDone()
   }
 }
 
@@ -108,6 +138,8 @@ SENTIMENT: -0.15
 Now write the commentary for the current data:`
 
   try {
+    if (!canCallLlm()) return { commentary: '', sentiment: 0 }
+    llmStart()
     const zai = await getZAI()
     const completion = await zai.chat.completions.create({
       messages: [
@@ -124,5 +156,7 @@ Now write the commentary for the current data:`
   } catch (e) {
     console.error('[llm] marketCommentary failed:', e)
     return { commentary: '', sentiment: 0 }
+  } finally {
+    llmDone()
   }
 }

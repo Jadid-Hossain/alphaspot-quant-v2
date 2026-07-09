@@ -1,16 +1,15 @@
 'use client'
 
-import { memo } from 'react'
-import { useAlphaSpot, SYMBOLS } from '@/hooks/use-alpha-spot'
+import { memo, useState, useMemo } from 'react'
+import { useAlphaSpot } from '@/hooks/use-alpha-spot'
 import { fmtPrice, fmtPct, SIGNAL_META } from './format'
 import { cn } from '@/lib/utils'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { ListFilter, Search } from 'lucide-react'
-import { useState, useMemo } from 'react'
+import type { SymbolSnapshot } from '@/lib/alphaspot/types'
 
 /** A colored dot indicating the AI signal for a symbol. */
-function SignalDot({ label, score }: { label: string; score: number }) {
-  const meta = SIGNAL_META[label] ?? SIGNAL_META.HOLD
+function SignalDot({ label }: { label: string }) {
   const dotColor =
     label === 'STRONG_BUY' || label === 'TAKE_PROFIT'
       ? 'bg-emerald-400'
@@ -25,7 +24,6 @@ function SignalDot({ label, score }: { label: string; score: number }) {
               : 'bg-zinc-600'
   return (
     <span
-      title={`${meta.label} (${score > 0 ? '+' : ''}${score})`}
       className={cn('inline-block h-1.5 w-1.5 shrink-0 rounded-full', dotColor, (label === 'STRONG_BUY' || label === 'STRONG_SELL') && 'animate-pulse-ring')}
     />
   )
@@ -33,37 +31,55 @@ function SignalDot({ label, score }: { label: string; score: number }) {
 
 interface RowProps {
   sym: string
-  base: string
-  price: number | null
-  change: number | null
-  label: string
-  score: number
-  state: string
   selected: boolean
-  onClick: () => void
+  onSelect: () => void
 }
 
-const WatchlistRow = memo(function WatchlistRow({ sym, base, price, change, label, score, state, selected, onClick }: RowProps) {
+/**
+ * Each row subscribes to ONLY its own snapshot + live price via Zustand
+ * selectors. This means when BTC's price updates, only the BTC row re-renders
+ * — not all 350+ rows. This is the key optimization for a large watchlist.
+ */
+const WatchlistRow = memo(function WatchlistRow({ sym, selected, onSelect }: RowProps) {
+  const base = sym.split('/')[0]
+  // Per-row subscriptions: only this row re-renders when THIS symbol's data changes
+  const snap = useAlphaSpot((s) => s.snapshots[sym])
+  const live = useAlphaSpot((s) => s.livePrices[sym])
+  const flash = useAlphaSpot((s) => s.lastPriceFlash[sym])
+
+  // Prefer live price (instant) over snapshot price (periodic)
+  const price = live?.price ?? snap?.price ?? null
+  const change = live?.change24hPct ?? snap?.change24hPct ?? null
+  const label = snap?.confluence.label ?? 'HOLD'
+  const state = snap?.position.state ?? 'FLAT'
   const inPos = state !== 'FLAT'
+
   return (
     <button
-      onClick={onClick}
+      onClick={onSelect}
       className={cn(
-        'flex w-full items-center gap-2 border-l-2 px-3 py-2 text-left transition-colors',
+        'flex w-full items-center gap-2 border-l-2 px-3 py-1.5 text-left transition-colors',
         selected ? 'border-emerald-500 bg-zinc-800/70' : 'border-transparent hover:bg-zinc-900/60',
+        flash === 'up' && 'flash-green',
+        flash === 'down' && 'flash-red',
       )}
     >
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
           <span className="text-xs font-bold text-zinc-200">{base}</span>
-          <SignalDot label={label} score={score} />
+          <SignalDot label={label} />
           {inPos && (
             <span className="rounded bg-emerald-500/15 px-1 py-0.5 text-[8px] font-bold uppercase text-emerald-400">
               {state === 'RECOVERY_MODE' ? 'R' : 'IN'}
             </span>
           )}
         </div>
-        <div className="font-mono text-[10px] tabular-nums text-zinc-500">
+        <div
+          className={cn(
+            'font-mono text-[10px] tabular-nums',
+            flash === 'up' ? 'text-emerald-400' : flash === 'down' ? 'text-rose-400' : 'text-zinc-500',
+          )}
+        >
           {price != null ? `$${fmtPrice(price, price < 10 ? 4 : 2)}` : '—'}
         </div>
       </div>
@@ -80,46 +96,40 @@ const WatchlistRow = memo(function WatchlistRow({ sym, base, price, change, labe
 })
 
 interface WatchlistProps {
-  /** When inside a Sheet (mobile), render without the ScrollArea wrapper. */
   inSheet?: boolean
   onPick?: () => void
 }
 
 export function Watchlist({ inSheet, onPick }: WatchlistProps) {
-  const { snapshots, selectedSymbol, setSelectedSymbol } = useAlphaSpot()
+  const symbols = useAlphaSpot((s) => s.symbols)
+  const selectedSymbol = useAlphaSpot((s) => s.selectedSymbol)
+  const setSelectedSymbol = useAlphaSpot((s) => s.setSelectedSymbol)
   const [query, setQuery] = useState('')
 
   const filtered = useMemo(() => {
-    if (!query.trim()) return SYMBOLS
+    if (!query.trim()) return symbols
     const q = query.toLowerCase()
-    return SYMBOLS.filter((s) => s.toLowerCase().includes(q) || s.split('/')[0].toLowerCase().includes(q))
-  }, [query])
+    return symbols.filter((s) => s.toLowerCase().includes(q) || s.split('/')[0].toLowerCase().includes(q))
+  }, [symbols, query])
 
   const list = (
     <div className="flex-1 overflow-y-auto scrollbar-thin">
       {filtered.length === 0 ? (
-        <div className="px-3 py-6 text-center text-xs text-zinc-600">No coins match &ldquo;{query}&rdquo;</div>
+        <div className="px-3 py-6 text-center text-xs text-zinc-600">
+          {symbols.length === 0 ? 'Loading coins…' : `No coins match “${query}”`}
+        </div>
       ) : (
-        filtered.map((sym) => {
-          const snap = snapshots[sym]
-          return (
-            <WatchlistRow
-              key={sym}
-              sym={sym}
-              base={sym.split('/')[0]}
-              price={snap?.price ?? null}
-              change={snap?.change24hPct ?? null}
-              label={snap?.confluence.label ?? 'HOLD'}
-              score={snap?.confluence.score ?? 0}
-              state={snap?.position.state ?? 'FLAT'}
-              selected={sym === selectedSymbol}
-              onClick={() => {
-                setSelectedSymbol(sym)
-                onPick?.()
-              }}
-            />
-          )
-        })
+        filtered.map((sym) => (
+          <WatchlistRow
+            key={sym}
+            sym={sym}
+            selected={sym === selectedSymbol}
+            onSelect={() => {
+              setSelectedSymbol(sym)
+              onPick?.()
+            }}
+          />
+        ))
       )}
     </div>
   )
@@ -133,7 +143,7 @@ export function Watchlist({ inSheet, onPick }: WatchlistProps) {
             Watchlist
           </span>
           <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] font-bold text-zinc-400">
-            {SYMBOLS.length}
+            {symbols.length}
           </span>
         </div>
       </div>

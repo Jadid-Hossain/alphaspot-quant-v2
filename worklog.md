@@ -64,3 +64,27 @@ Stage Summary:
 - All 5 blueprint modules (ingestion, confluence, risk, backend, frontend) now operate across 24 coins simultaneously.
 - Performance optimized with memoized watchlist rows; no jank with 24 coins streaming at ~12 snapshots/sec.
 - Adding more coins in the future only requires editing the SUPPORTED_SYMBOLS array — everything else is dynamic.
+
+---
+Task ID: ALL-COINS + PRICE-FIX
+Agent: main (Z.ai Code)
+Task: (1) Add ALL tradeable Binance USDT coins. (2) Fix price not matching Binance/other platforms (lag).
+
+Work Log:
+- PRICE FIX: Root cause was the 2-second evaluation throttle — snapshots (which carry the price) were only broadcast every 2s per coin. Added a new `priceTick` socket event that broadcasts on EVERY kline WebSocket update with zero throttle and zero indicator computation. The frontend merges these instant price ticks into the snapshot, so the displayed price now matches Binance in real-time (verified: AlphaSpot $62,960.01 vs Binance API $62,963.43 — $3 difference = sub-second capture delay).
+- ALL COINS: Added `fetchAllSpotSymbols()` which queries Binance's `/api/v3/exchangeInfo` API and returns ALL tradeable USDT spot pairs (filtered: status=TRADING, isSpotTradingAllowed, excludes leveraged UP/DOWN/BULL/BEAR tokens and stablecoin-base pairs like USDC/USDT). Discovered 441 coins at runtime.
+- Chunked WebSocket: Rewrote `connectKlineStream()` to split 1323 streams (441 coins × 3 timeframes) across 7 independent WS connections (200 streams each) to stay under Binance's URL length limit. Each chunk auto-reconnects independently.
+- miniTicker stream: Added `connectMiniTickerStream()` subscribing to `!miniTicker@arr` — a single stream that pushes 24h change/volume for ALL symbols every 1 second. Replaced the 60s REST ticker polling entirely.
+- Dynamic state: Replaced all hardcoded per-symbol Maps with `Map<Symbol, T>` populated at boot from the exchangeInfo response. The engine now tracks 441 coins dynamically — adding/removing coins requires zero code changes.
+- Round-robin eval: Replaced per-kline-tick evaluation (which would overwhelm the CPU with 441 coins) with a timer-based round-robin queue: evaluates 8 coins every 300ms (~27 coins/sec), cycling through all 441 coins every ~16s. Price ticks still broadcast instantly on every kline update (decoupled from eval).
+- Concurrency-limited seeding: Added `runBatch()` helper that seeds 1323 candle buffers (441 coins × 3 timeframes × 300 candles) with concurrency=15 to respect Binance's REST weight limits. Seeding runs in the background after WS connects, so prices appear immediately and indicators populate progressively.
+- LLM rate limiting: With 400+ coins generating trade signals, added a strict rate limiter (1 LLM call per 5s, max 1 concurrent) to `explainDecision` and `marketCommentary`. Calls that can't be served are dropped gracefully (the engine's deterministic reason is already logged). Eliminated all 429 errors.
+- Volume-sorted watchlist: SYMBOLS sorted by 24h quote volume descending so top coins (BTC, ETH, SOL, XLM, XRP...) are seeded/evaluated first and order-book/funding/commentary (which cover top N) target the most relevant coins.
+- Frontend store: Added `livePrices` map + `priceTick` handler for instant price updates. Watchlist rows now use per-row Zustand selector subscriptions (`useAlphaSpot(s => s.snapshots[sym])`) so only the changed row re-renders — critical for 441 rows.
+- Verified: 441 coins in watchlist, BTC price matches Binance ($62,960 vs $62,963), 54 paper trades executed (+$41.26 PnL), 184 coins with computed signals, zero 429 errors, zero console errors.
+
+Stage Summary:
+- Watchlist expanded from 24 → 441 coins (ALL tradeable Binance USDT spot pairs, discovered dynamically).
+- Price is now real-time: instant priceTick broadcasts on every kline update, matching Binance's live price within sub-second.
+- Architecture scales: chunked WS (7 connections), round-robin eval queue, per-row React subscriptions, LLM rate limiting.
+- Adding new Binance listings requires zero code changes — the engine discovers them automatically at boot.

@@ -14,11 +14,19 @@ import { Watchlist } from './watchlist'
 import { useState } from 'react'
 
 export function Header() {
-  const { connected, engine, selectedSymbol, setSelectedSymbol, startEngine, stopEngine, resetPosition, snapshots } = useAlphaSpot()
+  const connected = useAlphaSpot((s) => s.connected)
+  const engine = useAlphaSpot((s) => s.engine)
+  const selectedSymbol = useAlphaSpot((s) => s.selectedSymbol)
+  const startEngine = useAlphaSpot((s) => s.startEngine)
+  const stopEngine = useAlphaSpot((s) => s.stopEngine)
+  const resetPosition = useAlphaSpot((s) => s.resetPosition)
+  const live = useAlphaSpot((s) => s.livePrices[s.selectedSymbol])
+  const snap = useAlphaSpot((s) => s.snapshots[s.selectedSymbol])
   const enabled = engine?.enabled ?? true
   const [sheetOpen, setSheetOpen] = useState(false)
-  const snap = snapshots[selectedSymbol]
   const base = selectedSymbol.split('/')[0]
+  const price = live?.price ?? snap?.price ?? null
+  const change = live?.change24hPct ?? snap?.change24hPct ?? null
 
   return (
     <header className="sticky top-0 z-40 border-b border-zinc-800/80 bg-zinc-950/90 backdrop-blur supports-[backdrop-filter]:bg-zinc-950/70">
@@ -45,14 +53,14 @@ export function Header() {
             <button className="flex items-center gap-1.5 rounded-md bg-zinc-900 px-2.5 py-1.5 text-xs font-semibold text-zinc-200 ring-1 ring-zinc-800 transition-colors hover:bg-zinc-800 lg:hidden">
               <Coins className="h-3.5 w-3.5 text-emerald-400" />
               <span>{base}</span>
-              {snap && (
+              {change != null && (
                 <span
                   className={cn(
                     'font-mono text-[10px] tabular-nums',
-                    (snap.change24hPct ?? 0) >= 0 ? 'text-emerald-400' : 'text-rose-400',
+                    change >= 0 ? 'text-emerald-400' : 'text-rose-400',
                   )}
                 >
-                  {snap.change24hPct != null ? `${snap.change24hPct >= 0 ? '+' : ''}${snap.change24hPct.toFixed(1)}%` : ''}
+                  {change >= 0 ? '+' : ''}{change.toFixed(1)}%
                 </span>
               )}
             </button>
@@ -70,19 +78,19 @@ export function Header() {
         {/* Selected symbol price (compact, always visible) */}
         <div className="hidden min-w-0 flex-1 items-baseline gap-2 md:flex">
           <span className="text-sm font-bold text-zinc-100">{selectedSymbol}</span>
-          {snap && (
+          {price != null && (
             <span className="font-mono text-sm tabular-nums text-zinc-400">
-              ${snap.price.toLocaleString('en-US', { minimumFractionDigits: snap.price < 10 ? 4 : 2, maximumFractionDigits: snap.price < 10 ? 4 : 2 })}
+              ${price.toLocaleString('en-US', { minimumFractionDigits: price < 10 ? 4 : 2, maximumFractionDigits: price < 10 ? 4 : 2 })}
             </span>
           )}
-          {snap?.change24hPct != null && (
+          {change != null && (
             <span
               className={cn(
                 'font-mono text-xs font-semibold tabular-nums',
-                snap.change24hPct >= 0 ? 'text-emerald-400' : 'text-rose-400',
+                change >= 0 ? 'text-emerald-400' : 'text-rose-400',
               )}
             >
-              {snap.change24hPct >= 0 ? '+' : ''}{snap.change24hPct.toFixed(2)}%
+              {change >= 0 ? '+' : ''}{change.toFixed(2)}%
             </span>
           )}
         </div>

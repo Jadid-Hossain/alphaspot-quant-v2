@@ -1,29 +1,38 @@
 // AlphaSpot Engine — socket.io mini-service on port 3003
-// Ingests Binance data, runs the confluence scorer + risk engine,
-// generates LLM reasoning, persists to Prisma, and broadcasts snapshots.
+// Ingests Binance data for ALL tradeable USDT spot pairs, runs the confluence
+// scorer + risk engine, generates LLM reasoning, persists to Prisma, and
+// broadcasts snapshots + instant price ticks.
+//
+// Architecture:
+//   - Dynamic symbol discovery via exchangeInfo (350+ coins)
+//   - Chunked kline WebSocket connections (200 streams each)
+//   - miniTicker@arr stream for 1-second 24h change/volume updates
+//   - Instant priceTick broadcast on every kline update (no throttle)
+//   - Round-robin evaluation queue for indicator computation (caps CPU)
+//   - Concurrency-limited REST seeding (respects Binance weight limits)
 
 import { createServer } from 'http'
 import { Server } from 'socket.io'
 import { db } from '../../src/lib/db'
 import {
-  SYMBOLS,
   TIMEFRAMES,
+  fetchAllSpotSymbols,
+  fetchAll24hTickers,
   fetchHistoricalKlines,
-  fetch24hTicker,
   fetchOrderBookImbalance,
   fetchFundingData,
   fetchFearGreed,
   connectKlineStream,
+  connectMiniTickerStream,
+  type SymbolInfo,
 } from './binance'
-import { SUPPORTED_SYMBOLS } from '../../src/lib/alphaspot/types'
 import { computeIndicators } from '../../src/lib/alphaspot/indicators'
-import { detectPatterns, summarizePatterns } from '../../src/lib/alphaspot/patterns'
+import { detectPatterns } from '../../src/lib/alphaspot/patterns'
 import { calculateConfluenceScore } from '../../src/lib/alphaspot/confluence'
 import {
   evaluateRisk,
   applyBuy,
   applySell,
-  simulateSell,
   markToMarket,
   emptyPosition,
   type RiskConfig,
@@ -41,17 +50,21 @@ import type {
   Indicators,
   SentimentData,
   Patterns,
+  PriceTick,
 } from '../../src/lib/alphaspot/types'
 
 const PORT = 3003
 const MAX_CANDLES = 300
-const EVAL_THROTTLE_MS = 2000
-const ORDERBOOK_INTERVAL_MS = 10_000
-const FUNDING_INTERVAL_MS = 60_000
+const SEED_CONCURRENCY = 15        // parallel REST calls during seeding
+const EVAL_BATCH_SIZE = 8          // coins evaluated per round-robin tick
+const EVAL_TICK_MS = 300           // round-robin interval → ~27 coins/sec
+const ORDERBOOK_INTERVAL_MS = 30_000
+const FUNDING_INTERVAL_MS = 120_000
 const FNG_INTERVAL_MS = 60 * 60 * 1000
-const COMMENTARY_INTERVAL_MS = 5 * 60 * 1000
+const COMMENTARY_INTERVAL_MS = 10 * 60 * 1000  // less frequent with many coins
+const ENGINE_BROADCAST_MS = 15_000
 
-// ---------- Engine state ----------
+// ---------- Engine config ----------
 const config: RiskConfig = {
   allocatedCapital: 10_000,
   initialPct: 0.20,
@@ -63,30 +76,18 @@ const config: RiskConfig = {
   maxRecoveries: 2,
 }
 
-// Build per-symbol state maps dynamically from the watchlist so adding a
-// new coin only requires editing SUPPORTED_SYMBOLS.
-function buildRecord<T>(fn: (s: Symbol) => T): Record<string, T> {
-  const r: Record<string, T> = {}
-  for (const s of SYMBOLS) r[s] = fn(s)
-  return r
-}
+// ---------- Dynamic state (populated at boot) ----------
+let SYMBOLS: Symbol[] = []
+let SYMBOL_INFOS: SymbolInfo[] = []
 
-const candleBuffers: Record<string, Record<Timeframe, Candle[]>> = buildRecord(() => ({
-  '15m': [],
-  '1h': [],
-  '4h': [],
-}))
-
-const positions: Record<string, Position> = buildRecord((s) => emptyPosition(s))
-
-// last computed 4h indicators (for macro-breakdown detection)
-const prev4hInd: Record<string, Indicators | null> = buildRecord(() => null)
-
-const ticker24h: Record<string, { changePct: number | null; volume: number | null; lastPrice: number | null }> = buildRecord(() => ({ changePct: null, volume: null, lastPrice: null }))
-
-const orderBooks: Record<string, SymbolSnapshot['orderBook']> = buildRecord(() => null)
-
-const funding: Record<string, SymbolSnapshot['funding']> = buildRecord(() => null)
+const candleBuffers = new Map<Symbol, Record<Timeframe, Candle[]>>()
+const positions = new Map<Symbol, Position>()
+const prev4hInd = new Map<Symbol, Indicators | null>()
+const ticker24h = new Map<Symbol, { changePct: number | null; volume: number | null; lastPrice: number | null }>()
+const orderBooks = new Map<Symbol, SymbolSnapshot['orderBook']>()
+const funding = new Map<Symbol, SymbolSnapshot['funding']>()
+const sentimentPerSymbol = new Map<Symbol, { score: number | null; commentary: string | null }>()
+const lastEvalAt = new Map<Symbol, number>()
 
 let sentimentShared: SentimentData = {
   fearGreed: null,
@@ -95,10 +96,6 @@ let sentimentShared: SentimentData = {
   newsHeadlines: [],
 }
 
-// per-symbol sentiment from LLM commentary
-const sentimentPerSymbol: Record<string, { score: number | null; commentary: string | null }> = buildRecord(() => ({ score: null, commentary: null }))
-
-const lastEvalAt: Record<string, number> = buildRecord(() => 0)
 let engineEnabled = true
 
 // ---------- Helpers ----------
@@ -106,8 +103,20 @@ function nowMs() {
   return Date.now()
 }
 
+function initSymbolState(s: Symbol) {
+  candleBuffers.set(s, { '15m': [], '1h': [], '4h': [] })
+  positions.set(s, emptyPosition(s))
+  prev4hInd.set(s, null)
+  ticker24h.set(s, { changePct: null, volume: null, lastPrice: null })
+  orderBooks.set(s, null)
+  funding.set(s, null)
+  sentimentPerSymbol.set(s, { score: null, commentary: null })
+  lastEvalAt.set(s, 0)
+}
+
 function upsertCandle(symbol: Symbol, tf: Timeframe, candle: Candle) {
-  const buf = candleBuffers[symbol][tf]
+  const buf = candleBuffers.get(symbol)?.[tf]
+  if (!buf) return
   if (buf.length === 0) {
     buf.push(candle)
     return
@@ -122,18 +131,22 @@ function upsertCandle(symbol: Symbol, tf: Timeframe, candle: Candle) {
 }
 
 function buildSnapshot(symbol: Symbol): SymbolSnapshot | null {
-  const buf15 = candleBuffers[symbol]['15m']
-  const buf1h = candleBuffers[symbol]['1h']
-  const buf4h = candleBuffers[symbol]['4h']
+  const bufs = candleBuffers.get(symbol)
+  if (!bufs) return null
+  const buf15 = bufs['15m']
+  const buf1h = bufs['1h']
+  const buf4h = bufs['4h']
   if (buf15.length < 30 || buf1h.length < 30 || buf4h.length < 30) return null
 
   const ind15 = computeIndicators(buf15)
   const ind1h = computeIndicators(buf1h)
   const ind4h = computeIndicators(buf4h)
-
-  // store prev 4h before overwriting (we track prev4hInd at evaluation time)
   const patterns: Patterns = detectPatterns(buf15)
   const price = buf15[buf15.length - 1].close
+  const sent = sentimentPerSymbol.get(symbol)!
+  const ob = orderBooks.get(symbol) ?? null
+  const fd = funding.get(symbol) ?? null
+  const tk = ticker24h.get(symbol)!
 
   const confluence = calculateConfluenceScore({
     indicators: { '15m': ind15, '1h': ind1h, '4h': ind4h },
@@ -141,21 +154,21 @@ function buildSnapshot(symbol: Symbol): SymbolSnapshot | null {
     sentiment: {
       fearGreed: sentimentShared.fearGreed,
       fearGreedLabel: sentimentShared.fearGreedLabel,
-      newsScore: sentimentPerSymbol[symbol].score,
-      newsHeadlines: [],
+      newsScore: sent.score,
+      newsHeadlines: sent.commentary ? [{ title: sent.commentary, score: sent.score ?? 0 }] : [],
     },
-    orderBook: orderBooks[symbol],
-    funding: funding[symbol],
+    orderBook: ob,
+    funding: fd,
     price,
   })
 
-  let pos = markToMarket(positions[symbol], price, config.allocatedCapital)
+  const pos = markToMarket(positions.get(symbol)!, price, config.allocatedCapital)
 
   return {
     symbol,
     price,
-    change24hPct: ticker24h[symbol].changePct,
-    volume24h: ticker24h[symbol].volume,
+    change24hPct: tk.changePct,
+    volume24h: tk.volume,
     candles: {
       '15m': buf15.slice(-200),
       '1h': buf1h.slice(-200),
@@ -166,11 +179,11 @@ function buildSnapshot(symbol: Symbol): SymbolSnapshot | null {
     sentiment: {
       fearGreed: sentimentShared.fearGreed,
       fearGreedLabel: sentimentShared.fearGreedLabel,
-      newsScore: sentimentPerSymbol[symbol].score,
-      newsHeadlines: sentimentPerSymbol[symbol].commentary ? [{ title: sentimentPerSymbol[symbol].commentary!, score: sentimentPerSymbol[symbol].score ?? 0 }] : [],
+      newsScore: sent.score,
+      newsHeadlines: sent.commentary ? [{ title: sent.commentary, score: sent.score ?? 0 }] : [],
     },
-    orderBook: orderBooks[symbol],
-    funding: funding[symbol],
+    orderBook: ob,
+    funding: fd,
     confluence,
     position: pos,
     updatedAt: nowMs(),
@@ -187,7 +200,6 @@ function logEntry(symbol: Symbol, source: string, level: string, message: string
     createdAt: new Date().toISOString(),
   }
   io.emit('log', entry)
-  // persist (fire and forget)
   db.reasoningLog
     .create({ data: { symbol, source, level, message } })
     .catch((e) => console.error('[db] log persist failed', e))
@@ -195,24 +207,23 @@ function logEntry(symbol: Symbol, source: string, level: string, message: string
 
 async function executeDecision(symbol: Symbol, snapshot: SymbolSnapshot) {
   const decision = evaluateRisk(
-    positions[symbol],
+    positions.get(symbol)!,
     {
       symbol,
       price: snapshot.price,
       score: snapshot.confluence.score,
       confluence: snapshot.confluence,
       indicators: snapshot.indicators,
-      prev4hIndicators: prev4hInd[symbol],
+      prev4hIndicators: prev4hInd.get(symbol) ?? null,
     },
     config,
   )
 
   if (decision.action === 'HOLD') return
 
-  // Apply the decision
   if (decision.action === 'BUY') {
-    positions[symbol] = applyBuy(
-      positions[symbol],
+    const newPos = applyBuy(
+      positions.get(symbol)!,
       snapshot.price,
       decision.quantity,
       decision.quoteValue,
@@ -220,11 +231,11 @@ async function executeDecision(symbol: Symbol, snapshot: SymbolSnapshot) {
       decision.kind!,
       config.allocatedCapital,
     )
+    positions.set(symbol, newPos)
   } else if (decision.action === 'SELL') {
-    positions[symbol] = applySell(positions[symbol], snapshot.price)
+    positions.set(symbol, applySell(positions.get(symbol)!, snapshot.price))
   }
 
-  // Persist trade
   const trade = await db.trade
     .create({
       data: {
@@ -234,9 +245,9 @@ async function executeDecision(symbol: Symbol, snapshot: SymbolSnapshot) {
         price: snapshot.price,
         quantity: decision.quantity,
         quoteValue: decision.quoteValue,
-        avgEntryPrice: positions[symbol].avgEntryPrice,
-        positionQty: positions[symbol].quantity,
-        state: positions[symbol].state,
+        avgEntryPrice: positions.get(symbol)!.avgEntryPrice,
+        positionQty: positions.get(symbol)!.quantity,
+        state: positions.get(symbol)!.state,
         realizedPnl: decision.realizedPnl,
         score: snapshot.confluence.score,
         reason: decision.reason,
@@ -247,7 +258,6 @@ async function executeDecision(symbol: Symbol, snapshot: SymbolSnapshot) {
       return null
     })
 
-  // Broadcast trade
   io.emit('trade', {
     id: trade?.id ?? Math.random().toString(36).slice(2),
     symbol,
@@ -256,7 +266,7 @@ async function executeDecision(symbol: Symbol, snapshot: SymbolSnapshot) {
     price: snapshot.price,
     quantity: decision.quantity,
     quoteValue: decision.quoteValue,
-    state: positions[symbol].state,
+    state: positions.get(symbol)!.state,
     realizedPnl: decision.realizedPnl,
     score: snapshot.confluence.score,
     reason: decision.reason,
@@ -265,56 +275,46 @@ async function executeDecision(symbol: Symbol, snapshot: SymbolSnapshot) {
 
   logEntry(symbol, 'ENGINE', 'TRADE', decision.reason)
 
-  // Ask LLM for an analyst-style explanation (non-blocking)
   explainDecision({
     symbol,
     action: decision.action,
     kind: decision.kind!,
     price: snapshot.price,
     score: snapshot.confluence.score,
-    position: positions[symbol],
+    position: positions.get(symbol)!,
     confluence: snapshot.confluence,
     reasoning: decision.reason,
   })
-    .then((explanation) => {
-      logEntry(symbol, 'LLM', 'SIGNAL', explanation)
-    })
+    .then((explanation) => logEntry(symbol, 'LLM', 'SIGNAL', explanation))
     .catch((e) => console.error('[llm] explain failed', e))
 }
 
 async function evaluateSymbol(symbol: Symbol) {
-  if (!engineEnabled) {
-    // still broadcast snapshot so UI shows live data
-    const snap = buildSnapshot(symbol)
-    if (snap) io.emit('snapshot', snap)
-    return
-  }
   const snap = buildSnapshot(symbol)
   if (!snap) return
 
-  // detect macro breakdown before overwriting prev4hInd
-  // (we pass prev4hInd to evaluateRisk; update it after)
-  try {
-    await executeDecision(symbol, snap)
-  } catch (e) {
-    console.error(`[engine] decision error for ${symbol}`, e)
+  if (engineEnabled) {
+    try {
+      await executeDecision(symbol, snap)
+    } catch (e) {
+      console.error(`[engine] decision error for ${symbol}`, e)
+    }
   }
-  // update prev4h for next tick
-  prev4hInd[symbol] = snap.indicators['4h']
+  prev4hInd.set(symbol, snap.indicators['4h'])
 
-  // persist a signal snapshot every ~60s
-  if (Math.random() < 0.05) {
+  // Occasionally persist a signal snapshot to the DB (for history)
+  if (Math.random() < 0.02) {
     db.signal
       .create({
         data: {
           symbol,
           score: snap.confluence.score,
           label: snap.confluence.label,
-          state: positions[symbol].state,
+          state: positions.get(symbol)!.state,
           price: snap.price,
           indicatorsJson: JSON.stringify(snap.indicators),
           patternsJson: JSON.stringify(snap.patterns),
-          sentiment: sentimentPerSymbol[symbol].score,
+          sentiment: sentimentPerSymbol.get(symbol)!.score,
           fearGreed: sentimentShared.fearGreed,
         },
       })
@@ -325,6 +325,8 @@ async function evaluateSymbol(symbol: Symbol) {
 }
 
 function getEngineState(): EngineState {
+  const snapMap: Record<string, SymbolSnapshot | null> = {}
+  for (const s of SYMBOLS) snapMap[s] = null
   return {
     enabled: engineEnabled,
     symbols: SYMBOLS,
@@ -337,30 +339,51 @@ function getEngineState(): EngineState {
       strongBuyScore: config.strongBuyScore,
       strongSellScore: config.strongSellScore,
     },
-    snapshots: buildRecord(() => null),
+    snapshots: snapMap,
     lastTickAt: nowMs(),
   }
 }
 
-// ---------- Periodic fetchers ----------
+// ---------- Concurrency-limited batch runner ----------
+async function runBatch<T, R>(items: T[], concurrency: number, fn: (item: T) => Promise<R>): Promise<R[]> {
+  const results: R[] = []
+  let idx = 0
+  const workers = Array.from({ length: Math.min(concurrency, items.length) }, async () => {
+    while (idx < items.length) {
+      const cur = idx++
+      try {
+        results[cur] = await fn(items[cur])
+      } catch {
+        /* swallow — errors logged by caller */
+      }
+    }
+  })
+  await Promise.all(workers)
+  return results
+}
+
+// ---------- Periodic fetchers (only for top coins to limit API weight) ----------
 async function refreshOrderBooks() {
-  for (const s of SYMBOLS) {
+  // Only fetch order books for top 40 coins by volume to respect rate limits
+  const top = [...SYMBOLS].slice(0, 40)
+  await runBatch(top, 8, async (s) => {
     try {
-      orderBooks[s] = await fetchOrderBookImbalance(s)
+      orderBooks.set(s, await fetchOrderBookImbalance(s))
     } catch (e) {
       console.error(`[orderbook] ${s} failed`, e)
     }
-  }
+  })
 }
 
 async function refreshFunding() {
-  for (const s of SYMBOLS) {
+  const top = [...SYMBOLS].slice(0, 40)
+  await runBatch(top, 8, async (s) => {
     try {
-      funding[s] = await fetchFundingData(s)
+      funding.set(s, await fetchFundingData(s))
     } catch (e) {
       console.error(`[funding] ${s} failed`, e)
     }
-  }
+  })
 }
 
 async function refreshFearGreed() {
@@ -373,24 +396,16 @@ async function refreshFearGreed() {
   }
 }
 
-async function refreshTickers() {
-  for (const s of SYMBOLS) {
-    try {
-      const t = await fetch24hTicker(s)
-      ticker24h[s] = { changePct: t.changePct, volume: t.volume, lastPrice: t.lastPrice }
-    } catch (e) {
-      console.error(`[ticker] ${s} failed`, e)
-    }
-  }
-}
-
 async function refreshCommentary() {
-  for (const s of SYMBOLS) {
+  // Commentary only for top 12 coins (LLM calls are expensive)
+  const top = [...SYMBOLS].slice(0, 12)
+  for (const s of top) {
     const snap = buildSnapshot(s)
     if (!snap) continue
     try {
       const { commentary, sentiment } = await marketCommentary(snap)
-      sentimentPerSymbol[s] = { score: sentiment, commentary }
+      sentimentPerSymbol.get(s)!.score = sentiment
+      sentimentPerSymbol.get(s)!.commentary = commentary
       if (commentary) logEntry(s, 'LLM', 'INFO', commentary)
     } catch (e) {
       console.error(`[commentary] ${s} failed`, e)
@@ -412,19 +427,15 @@ io.on('connection', (socket) => {
   socket.emit('status', { ok: true, msg: 'AlphaSpot engine online' })
   socket.emit('engine', getEngineState())
 
-  socket.on('subscribe', () => {
-    // all clients get all symbols by default; no per-client filtering needed
-  })
-
   socket.on('control', (cmd) => {
     if (cmd.action === 'start') {
       engineEnabled = true
-      logEntry('BTC/USDT', 'SYSTEM', 'INFO', 'Engine ENABLED by user.')
+      logEntry(SYMBOLS[0] ?? 'BTC/USDT', 'SYSTEM', 'INFO', 'Engine ENABLED by user.')
     } else if (cmd.action === 'stop') {
       engineEnabled = false
-      logEntry('BTC/USDT', 'SYSTEM', 'INFO', 'Engine PAUSED by user. Live data still streaming.')
+      logEntry(SYMBOLS[0] ?? 'BTC/USDT', 'SYSTEM', 'INFO', 'Engine PAUSED by user. Live data still streaming.')
     } else if (cmd.action === 'reset' && cmd.symbol) {
-      positions[cmd.symbol] = emptyPosition(cmd.symbol)
+      positions.set(cmd.symbol, emptyPosition(cmd.symbol))
       logEntry(cmd.symbol, 'SYSTEM', 'INFO', `Position for ${cmd.symbol} reset to FLAT (paper).`)
     }
     io.emit('engine', getEngineState())
@@ -435,60 +446,133 @@ io.on('connection', (socket) => {
   })
 })
 
+// ---------- Round-robin evaluation queue ----------
+let evalCursor = 0
+function startEvalQueue() {
+  setInterval(async () => {
+    if (SYMBOLS.length === 0) return
+    const batch: Symbol[] = []
+    for (let i = 0; i < EVAL_BATCH_SIZE && i < SYMBOLS.length; i++) {
+      batch.push(SYMBOLS[evalCursor % SYMBOLS.length])
+      evalCursor++
+    }
+    await Promise.all(batch.map((s) => evaluateSymbol(s).catch((e) => console.error(`[eval] ${s}`, e))))
+  }, EVAL_TICK_MS)
+}
+
 // ---------- Boot ----------
 async function boot() {
   console.log('[boot] AlphaSpot engine starting...')
-  console.log('[boot] Seeding candle buffers from Binance REST...')
-  await Promise.all(
-    SYMBOLS.map(async (s) => {
-      for (const tf of TIMEFRAMES) {
-        try {
-          const klines = await fetchHistoricalKlines(s, tf, MAX_CANDLES)
-          candleBuffers[s][tf] = klines
-          console.log(`[boot] ${s} ${tf}: ${klines.length} candles seeded`)
-        } catch (e) {
-          console.error(`[boot] seed failed ${s} ${tf}`, e)
-        }
+
+  // 1. Discover ALL tradeable USDT spot pairs
+  console.log('[boot] Fetching exchangeInfo (all USDT spot pairs)...')
+  SYMBOL_INFOS = await fetchAllSpotSymbols()
+  SYMBOLS = SYMBOL_INFOS.map((s) => s.symbol)
+  console.log(`[boot] Discovered ${SYMBOLS.length} tradeable USDT spot pairs`)
+
+  // 2. Initialize per-symbol state
+  for (const s of SYMBOLS) initSymbolState(s)
+
+  // 3. Fetch all 24h tickers in ONE call (for volume ranking + initial prices)
+  console.log('[boot] Fetching 24h tickers for all symbols...')
+  const tickerMap = await fetchAll24hTickers()
+  for (const [sym, t] of tickerMap) {
+    if (ticker24h.has(sym)) {
+      ticker24h.set(sym, { changePct: t.changePct, volume: t.volume, lastPrice: t.lastPrice })
+    }
+  }
+  // Sort SYMBOLS by 24h quote volume descending (most liquid first) — so
+  // top coins get seeded + evaluated first, and order-book/funding/commentary
+  // (which only cover the top N) target the most relevant coins.
+  SYMBOLS.sort((a, b) => (tickerMap.get(b)?.quoteVolume ?? 0) - (tickerMap.get(a)?.quoteVolume ?? 0))
+  console.log(`[boot] Sorted by volume. Top 5: ${SYMBOLS.slice(0, 5).map((s) => `${s.split('/')[0]}($${(tickerMap.get(s)?.quoteVolume ?? 0).toFixed(0)})`).join(', ')}`)
+
+  // 4. Connect miniTicker stream (instant 24h change/volume updates for ALL coins)
+  console.log('[boot] Connecting miniTicker stream...')
+  connectMiniTickerStream((map) => {
+    for (const [sym, t] of map) {
+      const existing = ticker24h.get(sym)
+      if (existing) {
+        existing.changePct = t.changePct
+        existing.volume = t.volume
+        existing.lastPrice = t.price
       }
-    }),
-  )
+    }
+  })
 
-  await Promise.allSettled([refreshTickers(), refreshOrderBooks(), refreshFunding(), refreshFearGreed()])
-
-  console.log('[boot] Connecting Binance kline WebSocket...')
+  // 5. Connect kline WebSocket (chunked) — prices start flowing immediately
+  console.log('[boot] Connecting kline WebSocket (chunked)...')
   connectKlineStream(
     SYMBOLS,
     TIMEFRAMES,
     (symbol, tf, candle) => {
       upsertCandle(symbol, tf, candle)
-      // evaluate on 15m ticks + every 2s throttle for responsiveness
+      // INSTANT price tick broadcast — no throttle, no indicator computation.
+      // This is what makes the displayed price match Binance in real-time.
       if (tf === '15m') {
-        const now = nowMs()
-        if (now - lastEvalAt[symbol] >= EVAL_THROTTLE_MS) {
-          lastEvalAt[symbol] = now
-          evaluateSymbol(symbol).catch((e) => console.error(`[eval] ${symbol}`, e))
+        const tk = ticker24h.get(symbol)
+        const tick: PriceTick = {
+          symbol,
+          price: candle.close,
+          change24hPct: tk?.changePct ?? null,
+          volume24h: tk?.volume ?? null,
+          time: candle.time,
         }
+        io.emit('priceTick', tick)
       }
     },
     (connected) => {
-      logEntry(SUPPORTED_SYMBOLS[0], 'SYSTEM', connected ? 'INFO' : 'WARN', connected ? `Binance stream connected (${SYMBOLS.length * TIMEFRAMES.length} streams).` : 'Binance stream disconnected — reconnecting.')
+      if (connected) {
+        logEntry(SYMBOLS[0] ?? 'BTC/USDT', 'SYSTEM', 'INFO', `Binance kline stream connected.`)
+      } else {
+        logEntry(SYMBOLS[0] ?? 'BTC/USDT', 'SYSTEM', 'WARN', 'Binance kline stream disconnected — reconnecting.')
+      }
     },
   )
 
-  // periodic loops
+  // 6. Seed candle buffers in background (concurrency-limited) — indicators
+  //    come online progressively as each coin's buffers fill.
+  console.log(`[boot] Seeding ${SYMBOLS.length}×${TIMEFRAMES.length} candle buffers (concurrency=${SEED_CONCURRENCY})...`)
+  const seedTasks: { symbol: Symbol; tf: Timeframe }[] = []
+  for (const s of SYMBOLS) {
+    for (const tf of TIMEFRAMES) seedTasks.push({ symbol: s, tf })
+  }
+  let seeded = 0
+  runBatch(seedTasks, SEED_CONCURRENCY, async ({ symbol, tf }) => {
+    try {
+      const klines = await fetchHistoricalKlines(symbol, tf, MAX_CANDLES)
+      const buf = candleBuffers.get(symbol)
+      if (buf) buf[tf] = klines
+      seeded++
+      if (seeded % 100 === 0) console.log(`[boot] seeded ${seeded}/${seedTasks.length} buffers`)
+    } catch (e) {
+      // Some minor symbols may fail — log once and continue
+    }
+  }).then(() => {
+    console.log(`[boot] Seeding complete: ${seeded}/${seedTasks.length} buffers`)
+  })
+
+  // 7. Fetch Fear & Greed
+  refreshFearGreed().catch(() => {})
+
+  // 8. Start round-robin evaluation queue
+  startEvalQueue()
+
+  // 9. Periodic loops (order books + funding only for top coins)
   setInterval(refreshOrderBooks, ORDERBOOK_INTERVAL_MS)
   setInterval(refreshFunding, FUNDING_INTERVAL_MS)
   setInterval(refreshFearGreed, FNG_INTERVAL_MS)
-  setInterval(refreshTickers, 60_000)
+  setTimeout(refreshOrderBooks, 5_000)
+  setTimeout(refreshFunding, 15_000)
+  setTimeout(refreshCommentary, 60_000)
   setInterval(refreshCommentary, COMMENTARY_INTERVAL_MS)
-  // first commentary after 30s (let data settle)
-  setTimeout(refreshCommentary, 30_000)
-  // broadcast engine state every 15s
-  setInterval(() => io.emit('engine', getEngineState()), 15_000)
+
+  // 10. Broadcast engine state periodically
+  setInterval(() => io.emit('engine', getEngineState()), ENGINE_BROADCAST_MS)
 
   httpServer.listen(PORT, () => {
     console.log(`[io] AlphaSpot engine listening on port ${PORT}`)
-    logEntry('BTC/USDT', 'SYSTEM', 'INFO', `AlphaSpot engine online. Allocated capital $${config.allocatedCapital}. Scanning ${SUPPORTED_SYMBOLS.length} coins on 15m/1h/4h: ${SUPPORTED_SYMBOLS.map((s) => s.split('/')[0]).join(', ')}.`)
+    logEntry(SYMBOLS[0] ?? 'BTC/USDT', 'SYSTEM', 'INFO', `AlphaSpot engine online. Tracking ${SYMBOLS.length} coins. Allocated capital $${config.allocatedCapital}.`)
   })
 }
 

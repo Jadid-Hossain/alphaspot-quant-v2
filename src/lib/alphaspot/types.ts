@@ -1,37 +1,8 @@
 // AlphaSpot shared types — used by both the Next.js API routes and the socket.io mini-service
 
-// A trading pair string, e.g. "BTC/USDT". Relaxed to string so the watchlist
-// can be extended without touching type definitions.
+// A trading pair string, e.g. "BTC/USDT". The full list is discovered
+// dynamically from Binance's exchangeInfo API at engine boot.
 export type Symbol = string
-
-// The full watchlist — top 24 USDT spot pairs on Binance by liquidity.
-// 24 symbols × 3 timeframes = 72 WS streams (well under Binance's 200-stream limit).
-export const SUPPORTED_SYMBOLS: Symbol[] = [
-  'BTC/USDT',
-  'ETH/USDT',
-  'BNB/USDT',
-  'SOL/USDT',
-  'XRP/USDT',
-  'ADA/USDT',
-  'AVAX/USDT',
-  'DOGE/USDT',
-  'DOT/USDT',
-  'LINK/USDT',
-  'LTC/USDT',
-  'ATOM/USDT',
-  'UNI/USDT',
-  'ETC/USDT',
-  'NEAR/USDT',
-  'APT/USDT',
-  'ARB/USDT',
-  'OP/USDT',
-  'FIL/USDT',
-  'INJ/USDT',
-  'SUI/USDT',
-  'SEI/USDT',
-  'TIA/USDT',
-  'RUNE/USDT',
-]
 
 export type Timeframe = '15m' | '1h' | '4h'
 
@@ -177,9 +148,21 @@ export interface EngineState {
   lastTickAt: number | null
 }
 
+// Lightweight real-time price tick — broadcast on every kline update,
+// decoupled from the heavier indicator computation. This is what makes
+// the displayed price feel instant (no 2-second eval throttle).
+export interface PriceTick {
+  symbol: Symbol
+  price: number
+  change24hPct: number | null
+  volume24h: number | null
+  time: number
+}
+
 // Socket.io event payloads (server -> client)
 export interface ServerToClientEvents {
   snapshot: (snapshot: SymbolSnapshot) => void
+  priceTick: (tick: PriceTick) => void
   engine: (state: EngineState) => void
   log: (entry: { id: string; symbol: string; source: string; level: string; message: string; createdAt: string }) => void
   trade: (trade: {
