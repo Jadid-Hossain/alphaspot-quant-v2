@@ -337,3 +337,30 @@ Stage Summary:
 - Bounded ring buffer (§4.1) with priority-based dropping: Trade > Depth > BookTicker > Kline > MiniTicker > Ticker. Protected events (Trade/Depth) never dropped unless emergency degradation explicitly enabled.
 - Replay modes (§18.1): STANDARD (full validation pipeline) + VALIDATED (bypass for trusted historical data — for large-scale backtesting/model validation). Provenance always recorded.
 - This pipeline feeds Domain 04 (Market Data) from Domain 03 (Market Gateway). The next chapter will likely detail Feature Engineering (Domain 05) which consumes these canonical events.
+
+---
+Task ID: MDS-CH3.3
+Agent: main (Z.ai Code)
+Task: Chapter 3.3 of the MDS — Market State Cache. Build the authoritative, low-latency, in-memory representation of current market state.
+
+Work Log:
+- Appended Chapter 3.3 verbatim to full_prompt.md (now 1210 lines, 9 chapters: Ch1, Ch2.1–Ch2.5, Ch3.1–Ch3.3).
+- Analyzed Chapter 3.3: mandates a single source of truth for live market state, partitioned by asset, with atomic updates, monotonic versioning, immutable snapshots, consistency guarantees, isolated read/write models, invalidation + recovery, quality tracking, and failure isolation. 10 architectural rules.
+- Created src/lib/alphaspot/v2/market-state/cache.ts with:
+  • MarketState type (§5) — immutable logical state with symbol, exchange, currentPrice, bestBid, bestAsk, midPrice, spread, spreadPct, lastTrade, volume24h, quoteVolume24h, high24h, low24h, priceChangePct24h, orderBook (OrderBookSummary), lastUpdateTimestamp, lastPipelineTimestamp, marketStatus, sequenceNumber. All fields readonly.
+  • MarketStatus enum (LIVE, STALE, INVALID, RECOVERING, DISCONNECTED).
+  • OrderBookSummary (bestBid, bestAsk, bidVolume, askVolume, imbalance, lastUpdateId).
+  • LastTrade (price, quantity, side, timestamp, tradeId).
+  • MarketStateSnapshot (§9 — immutable, read-only: symbol, version, timestamp, state, sequence, valid).
+  • CacheQuality (§15 — synchronizationStatus, updateLatencyMs, eventAgeMs, validity, recoveryStatus, healthScore, lastUpdateAt, updateCount, invalidationCount, recoveryCount).
+  • CachePartition class (§4, §6, §7, §8): isolated per-asset partition. applyEvent() merges canonical event into state atomically (§7 — builds full new state then swaps), increments version monotonically (§8, Rule 5), freezes the state (§5 immutable). mergeEventIntoState() handles all 10 canonical event types (TRADE, TICKER, MINI_TICKER, BOOK_TICKER, DEPTH_UPDATE, KLINE). snapshot() generates immutable MarketStateSnapshot (§9). getState() read-only access (§11 — reads never mutate). getVersion() monotonic version. getQuality() (§15). invalidate() quarantines (§13). pauseUpdates()/resumeUpdates() for recovery (§14). replaceState() for recovery stage 4. subscribe() for snapshot publication. computeHealthScore() based on freshness (1.0 if <1s, 0.0 if >30s).
+  • MarketStateCache class (§3, §4): getPartition() creates isolated partitions per asset. applyEvent() is the ONLY way to update cache state (Rule 3, Rule 7 — centrally controlled). getState()/getCurrentPrice()/getBestBid()/getBestAsk()/getVolume24h() single-source-of-truth readers (§3). snapshot() generates immutable snapshots. getQuality()/getAllQuality() per-partition quality (§15). invalidate() quarantines (§13). recover() implements the 5-stage recovery (§14): Pause Updates → Acquire Authoritative Snapshot → Validate → Replace Cache → Resume Publication. subscribe() for all-partition updates. getStats() observability (§17 — totalUpdates, totalReads, invalidations, recoveries, partitionCount, avgHealthScore, valid/invalid/recovering counts). evict() for memory management (§16 bounded).
+- Created market-state/index.ts barrel export. Updated v2/index.ts to export market-state + document Chapter 3.3.
+- Lint passes cleanly. Both services still running (78 V2 files total).
+- Smoke-tested all 10 cache subsystems end-to-end: (1) single source of truth — price/bid/ask all read from cache, (2) canonical event updates — BOOK_TICKER + TRADE + TICKER applied with version increments 1→2→3, (3) monotonic versioning verified, (4) atomic updates — state + snapshot frozen, (5) immutable snapshots read-only, (6) partition isolation — BTC and ETH independent, (7) read model — concurrent reads return same version, (8) cache quality — SYNCED/VALID/health 1.00/latency 0.003ms, (9) invalidation + recovery — quarantined → 5-stage recovery (pause→snapshot→validate→replace→resume) → VALID with new price + incremented version, (10) observability — all stats tracked.
+
+Stage Summary:
+- Market State Cache complete per Chapter 3.3. The authoritative, low-latency, in-memory representation of current market state is now available for all downstream analytical domains.
+- 10 architectural rules enforced: cache is only source of live state (Rule 1), business domains never consume exchange messages (Rule 2), all updates from canonical events (Rule 3), updates atomic (Rule 4 — Object.freeze + build-then-swap), versions monotonic (Rule 5), reads never mutate (Rule 6), writes centrally controlled (Rule 7 — only applyEvent), historical separated from live (Rule 8), invalid state never published (Rule 9 — quarantined), partitions independently recoverable (Rule 10 — 5-stage recovery).
+- Partition isolation (§4, §18): BTC cache corruption → BTC partition rebuild → ETH/SOL continue operating. Global cache failure prohibited.
+- This cache is the bridge between the Market Data Pipeline (Ch 3.2) and downstream Feature Engineering (Domain 05). The next chapter will likely detail Feature Engineering which consumes market state from this cache.

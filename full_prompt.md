@@ -1109,3 +1109,102 @@ Rule 13 — Replay behavior shall be governed by explicit replay policies rather
 The Real-Time Market Data Pipeline transforms raw, exchange-specific messages into deterministic, validated, normalized, immutable market events. Every downstream domain operates on identical, high-quality data regardless of exchange behavior, network latency, or message ordering. The pipeline guarantees consistency, traceability, replayability, and resilience under both normal and extreme market conditions.
 
 END OF CHAPTER 3.2
+
+---
+
+# CHAPTER 3.3 — MARKET STATE CACHE
+
+## 1. Purpose
+
+The Market State Cache provides the authoritative, low-latency, in-memory representation of the current market state. All downstream analytical domains consume market data from the cache. No downstream domain consumes raw exchange streams. The cache performs: state aggregation, state synchronization, snapshot generation, version control, cache consistency. It performs NO feature engineering, indicators, AI inference, or trading decisions.
+
+## 2. Cache Philosophy
+
+The cache represents the current market. Not historical storage. Not analytics. Not persistence. Its purpose is deterministic, low-latency access.
+
+## 3. Single Source of Truth
+
+Every live market value originates from exactly one authoritative cache object. Examples: Current Price → Market State Cache, Best Bid → Market State Cache, Best Ask → Market State Cache, Current Volume → Market State Cache. No duplicate ownership exists.
+
+## 4. Cache Organization
+
+The cache is partitioned by asset. Each asset owns an isolated cache partition. Example: BTCUSDT → Market State, ETHUSDT → Market State, SOLUSDT → Market State. Failure of one partition must never affect another.
+
+## 5. Market State Object
+
+Each asset maintains one immutable logical state. Typical fields: Symbol, Exchange, Current Price, Best Bid, Best Ask, Last Trade, Mid Price, Spread, Volume, Order Book Summary, Last Update Timestamp, Market Status, Sequence Number. Internal representation is implementation-defined.
+
+## 6. Cache Update Model
+
+Updates occur only through Canonical Market Events. Raw exchange messages prohibited. Update flow: Canonical Event → Validation → Atomic State Update → Version Increment → Publication. Every successful update produces a new cache version.
+
+## 7. Atomicity
+
+A cache update is indivisible. Consumers observe either Previous State or Updated State. Partial updates are prohibited.
+
+## 8. Versioning
+
+Each cache partition maintains a monotonically increasing version number. Consumers may reference State + Version. This guarantees deterministic processing.
+
+## 9. Snapshot Generation
+
+The cache supports immutable snapshots. Snapshots capture the complete state of one asset at one instant. Snapshots contain: Version, Timestamp, Market State, Sequence. Snapshots are read-only.
+
+## 10. Consistency
+
+Cache consistency rules: No duplicate state. No partially applied events. No mixed versions. No invalid sequences. Consumers always observe internally consistent state.
+
+## 11. Read Model
+
+Reads never modify cache state. Multiple concurrent readers are supported. Read operations must not block update operations.
+
+## 12. Write Model
+
+Writes occur exclusively through the Market Data Pipeline. Business domains never modify cache state. Unauthorized mutation is prohibited.
+
+## 13. Cache Invalidation
+
+State becomes invalid when: synchronization failure, exchange disconnect, unrecoverable sequence gap, corrupted state. Invalid state is quarantined. Consumers receive explicit validity information.
+
+## 14. Cache Recovery
+
+Recovery follows: Pause Updates → Acquire Authoritative Snapshot → Validate → Replace Cache → Resume Publication. Recovery never exposes inconsistent state.
+
+## 15. Cache Quality
+
+Every cache partition continuously tracks: synchronization status, update latency, event age, validity, recovery status, health score. Consumers may use cache quality metadata.
+
+## 16. Cache Lifetime
+
+The Market State Cache stores only current state. Historical data belongs exclusively to Historical Storage. The cache must remain memory bounded.
+
+## 17. Observability
+
+Metrics include: update frequency, read latency, write latency, cache size, partition count, recovery count, invalidation count, version growth, health score.
+
+## 18. Failure Isolation
+
+Failures remain partition-local. Example: BTC cache corruption → BTC partition rebuild → ETH continues operating → SOL continues operating. Global cache failure is prohibited.
+
+## 19. Scalability
+
+The cache architecture supports: additional assets, additional exchanges, additional cache nodes, distributed execution without redesign.
+
+## 20. Architectural Rules
+
+Rule 1 — Market State Cache is the only source of live market state.
+Rule 2 — Business domains never consume exchange messages.
+Rule 3 — All updates originate from Canonical Market Events.
+Rule 4 — Cache updates are atomic.
+Rule 5 — Cache versions are monotonically increasing.
+Rule 6 — Reads never mutate state.
+Rule 7 — Writes are centrally controlled.
+Rule 8 — Historical storage is separated from live state.
+Rule 9 — Invalid state is never published.
+Rule 10 — Every cache partition is independently recoverable.
+
+## 21. Chapter Summary
+
+The Market State Cache serves as the authoritative, low-latency representation of the live cryptocurrency market. It isolates downstream analytical components from exchange complexity while guaranteeing atomicity, consistency, deterministic versioning, partition isolation, bounded memory usage, and recoverable state. Every prediction, feature calculation, and trading recommendation relies exclusively on this validated market state.
+
+END OF CHAPTER 3.3
