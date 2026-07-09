@@ -553,3 +553,126 @@ Rule 10 — Failures are isolated and recoverable.
 AlphaSpot Quant is an event-driven platform coordinated by a central Workflow Orchestrator. Domains never communicate directly. Events are immutable, versioned, traceable, and idempotent. Recommendations originate only from completed analytical snapshots. Execution is deterministic, reproducible, scalable, and resilient to failures.
 
 END OF CHAPTER 2.2
+
+---
+
+# CHAPTER 2.3 — RUNTIME ARCHITECTURE: PERSISTENCE, CONCURRENCY, FAULT TOLERANCE & RESOURCE MANAGEMENT
+
+## 1. Purpose
+
+This chapter defines how AlphaSpot Quant behaves while running. It specifies: runtime execution, persistence, concurrency, worker management, memory management, resource scheduling, database coordination, fault tolerance, recovery. Business logic is intentionally excluded.
+
+## 2. Runtime Philosophy
+
+The platform must assume failure. Every subsystem must continue operating whenever possible. Temporary failures must reduce capability, never terminate the platform. Graceful degradation is preferred over complete shutdown.
+
+## 3. Execution Model
+
+The runtime consists of independent execution environments: Realtime Processing → Worker Processing → Persistence → Presentation. Each environment operates independently. No environment may block another.
+
+## 4. Process Isolation
+
+The platform separates responsibilities into isolated execution units (Realtime Market Ingestion, Feature Generation, ML Inference, Cross-Asset Ranking, Portfolio Analysis, Persistence, Presentation). Failure inside one execution unit must not terminate others.
+
+## 5. Worker Architecture
+
+CPU-intensive computation must execute outside the realtime ingestion pipeline. Workers receive jobs, return results, and never directly manipulate platform state.
+
+## 6. Workload Classification
+
+Realtime (minimum latency: market ticks, heartbeat, exchange sync), Interactive (dashboard responsiveness: charts, recommendations, trade history), Analytical (heavy computation: feature generation, ML inference, ranking), Background (non-urgent: cleanup, compression, statistics, optimization, archiving).
+
+## 7. Persistence Philosophy
+
+Persistence exists only to guarantee durable state. Business logic never depends on direct database behavior. Persistence implementation remains replaceable.
+
+## 8. Write Coordination
+
+Business domains never write directly to persistent storage. All write operations pass through a centralized Write Coordination layer (transaction coordination, batching, ordering, validation, durability, retry, storage abstraction).
+
+## 9. Read / Write Separation
+
+Reading and writing are logically separated. Reads never block writes. Writes never interrupt analytical processing. Business domains consume published state, not database transactions.
+
+## 10. Storage Abstraction
+
+The platform never depends on a specific database engine. Storage implementation is interchangeable (embedded, relational, distributed, cloud). Changing storage technology must not require business logic modifications.
+
+## 11. Cache Hierarchy
+
+Level 1: Realtime Memory Cache (lowest latency). Level 2: Analytical Cache (intermediate computation). Level 3: Persistent Storage (long-term durability). Data moves downward through the hierarchy.
+
+## 12. Memory Lifecycle
+
+Short-lived data remains in memory. Historical information migrates to persistent storage. Memory usage must remain bounded. No component may retain unlimited historical state.
+
+## 13. Backpressure Management
+
+When workload exceeds processing capacity: slow intake gracefully (queueing, prioritization, temporary sampling, deferred analytics). Realtime ingestion always receives highest priority.
+
+## 14. Resource Scheduling
+
+The runtime continuously balances CPU, memory, storage, worker utilization, queue depth. Long-running workloads should never starve higher-priority processing.
+
+## 15. Concurrency Model
+
+Independent work executes concurrently. Shared mutable state is minimized. Synchronization occurs only through immutable events, coordinated persistence, and published snapshots. Race conditions prevented by design, not corrected afterward.
+
+## 16. Database Concurrency
+
+Persistent storage is a coordinated resource. Concurrent writes never compete directly. Write ordering is coordinated centrally. Readers observe only committed state. Storage-specific locking remains hidden behind the Persistence domain.
+
+## 17. Failure Classification
+
+Transient (temporary network interruption, timeout, exchange outage). Recoverable (worker restart, cache rebuild, API recovery). Permanent (invalid configuration, corrupted data, unsupported schema). Each follows an independent recovery policy.
+
+## 18. Recovery Model
+
+Recovery stages: Detect → Isolate → Recover → Validate → Resume. Partial recovery preferred over full restart.
+
+## 19. Health Monitoring
+
+Every execution unit continuously reports: state, latency, queue depth, memory, CPU, failures, restart count. System health is continuously observable.
+
+## 20. Watchdogs
+
+Critical runtime components supervised: exchange connectivity, worker responsiveness, persistence responsiveness, pipeline progress, snapshot completion. Inactive components trigger recovery workflows.
+
+## 21. Time Synchronization
+
+All timestamps originate from a single authoritative time source. Execution ordering never depends on local machine clock drift.
+
+## 22. Resource Limits
+
+Every execution unit has defined limits: maximum memory, execution time, queue depth, retries, concurrent work. No subsystem may consume unlimited resources.
+
+## 23. Graceful Degradation
+
+Capability reduction in stages: sentiment unavailable → continue without sentiment; model unavailable → use latest validated prediction; exchange disconnected → freeze recommendation publication; dashboard unavailable → continue backend processing. Objective: continued operation.
+
+## 24. Observability
+
+Every runtime operation is measurable: execution duration, queue wait time, worker utilization, cache hit rate, database latency, snapshot duration, recovery count. No critical operation remains invisible.
+
+## 25. Scalability
+
+The runtime supports future scaling: additional workers, exchanges, AI models, databases, distributed deployment, cloud-native execution. Scaling requires expansion, not architectural redesign.
+
+## 26. Architectural Rules
+
+Rule 1 — Realtime processing never performs heavy computation.
+Rule 2 — Business domains never write directly to storage.
+Rule 3 — All persistent writes are coordinated.
+Rule 4 — Workers never own business state.
+Rule 5 — Graceful degradation is mandatory.
+Rule 6 — Resource usage is bounded.
+Rule 7 — Every failure is observable.
+Rule 8 — Recovery is deterministic.
+Rule 9 — Persistence remains replaceable.
+Rule 10 — Concurrency is controlled through architecture, not ad-hoc synchronization.
+
+## 27. Chapter Summary
+
+AlphaSpot Quant is designed to remain operational under heavy computational load, partial infrastructure failure, and evolving deployment environments. Runtime execution is isolated. Persistence is coordinated. Concurrency is controlled. Resources are managed. Failures are expected. Recovery is automatic whenever possible. The platform prioritizes resilience, predictability, and operational stability over raw throughput.
+
+END OF CHAPTER 2.3

@@ -6,6 +6,7 @@
 //   Chapter 1:   3 lanes + 10-stage recommendation pipeline + immutable snapshots
 //   Chapter 2.1: 14 independent domains with explicit boundaries
 //   Chapter 2.2: Event-driven communication + Workflow Orchestrator + snapshot lifecycle
+//   Chapter 2.3: Runtime architecture — write coordination, worker pool, cache hierarchy, backpressure, fault tolerance, watchdogs
 //
 // The 10-stage pipeline (Chapter 1) maps onto the 14 domains (Chapter 2.1):
 //   • Market Observation           → Domain 03 (Gateway) + 04 (Data)
@@ -28,6 +29,7 @@
 export * from './types'
 export * from './domains' // 14 domains + domain map + I/O flow (Chapter 2.1)
 export * from './events' // Event transport + catalog + snapshot lifecycle + orchestrator (Chapter 2.2)
+export * from './runtime' // Write coordinator + worker pool + cache hierarchy + backpressure + fault tolerance + watchdogs (Chapter 2.3)
 export * from './lanes/lane-a-realtime'
 export * from './lanes/lane-b-analytical'
 export * from './lanes/lane-c-research'
