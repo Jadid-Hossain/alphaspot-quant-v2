@@ -15,14 +15,25 @@ import { TradeHistory } from '@/components/alphaspot/trade-history'
 import { Footer } from '@/components/alphaspot/footer'
 import { BootSplash } from '@/components/alphaspot/boot-splash'
 import { Watchlist } from '@/components/alphaspot/watchlist'
+import { ComplianceBadge, ComplianceReason, ComplianceLockOverlay } from '@/components/alphaspot/compliance-badge'
+import { TradePlannerRestrictions } from '@/components/alphaspot/trade-planner-restrictions'
 
 export default function Home() {
-  const { connect, connected, snapshots, engine, loadHistory } = useAlphaSpot()
+  const connect = useAlphaSpot((s) => s.connect)
+  const connected = useAlphaSpot((s) => s.connected)
+  const snapshots = useAlphaSpot((s) => s.snapshots)
+  const loadHistory = useAlphaSpot((s) => s.loadHistory)
+  const loadCompliance = useAlphaSpot((s) => s.loadCompliance)
+  const selectedSymbol = useAlphaSpot((s) => s.selectedSymbol)
+  const shariahMode = useAlphaSpot((s) => s.shariahMode)
 
   useEffect(() => {
+    // Rehydrate persisted state (shariahMode) from localStorage on client
+    useAlphaSpot.persist.rehydrate()
     connect()
     loadHistory()
-  }, [connect, loadHistory])
+    loadCompliance()
+  }, [connect, loadHistory, loadCompliance])
 
   const anySnapshot = Object.values(snapshots).some((s) => s !== null)
 
@@ -47,6 +58,16 @@ export default function Home() {
             {/* Loading splash while first snapshot arrives */}
             {!anySnapshot && connected && <BootSplash />}
 
+            {/* Compliance badge for selected symbol (shown when Shariah mode is ON) */}
+            {shariahMode && (
+              <div className="flex flex-wrap items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900/60 p-3">
+                <ComplianceBadge symbol={selectedSymbol} />
+                <div className="min-w-0 flex-1">
+                  <ComplianceReason symbol={selectedSymbol} />
+                </div>
+              </div>
+            )}
+
             {/* Main grid: chart+indicators (left, 2/3) | signal+position+factors (right, 1/3) */}
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
               <div className="space-y-4 lg:col-span-2">
@@ -56,9 +77,19 @@ export default function Home() {
                 <IndicatorPanels />
               </div>
               <div className="space-y-4">
-                <SignalBox />
-                <PositionCard />
-                <ConfluenceFactors />
+                {/* Trade Planner Restrictions (shown when Shariah mode is ON) */}
+                <TradePlannerRestrictions />
+
+                {/* AI Trade Planner sections — locked when non-compliant in Shariah mode */}
+                <ComplianceLockOverlay symbol={selectedSymbol}>
+                  <SignalBox />
+                </ComplianceLockOverlay>
+                <ComplianceLockOverlay symbol={selectedSymbol}>
+                  <PositionCard />
+                </ComplianceLockOverlay>
+                <ComplianceLockOverlay symbol={selectedSymbol}>
+                  <ConfluenceFactors />
+                </ComplianceLockOverlay>
               </div>
             </div>
 

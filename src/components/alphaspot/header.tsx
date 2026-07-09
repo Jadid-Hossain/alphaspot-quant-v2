@@ -11,6 +11,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { Watchlist } from './watchlist'
+import { ShariahSettings } from './shariah-settings'
 import { useState } from 'react'
 
 export function Header() {
@@ -20,6 +21,7 @@ export function Header() {
   const startEngine = useAlphaSpot((s) => s.startEngine)
   const stopEngine = useAlphaSpot((s) => s.stopEngine)
   const resetPosition = useAlphaSpot((s) => s.resetPosition)
+  const shariahMode = useAlphaSpot((s) => s.shariahMode)
   const live = useAlphaSpot((s) => s.livePrices[s.selectedSymbol])
   const snap = useAlphaSpot((s) => s.snapshots[s.selectedSymbol])
   const enabled = engine?.enabled ?? true
@@ -108,6 +110,9 @@ export function Header() {
             {connected ? <Wifi className="h-3.5 w-3.5" /> : <WifiOff className="h-3.5 w-3.5" />}
             <span className="hidden sm:inline">{connected ? 'Live' : 'Offline'}</span>
           </div>
+
+          {/* Shariah Compliance Settings */}
+          <ShariahSettings />
 
           {enabled ? (
             <button

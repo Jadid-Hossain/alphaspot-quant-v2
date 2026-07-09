@@ -38,6 +38,13 @@ import {
   type RiskConfig,
 } from '../../src/lib/alphaspot/risk-engine'
 import { explainDecision, marketCommentary } from './llm'
+import {
+  shouldDropForCompliance,
+  setShariahMode,
+  isShariahModeEnabled,
+  loadComplianceCache,
+  getComplianceSummary,
+} from './compliance-gate'
 import type {
   Symbol,
   Timeframe,
@@ -290,6 +297,13 @@ async function executeDecision(symbol: Symbol, snapshot: SymbolSnapshot) {
 }
 
 async function evaluateSymbol(symbol: Symbol) {
+  // ── SHARIAH COMPLIANCE GATE (§2) ──
+  // If shariahMode is ON and the asset is non-compliant, drop it instantly
+  // BEFORE any feature engineering, ML inference, or risk calculations.
+  if (shouldDropForCompliance(symbol)) {
+    return // Non-compliant asset — dropped from evaluation queue
+  }
+
   const snap = buildSnapshot(symbol)
   if (!snap) return
 
@@ -437,6 +451,12 @@ io.on('connection', (socket) => {
     } else if (cmd.action === 'reset' && cmd.symbol) {
       positions.set(cmd.symbol, emptyPosition(cmd.symbol))
       logEntry(cmd.symbol, 'SYSTEM', 'INFO', `Position for ${cmd.symbol} reset to FLAT (paper).`)
+    } else if (cmd.action === 'shariah-on') {
+      setShariahMode(true)
+      logEntry(SYMBOLS[0] ?? 'BTC/USDT', 'SYSTEM', 'INFO', 'Shariah Compliance Mode ENABLED. Non-compliant assets filtered from pipeline. Execution locked to unleveraged Spot.')
+    } else if (cmd.action === 'shariah-off') {
+      setShariahMode(false)
+      logEntry(SYMBOLS[0] ?? 'BTC/USDT', 'SYSTEM', 'INFO', 'Shariah Compliance Mode DISABLED.')
     }
     io.emit('engine', getEngineState())
   })
@@ -554,6 +574,9 @@ async function boot() {
 
   // 7. Fetch Fear & Greed
   refreshFearGreed().catch(() => {})
+
+  // 7b. Load Shariah compliance cache
+  await loadComplianceCache().catch((e) => console.error('[boot] compliance cache load failed', e))
 
   // 8. Start round-robin evaluation queue
   startEvalQueue()

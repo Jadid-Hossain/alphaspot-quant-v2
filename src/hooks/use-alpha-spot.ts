@@ -1,6 +1,7 @@
 'use client'
 
 import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
 import { io, type Socket } from 'socket.io-client'
 import type {
   Symbol,
@@ -10,6 +11,7 @@ import type {
   ServerToClientEvents,
   ClientToServerEvents,
 } from '@/lib/alphaspot/types'
+import type { ComplianceCategory } from '@/lib/alphaspot/compliance-registry'
 
 export interface LogEntry {
   id: string
@@ -35,6 +37,14 @@ export interface TradeEntry {
   createdAt: string
 }
 
+export interface ComplianceInfo {
+  symbol: string
+  base: string
+  isShariahCompliant: boolean
+  complianceReason: string
+  complianceCategory: ComplianceCategory
+}
+
 interface AlphaSpotState {
   connected: boolean
   engine: EngineState | null
@@ -50,6 +60,16 @@ interface AlphaSpotState {
   socket: Socket<ServerToClientEvents, ClientToServerEvents> | null
   lastPriceFlash: Record<string, 'up' | 'down' | null>
 
+  // ── Shariah Compliance Mode (persisted to localStorage) ──
+  /** Global toggle for Strict Shariah Compliance Mode.
+   *  When true, non-compliant assets are filtered from the pipeline and
+   *  execution is locked to unleveraged Spot trading. */
+  shariahMode: boolean
+  /** Compliance data per symbol, fetched from /api/compliance. */
+  complianceMap: Record<string, ComplianceInfo>
+  /** Whether the compliance data has been loaded. */
+  complianceLoaded: boolean
+
   connect: () => void
   setSelectedSymbol: (s: Symbol) => void
   startEngine: () => void
@@ -57,22 +77,32 @@ interface AlphaSpotState {
   resetPosition: (s: Symbol) => void
   clearLogs: () => void
   loadHistory: () => Promise<void>
+  setShariahMode: (on: boolean) => void
+  loadCompliance: () => Promise<void>
+  getCompliance: (symbol: string) => ComplianceInfo | null
 }
 
 const MAX_LOGS = 300
 const MAX_TRADES = 100
 
-export const useAlphaSpot = create<AlphaSpotState>((set, get) => ({
-  connected: false,
-  engine: null,
-  symbols: [],
-  snapshots: {},
-  livePrices: {},
-  logs: [],
-  trades: [],
-  selectedSymbol: 'BTC/USDT',
-  socket: null,
-  lastPriceFlash: {},
+export const useAlphaSpot = create<AlphaSpotState>()(
+  persist(
+    (set, get) => ({
+      connected: false,
+      engine: null,
+      symbols: [],
+      snapshots: {},
+      livePrices: {},
+      logs: [],
+      trades: [],
+      selectedSymbol: 'BTC/USDT',
+      socket: null,
+      lastPriceFlash: {},
+
+      // Shariah Compliance Mode — persisted to localStorage
+      shariahMode: false,
+      complianceMap: {},
+      complianceLoaded: false,
 
   connect: () => {
     if (get().socket) return
@@ -185,7 +215,51 @@ export const useAlphaSpot = create<AlphaSpotState>((set, get) => ({
       console.error('loadHistory failed', e)
     }
   },
-}))
+
+  // ── Shariah Compliance Mode actions ──
+  setShariahMode: (on) => {
+    set({ shariahMode: on })
+    console.log(`[store] Shariah Compliance Mode ${on ? 'ENABLED' : 'DISABLED'}`)
+    // Notify the backend engine to apply the pipeline gate
+    get().socket?.emit('control', { action: on ? 'shariah-on' : 'shariah-off' })
+  },
+
+  loadCompliance: async () => {
+    try {
+      const res = await fetch('/api/compliance')
+      if (!res.ok) return
+      const data = await res.json()
+      const map: Record<string, ComplianceInfo> = {}
+      for (const r of data.records ?? []) {
+        map[r.symbol] = {
+          symbol: r.symbol,
+          base: r.base,
+          isShariahCompliant: r.isShariahCompliant,
+          complianceReason: r.complianceReason,
+          complianceCategory: r.complianceCategory as ComplianceCategory,
+        }
+      }
+      set({ complianceMap: map, complianceLoaded: true })
+    } catch (e) {
+      console.error('loadCompliance failed', e)
+    }
+  },
+
+  getCompliance: (symbol) => {
+    return get().complianceMap[symbol] ?? null
+  },
+    }),
+    {
+      name: 'alphaspot-store',
+      // Only persist the shariahMode flag (not socket/live data)
+      partialize: (state) => ({ shariahMode: state.shariahMode }),
+      // SSR-safe storage: returns undefined on the server, localStorage on client
+      storage: createJSONStorage(() => (typeof window !== 'undefined' ? window.localStorage : undefined)),
+      // Skip hydration during SSR — rehydrate happens on client only
+      skipHydration: true,
+    },
+  ),
+)
 
 function nowMs() {
   return Date.now()

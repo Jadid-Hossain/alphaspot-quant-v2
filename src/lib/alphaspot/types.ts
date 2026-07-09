@@ -185,5 +185,5 @@ export interface ServerToClientEvents {
 // Socket.io event payloads (client -> server)
 export interface ClientToServerEvents {
   subscribe: (symbols: Symbol[]) => void
-  control: (cmd: { action: 'start' | 'stop' | 'reset'; symbol?: Symbol }) => void
+  control: (cmd: { action: 'start' | 'stop' | 'reset' | 'shariah-on' | 'shariah-off'; symbol?: Symbol }) => void
 }

@@ -72,3 +72,20 @@ model EngineConfig {
   strongSellScore   Int     @default(-75)
   enabled           Boolean @default(true)
 }
+
+// Ethical Structural Constraints — Shariah Compliance Mode
+// Tracks whether an asset passes Shariah screening (utility test, no
+// interest-based lending, no gambling, no prohibited speculation).
+model AssetCompliance {
+  id                  String   @id @default(cuid())
+  symbol              String   @unique // canonical "BTC/USDT"
+  base                String   // "BTC"
+  isShariahCompliant  Boolean  @default(false)
+  complianceReason    String   @default("Pending compliance review")
+  complianceCategory  String   @default("PENDING") // COMPLIANT | HARAM | PENDING
+  classifiedAt        DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([isShariahCompliant])
+  @@index([base])
+}
