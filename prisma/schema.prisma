@@ -89,3 +89,38 @@ model AssetCompliance {
   @@index([isShariahCompliant])
   @@index([base])
 }
+
+// Chapter 3.4 — Historical Data Manager (metadata store)
+// Stores dataset metadata; actual OHLCV payloads live in the columnar
+// Payload Store (§15 — physically separated from transactional DB).
+model HistoricalDataset {
+  id                        String   @id @default(cuid())
+  datasetId                 String   @unique // canonical dataset identifier
+  version                   Int      // monotonically increasing version
+  exchange                  String   // e.g. "binance"
+  symbol                    String   // canonical "BTC/USDT"
+  timeframe                 String   // e.g. "15m"
+  startTime                 Int      // UTC Unix epoch (seconds) §9.1
+  endTime                   Int      // UTC Unix epoch (seconds)
+  candleCount               Int
+  importTimestamp           BigInt   // UTC Unix epoch (ms)
+  source                    String   // "exchange-rest" | "exchange-archive" | "internal-replay"
+  validationStatus          String   @default("PENDING") // PENDING | VALIDATED | QUARANTINED | FAILED
+  normalizationVersion      String   @default("1.0.0")
+  featureCompatibilityVersion String  @default("2.0.0") // §18.1
+  storageLocation           String   // path/key in the payload store
+  storageFormat             String   @default("columnar") // columnar | parquet | arrow | duckdb
+  coveragePct               Float    @default(0) // §10 data quality
+  missingCandleCount        Int      @default(0)
+  repairCount               Int      @default(0)
+  importErrorCount          Int      @default(0)
+  healthScore               Float    @default(0) // 0..1
+  retentionStatus           String   @default("ACTIVE") // ACTIVE | ARCHIVED | COMPRESSED | RETIRED
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  @@index([symbol, timeframe, version])
+  @@index([exchange, symbol])
+  @@index([validationStatus])
+  @@index([retentionStatus])
+}

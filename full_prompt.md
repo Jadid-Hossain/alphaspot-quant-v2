@@ -1208,3 +1208,129 @@ Rule 10 — Every cache partition is independently recoverable.
 The Market State Cache serves as the authoritative, low-latency representation of the live cryptocurrency market. It isolates downstream analytical components from exchange complexity while guaranteeing atomicity, consistency, deterministic versioning, partition isolation, bounded memory usage, and recoverable state. Every prediction, feature calculation, and trading recommendation relies exclusively on this validated market state.
 
 END OF CHAPTER 3.3
+
+---
+
+# CHAPTER 3.4 — HISTORICAL DATA MANAGER
+
+## 1. Purpose
+
+The Historical Data Manager (HDM) is the authoritative source of historical market data. It provides validated, versioned, reproducible historical datasets. Supports: feature engineering, model training, backtesting, market intelligence, explainability, statistical validation. Performs NO live market ingestion, AI inference, or recommendation generation.
+
+## 2. Design Philosophy
+
+Historical data is immutable. Historical records are facts. Facts must never change. Corrections require new versions. The platform never rewrites history.
+
+## 3. Single Source of Truth
+
+Every historical candle originates from exactly one authoritative dataset. Business domains never download historical candles directly from exchanges. All historical requests pass through the HDM.
+
+## 4. Data Sources
+
+Exchange REST APIs, exchange archive files, validated internal replay, future institutional providers. All imported datasets undergo identical validation.
+
+## 5. Data Organization
+
+Partitioned by: Exchange → Asset → Timeframe → Time Range → Dataset Version. Each partition independently manageable.
+
+## 6. Supported Timeframes
+
+1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 12h, 1d, 1w. Future intervals may be added without changing consumer interfaces.
+
+## 7. Dataset Versioning
+
+Every imported dataset receives: Dataset ID, Dataset Version, Import Timestamp, Source, Validation Status, Normalization Version. Consumers may reproduce historical calculations using exact dataset versions.
+
+## 8. Data Validation
+
+Checks: missing candles, duplicate candles, invalid timestamps, OHLC consistency, volume validity, interval continuity. Invalid datasets quarantined.
+
+## 9. Data Normalization
+
+Historical data converted into canonical format independent of exchange-specific schema. Normalization is versioned.
+
+## 9.1 Canonical Timestamp Standard
+
+All canonical historical timestamps stored using unified UTC Unix Epoch representation. UTC only, timezone independent, daylight-saving independent, integer representation, monotonically increasing. Local timezones prohibited. ISO date strings prohibited inside canonical datasets. Presentation formatting belongs exclusively to the UI. All analytical domains consume UTC Epoch timestamps.
+
+## 10. Data Quality
+
+Each dataset records: Coverage %, Missing Candle Count, Repair Count, Validation Result, Import Errors, Dataset Health Score. Consumers may reject datasets below minimum quality thresholds.
+
+## 11. Gap Detection
+
+Continuously scans for: missing intervals, duplicate intervals, overlapping intervals, clock discontinuities, corrupted ranges. Detected gaps enter repair workflow.
+
+## 12. Data Repair
+
+Repair follows: Gap Detection → Source Verification → Authoritative Download → Validation → Replacement Dataset. Original datasets remain archived.
+
+## 13. Immutability
+
+Validated datasets become immutable. Updates create Dataset Version + 1. Historical reproducibility is mandatory.
+
+## 14. Data Access
+
+Consumers request datasets through versioned interfaces specifying: Asset, Timeframe, Date Range, Dataset Version (optional). HDM returns immutable historical snapshots.
+
+## 14.1 Historical / Live Stitching Compatibility
+
+HDM and Market State Cache must expose structurally compatible market objects. Historical candles and live candles share the same canonical schema. Enables deterministic concatenation of Historical Dataset + Live Market State → Unified Time Series without runtime field mapping. Consumers unaware whether observations originate from historical storage or live cache. Incomplete live candles explicitly marked using canonical metadata. Completed historical candles remain immutable.
+
+## 15. Storage Architecture
+
+Historical market payloads and dataset metadata shall be physically separated.
+Metadata Store (Prisma): Dataset ID, Version, Import Time, Source, Validation Status, Health Score, Storage Location, Normalization Version, Feature Compatibility Version.
+Historical Payload Store: OHLCV, Trades, Order Book Snapshots, Funding History, Open Interest. Utilizes optimized columnar format (Parquet, Arrow, DuckDB, or equivalent). Storage layer responsible for compression, partition pruning, column projection, sequential streaming, efficient analytical retrieval. Transactional databases shall never become the primary storage mechanism for large historical market payloads.
+
+## 16. Caching
+
+Frequently accessed historical ranges may be cached. Historical cache independent from Market State Cache. Cache invalidation follows dataset versioning.
+
+## 17. Data Retention
+
+Configurable policy: Active, Archived, Compressed, Retired. No dataset permanently deleted unless explicitly permitted.
+
+## 18. Reproducibility
+
+Every experiment must record: Dataset Version, Feature Version, Model Version, Normalization Version. Guarantees identical future replay.
+
+## 18.1 Feature Compatibility Contract
+
+Every historical dataset shall declare its feature compatibility version. Feature Engineering consumes only datasets whose schema version is compatible with the active feature pipeline. Changes to canonical market schemas shall never silently invalidate historical feature generation. Schema evolution requires explicit compatibility tracking. Historical reproducibility remains guaranteed.
+
+## 19. Observability
+
+Metrics: Import Rate, Validation Failures, Gap Count, Repair Count, Dataset Size, Query Latency, Cache Hit Rate, Dataset Health.
+
+## 20. Failure Handling
+
+Import failures remain isolated. Dataset corruption never propagates. Consumers continue using previous validated versions until replacement is available.
+
+## 21. Scalability
+
+Supports: additional exchanges, assets, timeframes, larger historical archives, future cloud storage without architectural redesign.
+
+## 22. Architectural Rules
+
+Rule 1 — Historical data is immutable.
+Rule 2 — Every dataset is versioned.
+Rule 3 — Consumers never download history directly from exchanges.
+Rule 4 — Historical datasets must be validated.
+Rule 5 — Historical corrections create new versions.
+Rule 6 — Historical storage remains independent from live market state.
+Rule 7 — Every experiment must record dataset versions.
+Rule 8 — Historical reproducibility is mandatory.
+Rule 9 — Repair never overwrites validated history.
+Rule 10 — Business domains remain storage-independent.
+Rule 11 — Canonical timestamps shall use UTC Unix Epoch.
+Rule 12 — Historical and live market objects must share the same canonical schema.
+Rule 13 — Historical payloads and metadata remain physically separated.
+Rule 14 — Large historical datasets shall use optimized columnar storage.
+Rule 15 — Historical datasets shall declare feature compatibility versions.
+
+## 23. Chapter Summary
+
+The Historical Data Manager provides a validated, versioned, immutable, reproducible historical market repository. It separates historical analytics from live market processing while guaranteeing dataset integrity, version traceability, repairability, and long-term reproducibility across every analytical workflow.
+
+END OF CHAPTER 3.4

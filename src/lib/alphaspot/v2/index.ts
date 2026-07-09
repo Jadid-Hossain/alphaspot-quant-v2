@@ -37,6 +37,7 @@ export * from './governance' // Source-of-truth + dependency governance + error 
 export * from './connectivity' // Exchange connector + subscription manager + connection pool + stream sharding + heartbeat + time sync + rate limits + jitter buffer + reconnection + data recovery (Chapter 3.1)
 export * from './market-data' // Canonical market events + bounded ring buffer + schema/timestamp/sequence/duplicate validation + normalization + integrity verification + publication + replay (Chapter 3.2)
 export * from './market-state' // Market state cache — partitioned, atomic, versioned, immutable snapshots, quality tracking, recovery (Chapter 3.3)
+export * from './historical-data' // Historical data manager — immutable datasets, versioned, UTC epoch, gap detection + repair, columnar payload store, stitching (Chapter 3.4)
 export * from './lanes/lane-a-realtime'
 export * from './lanes/lane-b-analytical'
 export * from './lanes/lane-c-research'
