@@ -676,3 +676,120 @@ Rule 10 — Concurrency is controlled through architecture, not ad-hoc synchroni
 AlphaSpot Quant is designed to remain operational under heavy computational load, partial infrastructure failure, and evolving deployment environments. Runtime execution is isolated. Persistence is coordinated. Concurrency is controlled. Resources are managed. Failures are expected. Recovery is automatic whenever possible. The platform prioritizes resilience, predictability, and operational stability over raw throughput.
 
 END OF CHAPTER 2.3
+
+---
+
+# CHAPTER 2.4 — ENGINEERING STANDARDS, GOVERNANCE & ARCHITECTURAL CONSTRAINTS
+
+## 1. Purpose
+
+This chapter defines the engineering constitution of AlphaSpot Quant. It establishes mandatory rules governing: software quality, architectural consistency, dependency management, code ownership, API contracts, configuration, security, testing, documentation, extensibility. These rules apply to every module without exception.
+
+## 2. Engineering Philosophy
+
+The platform is designed for long-term evolution. Engineering decisions must prioritize: correctness, maintainability, readability, determinism, modularity, observability, reproducibility. Short-term convenience must never compromise long-term architectural integrity.
+
+## 3. Source of Truth
+
+Every business concept has one authoritative owner. Examples: Market Price → Market Data Domain; Feature Vector → Feature Engineering; Prediction → Machine Learning; Trade Candidate → Decision Engine; Risk Assessment → Risk Engine; Recommendation → Recommendation Publisher. No duplicated ownership is permitted.
+
+## 4. Dependency Governance
+
+Software dependencies are strictly hierarchical. Higher-level domains may depend on lower-level services only through public contracts. Forbidden: circular dependencies, bidirectional dependencies, hidden dependencies, runtime imports across architectural boundaries. All dependencies must be explicit.
+
+## 5. Public Contracts
+
+Every domain exposes only: public interfaces, event contracts, service contracts, data transfer objects. Internal implementation remains private. No external module may access internal state.
+
+## 6. Configuration Management
+
+Configuration must be externalized. No hardcoded: API keys, exchange URLs, thresholds, model paths, credentials, risk parameters. Configurations must support: validation, versioning, environment isolation.
+
+## 7. Security Boundaries
+
+The principle of least privilege is mandatory. Every subsystem receives only the permissions required for its responsibility. Sensitive information must never appear in: logs, events, exceptions, dashboards. Secrets remain isolated from business logic.
+
+## 8. Error Handling Policy
+
+Errors are classified: Business Errors, Infrastructure Errors, Configuration Errors, Validation Errors, External Dependency Errors. Each category has its own handling strategy. Errors must never be silently ignored.
+
+## 9. API Design Standards
+
+Every public API must be: deterministic, versioned, documented, strongly typed, backward compatible whenever practical. Breaking changes require explicit version upgrades.
+
+## 10. Model Governance
+
+Machine learning models are versioned artifacts. Every prediction must record: model version, feature version, inference timestamp, calibration version, confidence. Models may be upgraded without changing downstream interfaces.
+
+## 11. Feature Governance
+
+Every analytical feature requires: unique identifier, definition, calculation method, validation rules, version. Feature definitions must remain reproducible across time.
+
+## 12. Testing Strategy
+
+Every domain supports independent testing. Required categories: Unit Tests, Integration Tests, Contract Tests, Regression Tests, Performance Tests, Failure Recovery Tests. No production feature may bypass testing.
+
+## 13. Observability Standards
+
+Every critical operation must expose: metrics, logs, traces, health state, execution duration. No critical business workflow may become opaque.
+
+## 14. Documentation Requirements
+
+Every public module includes: Purpose, Inputs, Outputs, Dependencies, Events Produced, Events Consumed, Failure Conditions, Performance Characteristics. Documentation is part of the implementation.
+
+## 15. Extension Policy
+
+Future capabilities must be added through extension, never through modification of stable core components. Examples: New Exchange → Plugin; New ML Model → Plugin; New Indicator → Plugin; New Strategy → Plugin. Core architecture remains stable.
+
+## 16. Plugin Architecture
+
+The platform supports replaceable plugins: Exchange Connectors, Feature Generators, Market Intelligence Modules, ML Models, Risk Models, Portfolio Models. Plugins communicate only through public contracts.
+
+## 17. Code Quality Standards
+
+Every code contribution must satisfy: clear naming, strong typing, deterministic behavior, explicit dependencies, minimal side effects, comprehensive error handling, complete documentation, automated testing. Readability is preferred over cleverness.
+
+## 18. Performance Standards
+
+Optimization follows measurement. Premature optimization is prohibited. Performance improvements must preserve: correctness, determinism, maintainability.
+
+## 19. Change Management
+
+Every architectural change requires evaluation of: compatibility, performance, scalability, testing impact, migration requirements. Architecture evolves intentionally. Never accidentally.
+
+## 20. Prohibited Practices
+
+Forbidden: hidden global state, magic numbers, duplicated business logic, direct cross-domain access, silent exception handling, undocumented APIs, hardcoded credentials, bypassing validation, bypassing risk controls, bypassing architectural layers.
+
+## 21. Development Principles
+
+Every implementation should be: Simple before complex. Correct before fast. Observable before optimized. Modular before convenient. Reliable before feature-rich.
+
+## 22. Quality Gates
+
+No component enters production unless it satisfies: Architecture Review → Static Analysis → Automated Tests → Integration Validation → Performance Validation → Documentation Review → Approval.
+
+## 23. Future Evolution
+
+The architecture is expected to evolve. Future improvements may include: additional exchanges, distributed execution, alternative storage engines, improved AI models, reinforcement learning, new portfolio optimizers. These enhancements must preserve the architectural principles defined in Chapters 1 and 2.
+
+## 24. Engineering Constitution
+
+Every future implementation must respect:
+1. Architectural boundaries.
+2. Single responsibility.
+3. Public contracts.
+4. Event-driven communication.
+5. Coordinated persistence.
+6. Immutable snapshots.
+7. Explainable recommendations.
+8. Reproducible predictions.
+9. Risk-first decision making.
+10. Continuous validation.
+These principles override implementation convenience.
+
+## 25. Chapter Summary
+
+Chapter 2 establishes the permanent engineering rules of AlphaSpot Quant. Every future module, service, model, API, and feature must comply with these standards. The architecture is designed to remain stable, extensible, and maintainable as the platform grows in complexity.
+
+END OF CHAPTER 2.4
