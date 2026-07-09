@@ -35,6 +35,7 @@ export * from './events' // Event transport + catalog + snapshot lifecycle + orc
 export * from './runtime' // Write coordinator + worker pool + cache hierarchy + backpressure + fault tolerance + watchdogs (Chapter 2.3)
 export * from './governance' // Source-of-truth + dependency governance + error handling + config + security + model/feature governance + plugins + quality gates + constitution (Chapter 2.4 + 2.5)
 export * from './connectivity' // Exchange connector + subscription manager + connection pool + stream sharding + heartbeat + time sync + rate limits + jitter buffer + reconnection + data recovery (Chapter 3.1)
+export * from './market-data' // Canonical market events + bounded ring buffer + schema/timestamp/sequence/duplicate validation + normalization + integrity verification + publication + replay (Chapter 3.2)
 export * from './lanes/lane-a-realtime'
 export * from './lanes/lane-b-analytical'
 export * from './lanes/lane-c-research'

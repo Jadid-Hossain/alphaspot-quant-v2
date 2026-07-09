@@ -990,3 +990,122 @@ Rule 8 — The Connectivity Layer owns all exchange communication.
 The Exchange Connectivity Layer provides a resilient, exchange-independent foundation. It guarantees synchronized, validated, recoverable, observable market connectivity while isolating the platform from exchange-specific behavior.
 
 END OF CHAPTER 3.1
+
+---
+
+# CHAPTER 3.2 — REAL-TIME MARKET DATA PIPELINE
+
+## 1. Purpose
+
+Defines how raw exchange messages become validated, normalized, deterministic market events. Every downstream component receives identical, ordered, high-quality market data. Pipeline performs: ingestion, validation, normalization, sequencing, integrity verification, publication. Performs NO indicators, feature engineering, predictions, or trading logic.
+
+## 2. Pipeline Philosophy
+
+Raw exchange messages are never consumed directly. Every message must pass through the complete pipeline before becoming official platform data. No downstream domain may bypass this process.
+
+## 3. Data Flow
+
+Exchange Stream → Raw Message Buffer → Schema Validation → Timestamp Validation → Sequence Validation → Duplicate Detection → Normalization → Integrity Verification → Canonical Market Event → Publication
+
+## 4. Raw Message Buffer
+
+Incoming messages written to temporary in-memory buffer. Absorbs bursts, preserves arrival order, isolates exchange latency, prevents downstream overload. Raw messages never permanently stored.
+
+## 4.1 Bounded Ingestion Buffer
+
+Fixed-capacity bounded ring buffer (e.g. 50,000 events). When capacity reached, apply Backpressure Policy before allocating additional memory. Runtime must never permit unlimited buffer growth. Priority order (highest first): Trade, Depth Update, BookTicker, Kline, MiniTicker, Ticker. Dropping high-priority events prohibited unless explicitly authorized by emergency degradation policy. Every discarded event must generate operational metrics.
+
+## 5. Schema Validation
+
+Every message must satisfy the published exchange schema. Validation: required fields, field types, numeric ranges, symbol format, interval identifiers. Malformed messages rejected.
+
+## 6. Timestamp Validation
+
+Every message contains: Exchange Timestamp, Reception Timestamp, Pipeline Timestamp. Validation confirms chronological consistency, acceptable latency, clock synchronization. Messages outside tolerance are flagged.
+
+## 6.1 High-Resolution Timestamp Policy
+
+Reception Timestamp and Pipeline Timestamp use monotonic high-resolution timestamps. Must provide sufficient precision to uniquely order events arriving within the same millisecond. Timestamp precision implementation-independent. Business logic must never depend upon a specific timing API. High-resolution timestamps exist exclusively for: deterministic ordering, replay consistency, latency measurement, performance tracing.
+
+## 7. Sequence Validation
+
+Validation checks: sequence continuity, missing sequences, duplicated sequences, replay sequences, out-of-order arrivals. Broken sequences trigger reconciliation.
+
+## 8. Duplicate Detection
+
+Duplicate market events discarded. Identification may include: exchange sequence, timestamp, trade identifier, order book update identifier. Duplicate processing prohibited.
+
+## 9. Out-of-Order Handling
+
+Out-of-order events temporarily buffered. Pipeline attempts deterministic reordering. If ordering cannot be restored within the configured window: reconciliation initiated OR event discarded according to policy.
+
+## 10. Data Normalization
+
+Validated messages transformed into canonical market events. Canonical fields: symbol, event type, exchange timestamp, platform timestamp, normalized price, normalized quantity, side, source exchange, event version. Exchange-specific formats remain encapsulated.
+
+## 11. Event Versioning
+
+Canonical Market Events are versioned. Future schema evolution must preserve compatibility. Consumers declare supported versions.
+
+## 12. Market Event Types
+
+Trade, Ticker, MiniTicker, BookTicker, Depth Update, Partial Depth, Kline, Funding Information, Reference Update, Heartbeat. Additional event types may be added without breaking existing consumers.
+
+## 13. Integrity Verification
+
+Before publication: valid symbol, positive quantity, positive price, valid timestamps, sequence integrity, supported version. Invalid events quarantined.
+
+## 14. Event Publication
+
+Only verified canonical events may be published. Publication follows Chapter 2.2 event architecture. Every published event is immutable.
+
+## 15. Backpressure Management
+
+During bursts: queue expansion, workload prioritization, controlled throttling, temporary analytical delay. Realtime ingestion highest priority. Market data never silently discarded unless explicitly permitted by policy.
+
+## 16. Burst Handling
+
+Pipeline must remain operational during: liquidation cascades, exchange spikes, news events, extreme volatility. Burst conditions observable.
+
+## 17. Pipeline Isolation
+
+Pipeline stages remain isolated. Failure inside one stage does not terminate the entire pipeline. Recovery occurs from the failed stage whenever possible.
+
+## 18. Pipeline Replay
+
+Historical canonical events may be replayed using identical event contracts. Consumers unaware whether events originate from live exchange or historical replay. Replay guarantees deterministic behavior.
+
+## 18.1 Replay Execution Policy
+
+STANDARD REPLAY: Historical data follows the complete validation pipeline. Used for externally imported or untrusted data.
+VALIDATED REPLAY: Previously validated historical datasets bypass schema/duplicate/sequence validation. Consumers receive canonical events directly. Exists exclusively for large-scale backtesting, model validation, performance benchmarking. Replay mode explicitly selected. Replay provenance always recorded. No replay mode may alter business logic or event contracts. Replay and live execution remain behaviorally equivalent from downstream consumers' perspective.
+
+## 19. Observability
+
+Pipeline metrics: ingestion rate, validation failures, duplicate count, reordered events, reconciliation count, burst frequency, publication latency, queue depth, dropped events. All continuously observable.
+
+## 20. Failure Handling
+
+Schema Failure → Reject Message. Sequence Failure → Reconcile. Timestamp Failure → Flag/Quarantine. Normalization Failure → Reject. Publication Failure → Retry through Orchestrator.
+
+## 21. Architectural Rules
+
+Rule 1 — Raw exchange data is never consumed directly.
+Rule 2 — Every market event is validated.
+Rule 3 — Every published event is canonical.
+Rule 4 — Canonical events are immutable.
+Rule 5 — Duplicate events are never published.
+Rule 6 — Ordering must be deterministic.
+Rule 7 — Consumers only receive canonical events.
+Rule 8 — Replay and live execution use identical event contracts.
+Rule 9 — Exchange-specific formats never escape the pipeline.
+Rule 10 — Data quality takes precedence over publication speed.
+Rule 11 — Realtime buffers must always remain memory bounded.
+Rule 12 — Deterministic ordering requires high-resolution monotonic timestamps.
+Rule 13 — Replay behavior shall be governed by explicit replay policies rather than implicit assumptions.
+
+## 22. Chapter Summary
+
+The Real-Time Market Data Pipeline transforms raw, exchange-specific messages into deterministic, validated, normalized, immutable market events. Every downstream domain operates on identical, high-quality data regardless of exchange behavior, network latency, or message ordering. The pipeline guarantees consistency, traceability, replayability, and resilience under both normal and extreme market conditions.
+
+END OF CHAPTER 3.2
