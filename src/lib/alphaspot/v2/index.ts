@@ -9,6 +9,7 @@
 //   Chapter 2.3: Runtime architecture — write coordination, worker pool, cache hierarchy, backpressure, fault tolerance, watchdogs
 //   Chapter 2.4: Engineering standards & governance — source-of-truth, dependency governance, error classification, config, security, model/feature governance, plugins, quality gates, constitution
 //   Chapter 2.5: AI governance — model lifecycle, prediction traceability, confidence calibration, performance monitoring, drift detection, model decay policy, shadow evaluation, recommendation validity, operational safety, explainability, governance alerts, audit trail, continuous improvement
+//   Chapter 3.1: Exchange connectivity — exchange abstraction, connection lifecycle, subscription management, connection pool + stream sharding, heartbeat, time sync, rate limits, reconnection policy, jitter buffer, data gap detection, data recovery, failover, observability
 //
 // The 10-stage pipeline (Chapter 1) maps onto the 14 domains (Chapter 2.1):
 //   • Market Observation           → Domain 03 (Gateway) + 04 (Data)
@@ -32,7 +33,8 @@ export * from './types'
 export * from './domains' // 14 domains + domain map + I/O flow (Chapter 2.1)
 export * from './events' // Event transport + catalog + snapshot lifecycle + orchestrator (Chapter 2.2)
 export * from './runtime' // Write coordinator + worker pool + cache hierarchy + backpressure + fault tolerance + watchdogs (Chapter 2.3)
-export * from './governance' // Source-of-truth + dependency governance + error handling + config + security + model/feature governance + plugins + quality gates + constitution (Chapter 2.4)
+export * from './governance' // Source-of-truth + dependency governance + error handling + config + security + model/feature governance + plugins + quality gates + constitution (Chapter 2.4 + 2.5)
+export * from './connectivity' // Exchange connector + subscription manager + connection pool + stream sharding + heartbeat + time sync + rate limits + jitter buffer + reconnection + data recovery (Chapter 3.1)
 export * from './lanes/lane-a-realtime'
 export * from './lanes/lane-b-analytical'
 export * from './lanes/lane-c-research'

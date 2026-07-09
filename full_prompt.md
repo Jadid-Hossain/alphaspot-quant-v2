@@ -902,3 +902,91 @@ Rule 10 — No AI model receives permanent authority.
 AlphaSpot Quant governs its AI as carefully as it governs its trading recommendations. Models are versioned. Predictions are traceable. Confidence is continuously calibrated. Market drift is monitored. Recommendation quality is continuously measured. The platform continuously evaluates itself, allowing trust to be earned through measurable performance rather than assumed indefinitely.
 
 END OF CHAPTER 2.5
+
+---
+
+# CHAPTER 3.1 — EXCHANGE CONNECTIVITY ARCHITECTURE
+
+## 1. Purpose
+
+The Exchange Connectivity Layer maintains continuous, reliable, synchronized communication with supported exchanges. Its responsibility ends after obtaining validated market data. It performs NO feature engineering, prediction, ranking, trading decisions, or risk calculations.
+
+## 2. Design Principles
+
+The layer shall be: deterministic, fault tolerant, exchange agnostic, low latency, observable, scalable, recoverable, independently testable.
+
+## 3. Supported Connection Types
+
+Category A — Streaming Market Data (Trades, Ticker, MiniTicker, BookTicker, Depth, Kline)
+Category B — Snapshot APIs (Order Book Snapshot, Historical Candles, Exchange Information)
+Category C — Reference APIs (Trading Rules, Precision, Filters, Lot Sizes, Tick Sizes)
+Category D — Operational APIs (Ping, Server Time, System Status)
+
+## 4. Exchange Abstraction
+
+Business domains never depend on exchange-specific implementations. Each connector exposes a common interface: connect, disconnect, reconnect, subscribe, unsubscribe, heartbeat, snapshot synchronization, capability discovery. Adding a new exchange requires only a new connector implementation.
+
+## 5. Connection Lifecycle
+
+INITIALIZING → AUTHENTICATING (if required) → CONNECTING → SUBSCRIBING → SYNCHRONIZING → LIVE → RECONNECTING → LIVE or FAILED. State transitions are monotonic.
+
+## 6. Subscription Management
+
+Centrally managed: creation, batching, prioritization, monitoring, renewal, removal. Duplicate subscriptions prohibited.
+
+## 7. Connection Pool
+
+The platform manages a pool of exchange connections: workload distribution, connection balancing, reconnect isolation, health monitoring, rate awareness. No single connection should become a bottleneck. Stream Sharding is explicitly mandated: dynamically calculate total required payload and chunk subscriptions across multiple independent WebSocket connections (e.g. Connection A handles coins 1-100, Connection B handles 101-200).
+
+## 8. Heartbeat Monitoring
+
+Every connection continuously reports: last message time, heartbeat latency, synchronization status, reconnect count, error state. Heartbeat failure initiates recovery.
+
+## 9. Time Synchronization
+
+Exchange server time is the authoritative source for market timestamps. Local clock drift must never determine market ordering.
+
+## 10. Rate Limit Governance
+
+The platform continuously monitors: request frequency, subscription count, reconnect frequency, bandwidth. Rate management belongs exclusively to the Connectivity Layer. Business domains remain unaware of limits.
+
+## 11. Reconnection Policy
+
+Unexpected disconnections initiate: Detect → Pause Publishing → Reconnect → Snapshot Synchronization → Gap Detection → Gap Recovery → Resume Publishing. Realtime publishing resumes only after successful synchronization.
+
+## 12. Data Gap Detection
+
+The platform continuously detects: missing trades, missing candles, missing depth updates, timestamp discontinuities, sequence discontinuities. Detected gaps require reconciliation. A Jitter Buffer is explicitly defined: the connector reads the exchange's native Update IDs (u and U in Binance payloads). If an out-of-order packet arrives, it is held in a micro-buffer for up to X milliseconds to wait for the missing packet. If the missing packet does not arrive, the system triggers the Resynchronization protocol (Section 11) immediately.
+
+## 13. Data Recovery
+
+Recovery always prefers authoritative snapshots. Recovered data must be validated before publication. Consumers never observe partially recovered state.
+
+## 14. Failover
+
+Connector failures remain isolated. Failure of one exchange connector must never interrupt others. Recovery occurs independently.
+
+## 15. Observability
+
+Each connector exposes: connection state, uptime, latency, bandwidth, reconnect count, dropped messages, synchronization status. All metrics continuously observable.
+
+## 16. Security
+
+Public market data requires no trading authority. Credentials, when required, remain isolated inside connector implementations. Business domains never access secrets.
+
+## 17. Architectural Rules
+
+Rule 1 — The Connectivity Layer performs no analytics.
+Rule 2 — Business domains never communicate directly with exchanges.
+Rule 3 — Every exchange implements the same interface.
+Rule 4 — Realtime publishing requires synchronization.
+Rule 5 — Data gaps must be detected.
+Rule 6 — Recovered data must be validated.
+Rule 7 — Exchange-specific behavior remains encapsulated.
+Rule 8 — The Connectivity Layer owns all exchange communication.
+
+## 18. Chapter Summary
+
+The Exchange Connectivity Layer provides a resilient, exchange-independent foundation. It guarantees synchronized, validated, recoverable, observable market connectivity while isolating the platform from exchange-specific behavior.
+
+END OF CHAPTER 3.1
