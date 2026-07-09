@@ -1559,3 +1559,113 @@ Rule 13 — All rolling temporal metrics shall use constant-memory algorithms.
 The MME establishes the deterministic foundation for real-time market context. Transforms canonical exchange events into bounded, immutable, high-quality market state snapshots. Provides consistent view of liquidity, execution pressure, spreads, and order flow. Guarantees deterministic replay, bounded memory, constant-time computation, exchange-independent behavior.
 
 END OF CHAPTER 3.6
+
+---
+
+# CHAPTER 3.7 — ORDER BOOK INTELLIGENCE ENGINE
+
+## 1. Purpose
+
+The Order Book Intelligence Engine (OBI) transforms canonical Market Microstructure Snapshots (Ch 3.6) into deterministic structural intelligence describing institutional liquidity behavior. Continuously estimates: Liquidity Wall Strength/Authenticity, Liquidity Vacuum, Spoofing Probability, Iceberg Probability, Absorption Strength, Queue Dynamics, Liquidity Migration, Structural Support/Resistance, Institutional Participation Score. Provides intelligence for Feature Engineering, ML, Explainable AI, Risk Engine. Performs NO technical indicators, AI inference, trade execution, or portfolio management.
+
+## 2. Design Philosophy
+
+Price is a consequence. Liquidity is the cause. Identifies how liquidity providers and takers interact before significant price movement. Measures quality, stability, and intent of visible market liquidity. All outputs deterministic, reproducible, statistically normalized.
+
+## 3. Input Contract
+
+Consumes only immutable Market Microstructure Snapshots (Ch 3.6): Best Bid/Ask, Order Book Depth, Spread Metrics, Liquidity Profile, Execution Pressure, Trade Pressure, Order Book Imbalance, Market State Version, Snapshot Timestamp. Raw exchange events prohibited.
+
+## 4. Output Contract
+
+Each cycle produces an immutable Order Book Intelligence Snapshot: Symbol, Timestamp, Liquidity Wall Strength, Liquidity Wall Authenticity, Liquidity Vacuum Score, Spoofing Probability, Iceberg Probability, Buyer/Seller Absorption Score, Queue Pressure Score, Liquidity Migration Score, Structural Support/Resistance Score, Institutional Participation Score, Structural Confidence, Snapshot Version.
+
+## 5. Liquidity Wall Analysis
+
+Identifies significant resting liquidity. Each wall evaluated: Relative Volume, Persistence, Reinforcement Rate, Cancellation Rate, Execution Interaction, Distance from Mid. Classified: Stable, Growing, Weakening, Consumed, Removed, Suspected Spoof. Genuine structural support/resistance only if persistent while absorbing execution pressure. Walls disappearing before execution → Spoofing Detection.
+
+## 6. Liquidity Vacuum Detection
+
+Detects rapidly disappearing liquidity: Depth Collapse, Spread Expansion, Thin Book Regions, Liquidity Discontinuity, Vacuum Duration, Vacuum Recovery Rate. Vacuums indicate elevated execution uncertainty.
+
+## 7. Spoofing Detection
+
+Estimates spoofing probability: Rapid Order Appearance, Rapid Cancellation, Repeated Fake Liquidity, Execution Avoidance, Layering Behavior, Cancellation Asymmetry.
+
+## 7.1 Dynamic Baseline Normalization
+
+Behavioral detection NEVER relies on fixed thresholds. Each asset maintains rolling statistical baselines for: Cancellation Rate, Order Arrival Rate, Refill Rate, Queue Lifetime. Spoofing probability computed relative to rolling baselines using configurable statistical normalization (e.g. rolling Z-score). Ensures asset-independent behavior detection.
+
+## 8. Iceberg Detection
+
+Estimates hidden liquidity through execution behavior: Constant Visible Size, Refill Frequency, Refill Consistency, Hidden Volume Estimate, Execution Persistence.
+
+## 8.1 Adaptive Detection
+
+Iceberg detection uses rolling statistical baselines rather than absolute refill thresholds. Only statistically abnormal refill behavior considered evidence of hidden liquidity.
+
+## 9. Absorption Detection
+
+Absorption = aggressive market orders repeatedly execute without meaningful price displacement. Metrics: Buyer/Seller Absorption, Absorption Duration, Absorption Intensity, Price Stability During Execution.
+
+## 9.1 Statistical Baseline
+
+Absorption strength evaluated relative to rolling execution statistics using adaptive normalization.
+
+## 10. Queue Dynamics
+
+Queue Growth, Queue Decay, Queue Replenishment, Cancellation Velocity, Execution Velocity. Estimates participant commitment.
+
+## 11. Liquidity Migration
+
+Tracks movement of liquidity through order book: Inward/Outward Migration, Liquidity Drift, Concentration Shift, Migration Velocity. Reveals evolving market intent.
+
+## 12. Structural Support & Resistance
+
+Inferred from persistent liquidity rather than historical price: Support/Resistance Strength, Liquidity Persistence, Structural Durability, Reinforcement Frequency.
+
+## 12.1 Distance-to-Mid Weighting
+
+Liquidity influence decays as distance from Mid Price increases. Near spread = greatest structural weight. Distant liquidity = progressively smaller influence via configurable weighting function. Ensures support/resistance reflect actionable market structure.
+
+## 13. Multi-Asset Isolation
+
+Each asset maintains independent OBI instance. Runtime state never shared.
+
+## 14. Failure Recovery
+
+Pause → Reload Latest Market Snapshot → Replay Missing Events → Recompute Intelligence → Validate Snapshot → Resume. Incomplete intelligence never published.
+
+## 15. Performance
+
+Constant-time updates, incremental computation, worker-based execution, lock-free reads, bounded memory, cache locality.
+
+## 16. Observability
+
+Wall Detection Count, Spoof Probability Distribution, Iceberg Detection Count, Absorption Events, Queue Update Rate, Processing Latency, Memory Usage, Worker Utilization, Structural Confidence Distribution.
+
+## 17. Scalability
+
+Multiple exchanges, additional assets, distributed workers, exchange-specific plugins without redesign.
+
+## 18. Architectural Rules
+
+Rule 1 — Only Market Microstructure Snapshots may be consumed.
+Rule 2 — Outputs are immutable.
+Rule 3 — Inference shall remain deterministic.
+Rule 4 — Historical replay shall reproduce identical intelligence.
+Rule 5 — The OBI produces structural intelligence only.
+Rule 6 — Trading logic is prohibited.
+Rule 7 — All computations shall remain incremental.
+Rule 8 — Memory usage shall remain bounded.
+Rule 9 — Each asset shall remain fully isolated.
+Rule 10 — Probability outputs are informational and shall never directly trigger trade execution.
+Rule 11 — All behavioral detections (Spoofing, Icebergs, Absorption) shall utilize adaptive statistical baselines (rolling Z-score) rather than fixed thresholds.
+Rule 12 — Structural Support and Resistance calculations shall apply configurable Distance-to-Mid weighting decay.
+Rule 13 — Liquidity wall classification shall continuously cross-reference Execution Pressure to distinguish genuine institutional support from spoofing or transient arbitrage liquidity.
+
+## 19. Chapter Summary
+
+The OBI transforms normalized market microstructure into institutional-grade liquidity intelligence by identifying genuine support/resistance, liquidity walls, vacuums, spoofing, iceberg activity, absorption, queue dynamics, and liquidity migration. Through adaptive statistical normalization, bounded computation, and deterministic processing, it provides high-quality structural features for Feature Engineering and ML while filtering transient market noise.
+
+END OF CHAPTER 3.7
