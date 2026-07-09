@@ -1453,3 +1453,109 @@ Rule 18 — Late events must generate a new candle version and never mutate a fi
 The CCE provides the deterministic temporal foundation of AlphaSpot. Guarantees every candle used for feature engineering, ML, backtesting, validation, and live decision making is mathematically reproducible, versioned, auditable, and exchange-independent.
 
 END OF CHAPTER 3.5
+
+---
+
+# CHAPTER 3.6 — MARKET MICROSTRUCTURE ENGINE
+
+## 1. Purpose
+
+The Market Microstructure Engine (MME) transforms validated high-frequency market events into a deterministic, normalized representation of real-time market behavior. Continuously estimates: liquidity, execution pressure, order flow, spread dynamics, order book imbalance, market efficiency, short-term structural changes. Consumed by: Order Book Intelligence, Trade Flow Intelligence, Feature Engineering, ML, Risk Engine. Performs NO technical indicators, AI inference, trading decisions, or portfolio optimization.
+
+## 2. Design Philosophy
+
+Price explains what happened. Microstructure explains why it happened. Models interaction between passive liquidity providers and aggressive liquidity takers. Estimates hidden market pressure before it becomes visible in price action. All calculations deterministic, incremental, reproducible.
+
+## 3. Input Contract
+
+Consumes only Canonical Market Events (Ch 3.2). Accepted: Trade, Depth Updates, Book Ticker, Liquidation, Funding Rate, Open Interest, Exchange Status, Canonical Clock. Raw exchange payloads prohibited.
+
+## 4. Output Contract
+
+Every Market Microstructure Snapshot contains: Symbol, Exchange, Timestamp, Best Bid, Best Ask, Mid Price, Current Spread, Bid Volume, Ask Volume, Order Book Imbalance, Liquidity Score, Execution Pressure, Trade Pressure, Market Efficiency, Microstructure Quality, Snapshot Version. Snapshots immutable after publication.
+
+## 5. Market Snapshot
+
+One active snapshot per asset. Complete current microstructure state. Updates atomic. Consumers never observe partially updated snapshots.
+
+## 6. Event Processing Pipeline
+
+Canonical Event → Schema Validation → Sequence Validation → Duplicate Detection → Timestamp Validation → Market State Update → Snapshot Publication → Event Persistence. Every step deterministic.
+
+## 7. Market State Model
+
+Each asset maintains: Current Best Bid/Ask, Bid/Ask Depth, Rolling VWAP, Trade Velocity, Aggressive Buy/Sell Volume, Average Spread, Liquidity Estimate, Pressure Estimate, Order Book Shape.
+
+## 7.1 Depth Restitution Limit
+
+Never maintain full exchange order book. Configurable limit: Top N price levels (e.g. 50) OR percentage distance from Mid (e.g. ±2%). Updates outside boundary discarded before computation. All imbalance/liquidity/pressure operate on bounded depth. Constant-time processing regardless of exchange depth size.
+
+## 8. Spread Analysis
+
+Current Spread, Average Spread, Median Spread, Maximum Spread, Spread Volatility, Spread Expansion Rate, Spread Compression Rate. Incremental algorithms.
+
+## 9. Execution Pressure
+
+Aggressive Buy/Sell Ratio, Net Market Pressure, Trade Direction Bias, Execution Imbalance.
+
+## 9.1 Aggressor Tagging Policy
+
+Aggressive trade classification relies EXCLUSIVELY on exchange-provided Maker/Taker metadata. Binance: isBuyerMaker=false → Aggressive Buy, isBuyerMaker=true → Aggressive Sell. Price-based aggressor inference PROHIBITED. Deterministic, zero-latency.
+
+## 10. Order Book Pressure
+
+Depth Imbalance, Near-Price Liquidity, Far-Price Liquidity, Liquidity Gradient, Queue Pressure. Bounded depth only.
+
+## 11. Liquidity Profile
+
+Immediate Liquidity, Local Liquidity, Regional Liquidity, Structural Liquidity. Liquidity stability + migration over time.
+
+## 12. Microstructure Quality
+
+Quality factors: Synchronization, Latency, Book Completeness, Trade Coverage, Spread Stability, Data Integrity. Consumers may reject below threshold.
+
+## 13. Multi-Asset Isolation
+
+Each asset owns independent MME instance. No shared runtime state, buffers, or calculations. Fully partitioned.
+
+## 14. Failure Recovery
+
+Pause → Reload Latest Snapshot → Replay Missing Events → Reconstruct Market State → Validate Snapshot → Resume. Incomplete snapshots never published.
+
+## 15. Performance
+
+Constant-time updates, incremental computation, bounded memory, cache locality, lock-free snapshot reads, worker-based parallelism.
+
+## 15.1 Rolling Metric Policy
+
+All rolling temporal metrics (VWAP, spread volatility, liquidity stats, execution pressure) use constant-memory algorithms: EMA, EWMA, fixed-size circular buffers. Growing historical arrays PROHIBITED during live execution. Memory bounded regardless of uptime.
+
+## 16. Observability
+
+Snapshot Latency, Update Throughput, Event Throughput, Spread Stability, Pressure Stability, Book Completeness, Recovery Count, Worker Utilization, Memory Usage, Queue Depth.
+
+## 17. Scalability
+
+Additional exchanges, assets, workers, distributed deployment, future derivatives markets without redesign.
+
+## 18. Architectural Rules
+
+Rule 1 — Only Canonical Market Events may modify market state.
+Rule 2 — Snapshots are immutable after publication.
+Rule 3 — Updates shall be atomic.
+Rule 4 — Consumers shall never observe partial state.
+Rule 5 — Duplicate events shall be ignored.
+Rule 6 — Late events shall follow the global repair policy.
+Rule 7 — Each asset owns an independent Market Microstructure Engine.
+Rule 8 — Memory usage shall remain bounded.
+Rule 9 — Computation shall remain incremental.
+Rule 10 — Trading logic is prohibited inside the MME.
+Rule 11 — Order book processing shall be bounded by a configurable Depth Restitution Limit.
+Rule 12 — Execution pressure shall rely exclusively on exchange-provided Maker/Taker metadata.
+Rule 13 — All rolling temporal metrics shall use constant-memory algorithms.
+
+## 19. Chapter Summary
+
+The MME establishes the deterministic foundation for real-time market context. Transforms canonical exchange events into bounded, immutable, high-quality market state snapshots. Provides consistent view of liquidity, execution pressure, spreads, and order flow. Guarantees deterministic replay, bounded memory, constant-time computation, exchange-independent behavior.
+
+END OF CHAPTER 3.6
