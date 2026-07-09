@@ -255,3 +255,176 @@ Rule 6 — Production recommendation generation, research, and validation remain
 Rule 7 — The architecture must remain modular. Each subsystem should evolve independently without breaking the others.
 
 END OF CHAPTER 1
+
+---
+
+# CHAPTER 2.1 — SYSTEM DECOMPOSITION: DOMAIN RESPONSIBILITIES & SYSTEM BOUNDARIES
+
+## 1. Purpose
+
+AlphaSpot Quant is designed as a modular, service-oriented decision support platform.
+
+The objective of this chapter is to define:
+• every major domain
+• its responsibility
+• its ownership
+• its boundaries
+• its allowed inputs
+• its allowed outputs
+
+This chapter intentionally avoids implementation details.
+It defines WHAT each subsystem is responsible for.
+Later chapters define HOW those responsibilities are implemented.
+
+## 2. Architectural Principles
+
+Every subsystem follows five mandatory principles.
+
+Principle 1 — Single Responsibility
+Every domain owns one business capability. A domain must never perform unrelated work. If a module requires knowledge outside its responsibility, it should consume another domain's published output rather than reimplementing the logic.
+
+Principle 2 — Strong Encapsulation
+A domain owns: its data, its business rules, its validation, its interfaces, its internal implementation. No external module may manipulate another domain's internal state.
+
+Principle 3 — Replaceability
+Every major subsystem must be replaceable without requiring architectural redesign. Examples: current ML model → future ML model; current exchange → multiple exchanges; current database → distributed database. The surrounding system should remain unaffected.
+
+Principle 4 — Loose Coupling
+Domains communicate through contracts. Never through internal implementation. No domain should know how another domain performs its work. Only what it publishes.
+
+Principle 5 — Business-Driven Organization
+The architecture is organized around business capabilities. Not around frameworks. Not around libraries. Not around folders.
+
+## 3. Domain Map
+
+The platform is divided into 14 domains:
+01. Core Infrastructure
+02. Workflow Orchestration
+03. Market Gateway
+04. Market Data
+05. Feature Engineering
+06. Market Intelligence
+07. Machine Learning
+08. Decision Engine
+09. Portfolio Intelligence
+10. Risk Engine
+11. Execution Engine
+12. Persistence
+13. Research Platform
+14. Presentation Layer
+
+Each domain owns one clearly defined responsibility.
+
+## 4. Domain Definitions
+
+DOMAIN 01 — CORE INFRASTRUCTURE
+Purpose: Provide shared platform capabilities.
+Responsibilities: configuration, dependency injection, logging, metrics, monitoring, health checks, scheduling, time synchronization, secrets management, environment configuration.
+This domain contains no business logic. Every other subsystem depends on it.
+
+DOMAIN 02 — WORKFLOW ORCHESTRATION
+Purpose: Coordinate the execution lifecycle.
+The Workflow Orchestrator determines: when processing starts, execution order, snapshot lifecycle, retry policy, timeout policy, pipeline completion.
+It performs NO calculations. It performs NO predictions. It performs NO feature engineering. It only coordinates.
+
+DOMAIN 03 — MARKET GATEWAY
+Purpose: Communicate with external exchanges.
+Responsibilities: websocket connections, REST synchronization, exchange metadata, symbol discovery, heartbeat, reconnect strategy, exchange health.
+This domain never performs analysis. It only collects market information.
+
+DOMAIN 04 — MARKET DATA
+Purpose: Store raw market information.
+Responsibilities: tick history, candle history, orderbook snapshots, trade history, funding history, market snapshots, historical archive.
+No calculations occur here. This domain owns raw market data.
+
+DOMAIN 05 — FEATURE ENGINEERING
+Purpose: Transform raw market information into analytical features.
+Responsibilities: feature generation, feature normalization, feature validation, feature quality, feature versioning, feature storage.
+This domain owns feature vectors. It does not understand trading.
+
+DOMAIN 06 — MARKET INTELLIGENCE
+Purpose: Convert analytical features into market understanding.
+Responsibilities: market structure, trend, volatility, liquidity, sentiment, market regime, relative strength, correlation analysis.
+This domain understands markets. It does NOT recommend trades.
+
+DOMAIN 07 — MACHINE LEARNING
+Purpose: Generate probabilistic forecasts.
+Responsibilities: inference, confidence estimation, probability calibration, ensemble aggregation, prediction generation.
+Outputs are probabilities. Never recommendations.
+
+DOMAIN 08 — DECISION ENGINE
+Purpose: Transform intelligence into Trade Candidates.
+Responsibilities: expected value estimation, candidate scoring, candidate ranking, trade quality, recommendation reasoning.
+Only this domain may create Trade Candidates.
+
+DOMAIN 09 — PORTFOLIO INTELLIGENCE
+Purpose: Evaluate every Trade Candidate inside portfolio context.
+Responsibilities: diversification, exposure, sector concentration, correlation, capital allocation.
+A trade is never evaluated independently. Portfolio context is mandatory.
+
+DOMAIN 10 — RISK ENGINE
+Purpose: Protect capital.
+Responsibilities: stop loss, take profit, position sizing, portfolio risk, drawdown control, recommendation invalidation.
+Risk decisions override prediction quality.
+
+DOMAIN 11 — EXECUTION ENGINE
+Purpose: Manage trade execution.
+Responsibilities: paper execution, order simulation, execution monitoring, trade lifecycle, execution reports.
+This domain contains zero prediction logic.
+
+DOMAIN 12 — PERSISTENCE
+Purpose: Persist platform state.
+Responsibilities: database writes, transactions, batching, storage abstraction, data durability.
+No business logic exists here. Persistence never performs analysis.
+
+DOMAIN 13 — RESEARCH PLATFORM
+Purpose: Continuously improve the platform.
+Responsibilities: backtesting, walk-forward validation, optimization, experiment tracking, historical evaluation.
+Research never publishes production recommendations.
+
+DOMAIN 14 — PRESENTATION LAYER
+Purpose: Deliver information to the user.
+Responsibilities: dashboard, charts, watchlists, explanations, recommendation display, historical performance.
+Presentation never performs calculations.
+
+## 5. Ownership Rules
+
+Every domain owns: its models, its validation, its internal services, its business rules, its tests, its documentation.
+Ownership is exclusive. No shared mutable business state.
+
+## 6. Input / Output Contracts
+
+Each domain receives published outputs. Each domain publishes new outputs.
+
+Example flow:
+Market Gateway → Raw Market Events → Market Data → Historical Dataset → Feature Engineering → Feature Snapshot → Market Intelligence → Market Context → Machine Learning → Prediction → Decision Engine → Trade Candidate → Portfolio Intelligence → Portfolio Assessment → Risk Engine → Risk Assessment → Execution Engine → Execution Result → Presentation
+
+## 7. Forbidden Responsibilities
+
+Market Gateway × Feature Engineering
+Market Data × Trading Decisions
+Feature Engineering × Machine Learning
+Machine Learning × Portfolio Management
+Risk Engine × Prediction
+Execution Engine × Signal Generation
+Presentation × Business Logic
+Research Platform × Production Trading
+
+These restrictions are mandatory.
+
+## 8. Domain Independence
+
+Every domain must be independently: testable, deployable, replaceable, monitorable, observable.
+A failure inside one domain must never require rewriting another domain.
+
+## 9. Evolution Policy
+
+The architecture must support future additions without redesign.
+Examples: additional exchanges, futures, options, AI model upgrades, cloud deployment, distributed workers, additional asset classes.
+Future expansion should require extension, not architectural replacement.
+
+## 10. Chapter Summary
+
+AlphaSpot Quant is composed of fourteen independent domains. Each domain owns one responsibility. Each domain has explicit boundaries. Business logic remains isolated. Responsibilities never overlap. The architecture favors maintainability, replaceability, scalability, and long-term evolution over short-term convenience.
+
+END OF CHAPTER 2.1

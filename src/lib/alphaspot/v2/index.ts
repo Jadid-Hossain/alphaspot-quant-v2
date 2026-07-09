@@ -2,14 +2,25 @@
 //
 // Single entry point for the V2 architecture. Import from '@/lib/alphaspot/v2'.
 //
-// Architecture (Chapter 1):
-//   • 3 lanes: Lane A (real-time), Lane B (analytical), Lane C (research)
-//   • 10-stage recommendation pipeline (no module may bypass it)
-//   • Immutable Market Snapshots
-//   • Trade Candidate lifecycle with expiration
-//   • Structural validation as a hard eligibility gate
+// Architecture:
+//   Chapter 1: 3 lanes + 10-stage recommendation pipeline + immutable snapshots
+//   Chapter 2.1: 14 independent domains with explicit boundaries
+//
+// The 10-stage pipeline (Chapter 1) maps onto the 14 domains (Chapter 2.1):
+//   • Market Observation           → Domain 03 (Gateway) + 04 (Data)
+//   • Structural Validation        → Domain 04 (Market Data — eligibility gate)
+//   • Feature Engineering          → Domain 05
+//   • Market Context               → Domain 06 (Market Intelligence)
+//   • Statistical Evaluation       → Domain 07 (ML) + 08 (Decision, for EV)
+//   • Expected Value               → Domain 08 (Decision Engine)
+//   • Candidate Generation         → Domain 08 (only domain that creates candidates)
+//   • Portfolio Optimization       → Domain 09 (Portfolio Intelligence)
+//   • Recommendation Validation    → Domain 10 (Risk Engine — overrides)
+//   • Ranking Engine               → Domain 08
+//   • Snapshot Generation          → Domain 02 (Workflow Orchestration)
 
 export * from './types'
+export * from './domains' // 14 domains + domain map + I/O flow (Chapter 2.1)
 export * from './lanes/lane-a-realtime'
 export * from './lanes/lane-b-analytical'
 export * from './lanes/lane-c-research'

@@ -125,3 +125,50 @@ Stage Summary:
 - Trade Candidates carry asset, metrics, EV, risk, rationale, expiration, version (Chapter 1 §10).
 - Recommendations expire (Principle 7, Rule 5) and are tiered A/B/C/D.
 - Later MDS chapters will: (a) wire Lane A to the real engine via registerLaneAProvider, (b) specify exact regime/probability algorithms, (c) build the research/backtest lane, (d) replace the V1 dashboard with a snapshot-driven V2 dashboard.
+
+---
+Task ID: MDS-CH2.1
+Agent: main (Z.ai Code)
+Task: Chapter 2.1 of the MDS — System Decomposition: Domain Responsibilities & System Boundaries. Decompose the V2 architecture into 14 independent domains.
+
+Work Log:
+- Appended Chapter 2.1 verbatim to full_prompt.md (now 430 lines, 2 chapters).
+- Analyzed Chapter 2.1: mandates 14 domains with single responsibility, strong encapsulation, replaceability, loose coupling, business-driven organization. Explicit forbidden-responsibilities list per domain. I/O flow chain: Gateway → Data → Features → Intelligence → ML → Decision → Portfolio → Risk → Execution → Presentation.
+- Mapped the Chapter 1 10-stage pipeline onto the 14 domains (documented in v2/index.ts header).
+- Created 14 domain directories under src/lib/alphaspot/v2/domains/ (01-core-infrastructure through 14-presentation-layer).
+- DOMAIN 01 (Core Infrastructure) — FULLY IMPLEMENTED concretely:
+  • Configuration: PlatformConfig + DEFAULT_PLATFORM_CONFIG, getConfig/setConfig
+  • Logging: LogLevel, LogEntry, createLogger(domain) factory, addLogSink, domain-scoped loggers
+  • Metrics: gauge/counter/histogram factories, getMetricsSnapshot (with p50/p95/p99)
+  • Health Checks: registerHealthCheck, runHealthChecks, HealthStatus
+  • Scheduling: schedule(name, intervalMs, fn) with task tracking, getScheduledTasks
+  • Time Sync: now() with injectable time provider (testable)
+  • Secrets: getSecret/requireSecret (env-backed)
+  • Environment: getEnvironment/isProduction
+  • Dependency Injection: register/resolve/tryResolve registry + DI_TOKENS map for all 14 domains
+- DOMAINS 02–14: each has a contract.ts defining its typed interface (inputs accepted, outputs published) + forbidden-responsibilities documentation. Contracts:
+  • 02 Workflow Orchestration: start/stop/runNow/getLatestSnapshot/subscribe + buildPipelineContext
+  • 03 Market Gateway: discoverSymbols/connect/fetchHistoricalCandles/fetchOrderBook/fetchFunding/isHealthy — publishes RawMarketEvent
+  • 04 Market Data: raw data accessors + structural validation (eligibility gate) + ingestion methods
+  • 05 Feature Engineering: generateFeatures/generateForAssets/validateFeatures/getFeatureVersion
+  • 06 Market Intelligence: analyzeAsset/analyzeBatch/computeCorrelations/getMarketRegimeSummary — publishes MarketContext
+  • 07 Machine Learning: predict/predictBatch/calibrate/getModelInfo — outputs probabilities ONLY
+  • 08 Decision Engine: estimateExpectedValue/generateCandidates/rankCandidates/explainCandidate — ONLY domain that creates TradeCandidates
+  • 09 Portfolio Intelligence: optimize/getExposure/checkConcentration — portfolio context mandatory
+  • 10 Risk Engine: validate/computeRisk/checkPortfolioRisk/monitorPositions — risk overrides prediction
+  • 11 Execution Engine: execute/getOpenPositions/getHistory/tick — zero prediction logic
+  • 12 Persistence: saveSnapshot/getSnapshot/listRecommendations/saveExecution/batchWrite/transaction
+  • 13 Research Platform: backtest/validatePrediction/walkForward/trackExperiment — never in production chain
+  • 14 Presentation Layer: getActiveSnapshot/subscribeToSnapshots/getRecommendations/explainRecommendation — no calculations
+- Created domain-map.ts: DOMAINS array (14 DomainDescriptor objects with purpose/responsibilities/forbidden/publishes/consumes/inProductionChain), PRODUCTION_FLOW (10-stage I/O chain), getDomain/getProductionChain helpers.
+- Created domains/index.ts barrel export.
+- Updated v2/index.ts to export domains + document the pipeline→domain mapping.
+- Lint passes cleanly. Both services still running (V2 purely additive, V1 untouched).
+
+Stage Summary:
+- 14-domain decomposition complete per Chapter 2.1. Every domain has a typed contract + forbidden-responsibilities documentation.
+- Core Infrastructure (Domain 01) is fully implemented — provides config, logging, metrics, health checks, scheduling, time sync, secrets, DI registry for all other domains.
+- Domain map documents the I/O flow chain (§6) and which domain publishes/consumes which contract.
+- Forbidden responsibilities are enforced via contract types (e.g., ML contract outputs StatisticalMetrics/probabilities, NOT recommendations; Decision Engine is the ONLY domain with generateCandidates).
+- Replaceability (Principle 3): every domain is interface-driven — Binance gateway can swap to multi-exchange, SQLite to PostgreSQL, baseline ML to a trained model, without touching upstream domains.
+- Later MDS chapters will: (a) implement each domain's concrete logic against its contract, (b) register implementations in the DI registry, (c) wire the Workflow Orchestrator to drive the full chain, (d) rebuild the Presentation Layer as a snapshot-driven V2 dashboard.
