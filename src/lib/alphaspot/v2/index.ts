@@ -3,8 +3,9 @@
 // Single entry point for the V2 architecture. Import from '@/lib/alphaspot/v2'.
 //
 // Architecture:
-//   Chapter 1: 3 lanes + 10-stage recommendation pipeline + immutable snapshots
+//   Chapter 1:   3 lanes + 10-stage recommendation pipeline + immutable snapshots
 //   Chapter 2.1: 14 independent domains with explicit boundaries
+//   Chapter 2.2: Event-driven communication + Workflow Orchestrator + snapshot lifecycle
 //
 // The 10-stage pipeline (Chapter 1) maps onto the 14 domains (Chapter 2.1):
 //   • Market Observation           → Domain 03 (Gateway) + 04 (Data)
@@ -18,9 +19,15 @@
 //   • Recommendation Validation    → Domain 10 (Risk Engine — overrides)
 //   • Ranking Engine               → Domain 08
 //   • Snapshot Generation          → Domain 02 (Workflow Orchestration)
+//
+// Communication (Chapter 2.2): domains never invoke each other directly.
+// All inter-domain communication flows through the Event Transport Layer as
+// immutable, versioned, correlation-ID'd events. The Workflow Orchestrator
+// owns execution order, timeouts, retries, and snapshot lifecycle.
 
 export * from './types'
 export * from './domains' // 14 domains + domain map + I/O flow (Chapter 2.1)
+export * from './events' // Event transport + catalog + snapshot lifecycle + orchestrator (Chapter 2.2)
 export * from './lanes/lane-a-realtime'
 export * from './lanes/lane-b-analytical'
 export * from './lanes/lane-c-research'

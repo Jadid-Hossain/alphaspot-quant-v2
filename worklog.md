@@ -172,3 +172,32 @@ Stage Summary:
 - Forbidden responsibilities are enforced via contract types (e.g., ML contract outputs StatisticalMetrics/probabilities, NOT recommendations; Decision Engine is the ONLY domain with generateCandidates).
 - Replaceability (Principle 3): every domain is interface-driven — Binance gateway can swap to multi-exchange, SQLite to PostgreSQL, baseline ML to a trained model, without touching upstream domains.
 - Later MDS chapters will: (a) implement each domain's concrete logic against its contract, (b) register implementations in the DI registry, (c) wire the Workflow Orchestrator to drive the full chain, (d) rebuild the Presentation Layer as a snapshot-driven V2 dashboard.
+
+---
+Task ID: MDS-CH2.2
+Agent: main (Z.ai Code)
+Task: Chapter 2.2 of the MDS — Communication Architecture, Workflow Orchestration, Event Model & Snapshot Lifecycle. Build the event-driven communication layer.
+
+Work Log:
+- Appended Chapter 2.2 verbatim to full_prompt.md (now 555 lines, 3 chapters accumulated).
+- Analyzed Chapter 2.2: mandates an event-driven architecture where (1) domains never invoke each other directly, (2) all communication flows through an abstract Event Transport Layer, (3) the Workflow Orchestrator owns execution order/timeout/retry/dedup, (4) every event is an immutable versioned envelope with correlationId + snapshotId, (5) snapshots have a monotonic 7-state lifecycle, (6) consumers must be idempotent, (7) failures are isolated, (8) 15 standard event types in the catalog, (9) 4 priority levels (CRITICAL/HIGH/MEDIUM/LOW), (10) 10 architectural rules.
+- Created src/lib/alphaspot/v2/events/ with 5 modules:
+  • transport.ts — EventEnvelope type (eventId, eventType, eventVersion, timestamp, correlationId, snapshotId, producer, frozen payload), EventPriority, EventTransport interface (publish/subscribe/flush/getStats), InMemoryEventTransport implementation with deep-freeze on publish (immutability §8), async dispatch per handler (failure isolation §17), event history for audit, getEventTransport/setEventTransport singletons (pluggable transport §4), publishEvent helper, generateEventId/CorrelationId/SnapshotId.
+  • catalog.ts — All 15 standard events as typed contracts: MarketUpdated, CandlesUpdated, FeatureGenerated, MarketRegimeUpdated, PredictionCompleted, TradeCandidateCreated, CandidateRejected, PortfolioEvaluated, RiskAssessmentCompleted, SnapshotCompleted, RecommendationPublished, RecommendationExpired, PaperTradeOpened, PaperTradeClosed, ModelMetricsUpdated. Each has a versioned payload interface + EVENT_VERSIONS map + EVENT_DEFAULT_PRIORITY map. Type-safe publish() and on() helpers with EventPayloadMap for compile-time payload checking. onAll() wildcard subscriber for audit/observability.
+  • snapshot-lifecycle.ts — SnapshotState enum (CREATED→COLLECTING→PROCESSING→VALIDATING→COMPLETE→PUBLISHED|FAILED), ALLOWED_TRANSITIONS matrix (monotonic — §13), SnapshotRecord interface (9 content fields from §11 + observability), SnapshotRegistry class (create/transition/get/getByVersion/getLatest/getPublished/list/subscribe/getStats). Publishes SnapshotCompleted event when entering COMPLETE state. getStats reports byState counts + averageDurationMs.
+  • idempotency.ts — IdempotencyTracker class (check/mark/has with LRU eviction at 10k entries) for dedup by eventId (§10). Correlation context (beginCorrelation/bindSnapshot/getCorrelation/endCorrelation) so every event in one analytical cycle shares the same correlationId (§20).
+  • workflow-orchestrator.ts — The heart of Chapter 2.2. WorkflowOrchestratorImpl class: registerStages (canonical sequence §6), start(intervalMs) (scheduling §5), runCycle() (one complete pipeline cycle = one snapshot, Rule 4), executeStage with timeout (§18) + retry with exponential backoff (§19, retries belong ONLY to orchestrator), snapshot state transitions at milestones (§13), failure isolation (§17 — publishes failure events, recovery via orchestration), observability (§21 — stage timings, stats, currentContext, activeCorrelationId). timedStage() wrapper helper. onFailure/onComplete subscribers.
+- Created events/index.ts barrel export.
+- Updated v2/index.ts to export events + document Chapter 2.2 architecture.
+- Lint passes cleanly. Both services still running (V2 purely additive).
+- Smoke-tested end-to-end: created a snapshot, transitioned through all 7 lifecycle states to PUBLISHED, published 4 events (TradeCandidateCreated, RecommendationPublished, PaperTradeOpened, SnapshotCompleted), audit wildcard handler captured all, typed handler received BTC/USDT candidate, idempotency correctly rejected duplicate eventId. Transport stats: 4 published, 2 subscribers.
+
+Stage Summary:
+- Event-driven communication layer complete per Chapter 2.2. Domains can now communicate exclusively through published immutable events (Rule 1, Rule 2).
+- 15-event catalog with typed, versioned payloads (§7, §9, §15). Type-safe publish/on helpers enforce compile-time payload correctness.
+- Snapshot lifecycle is a monotonic 7-state machine (§13) with a registry that tracks every snapshot, publishes SnapshotCompleted on completion, and exposes stats for observability.
+- Workflow Orchestrator owns execution order, timeout, retry, dedup, snapshot coordination (§5, §6, §18, §19). It performs ZERO business logic.
+- Idempotency tracker dedupes by eventId (§10, Rule 5). Correlation context propagates correlationId across an analytical cycle (§20).
+- Failure isolation (§17): each handler failure is caught and logged without affecting other consumers; failed snapshots publish failure events.
+- Event Transport is pluggable (§4): in-memory today, swappable to IPC/Redis/distributed broker without business-logic changes.
+- Later MDS chapters will: (a) wire each domain to publish/consume events from the catalog, (b) register the 11 pipeline stages with the orchestrator, (c) connect the orchestrator to drive the live snapshot cycle.

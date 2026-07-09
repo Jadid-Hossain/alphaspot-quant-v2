@@ -428,3 +428,128 @@ Future expansion should require extension, not architectural replacement.
 AlphaSpot Quant is composed of fourteen independent domains. Each domain owns one responsibility. Each domain has explicit boundaries. Business logic remains isolated. Responsibilities never overlap. The architecture favors maintainability, replaceability, scalability, and long-term evolution over short-term convenience.
 
 END OF CHAPTER 2.1
+
+---
+
+# CHAPTER 2.2 — COMMUNICATION ARCHITECTURE: WORKFLOW ORCHESTRATION, EVENT MODEL & SNAPSHOT LIFECYCLE
+
+## 1. Purpose
+
+This chapter defines how information moves through AlphaSpot Quant.
+The objective is to guarantee: deterministic execution, reproducible recommendations, loose coupling, fault isolation, horizontal scalability, snapshot consistency, event traceability.
+Business logic is intentionally excluded. This chapter defines communication only.
+
+## 2. Communication Philosophy
+
+No domain may directly invoke another domain's internal business logic. Communication always occurs through published contracts. Every domain behaves as both an event producer and/or an event consumer. Domains remain unaware of each other's implementation. They only understand published contracts.
+
+## 3. Communication Model
+
+Every operation follows the same lifecycle:
+Domain → Produces Event → Event Transport → Workflow Orchestrator → Eligible Consumers → New Events → Next Stage
+No domain determines the execution order of another domain. Execution order belongs exclusively to the Workflow Orchestrator.
+
+## 4. Event Transport Abstraction
+
+All inter-domain communication passes through an abstract Event Transport Layer. The transport implementation is interchangeable (in-memory messaging, IPC, pub/sub, distributed message brokers). No business domain depends on a specific transport technology. Changing transport implementation must not require business logic changes.
+
+## 5. Workflow Orchestrator
+
+Purpose: Coordinate execution.
+Responsibilities: pipeline scheduling, execution ordering, dependency coordination, timeout handling, retry scheduling, duplicate prevention, snapshot coordination, workload prioritization.
+The Workflow Orchestrator performs NO: market analysis, feature engineering, prediction, ranking, portfolio management, risk analysis. It coordinates only.
+
+## 6. Pipeline Execution Model
+
+The canonical processing sequence is:
+Market Gateway → Market Data → Feature Engineering → Market Intelligence → Machine Learning → Decision Engine → Portfolio Intelligence → Risk Engine → Snapshot Builder → Recommendation Publisher → Presentation
+No stage may skip another stage. No stage may publish recommendations directly.
+
+## 7. Event Contracts
+
+Every published event must conform to a versioned contract. Every event contains: Event ID, Event Type, Event Version, Timestamp, Correlation ID, Snapshot ID, Producer, Payload. Optional fields may be added in future versions. Existing contracts must remain backward compatible whenever possible.
+
+## 8. Event Immutability
+
+Events are immutable. After publication: Payloads cannot change. Corrections require publishing a new event. Historical events remain permanently unchanged. This guarantees: reproducibility, debugging, auditing, deterministic replay.
+
+## 9. Event Versioning
+
+Event schemas evolve independently. Version changes must never silently break consumers. Consumers should explicitly declare supported versions. Breaking changes require new event versions.
+
+## 10. Idempotent Processing
+
+Every consumer must tolerate duplicate delivery. Receiving the same event multiple times must never create: duplicate recommendations, duplicate trades, duplicate snapshots, duplicate persistence. Consumers identify duplicates using: Event ID, Correlation ID, Snapshot ID, Sequence metadata.
+
+## 11. Snapshot Lifecycle
+
+Recommendations are never generated directly from live market ticks. Instead, the platform creates immutable analytical snapshots. Each snapshot represents one complete market evaluation. A snapshot includes: timestamp, evaluated assets, feature versions, market context, predictions, rankings, trade candidates, portfolio assessment, recommendation set. Snapshots never change after publication.
+
+## 12. Snapshot Consistency
+
+Every downstream calculation references exactly one Snapshot ID. No downstream stage may mix multiple snapshots. Partial snapshots are prohibited.
+
+## 13. Snapshot States
+
+Every snapshot progresses through defined states:
+CREATED → COLLECTING → PROCESSING → VALIDATING → COMPLETE → PUBLISHED or FAILED
+State transitions are monotonic. Snapshots never move backward.
+
+## 14. Feedback Event Architecture
+
+Business dependencies remain unidirectional. Operational feedback is global.
+Examples: CandidateRejected, RecommendationExpired, PortfolioConstraintTriggered, TradeOpened, TradeClosed, PredictionSucceeded, PredictionFailed, ModelPerformanceUpdated, RiskThresholdExceeded.
+These events inform future processing without introducing circular software dependencies.
+
+## 15. Event Catalog
+
+Examples of standard platform events:
+MarketUpdated, CandlesUpdated, FeatureGenerated, MarketRegimeUpdated, PredictionCompleted, TradeCandidateCreated, CandidateRejected, PortfolioEvaluated, RiskAssessmentCompleted, SnapshotCompleted, RecommendationPublished, RecommendationExpired, PaperTradeOpened, PaperTradeClosed, ModelMetricsUpdated.
+This catalog may expand over time.
+
+## 16. Processing Priorities
+
+CRITICAL: Exchange connectivity, Heartbeat, Market synchronization.
+HIGH: Market ingestion, Snapshot completion, Recommendation publication.
+MEDIUM: Feature generation, Predictions, Portfolio analysis.
+LOW: Historical persistence, Analytics, Statistics, Background optimization.
+Priority influences scheduling only. Never business decisions.
+
+## 17. Failure Handling
+
+Failures remain isolated. Prediction failure does not terminate market ingestion. Research failure does not stop recommendations. Dashboard failure does not stop analysis. Each failed workflow publishes failure events. Recovery occurs through orchestration.
+
+## 18. Timeout Policy
+
+Every processing stage has finite execution time. Expired workflows are cancelled. Timeouts generate failure events. No pipeline may wait indefinitely.
+
+## 19. Retry Policy
+
+Retry decisions belong exclusively to the Workflow Orchestrator. Business domains never retry independently. Retry policy considers: failure type, retry count, dependency state, system health.
+
+## 20. Correlation Model
+
+Every event generated from one analytical cycle shares the same Correlation ID. This enables: distributed tracing, debugging, replay, audit, performance measurement.
+
+## 21. Observability
+
+Every workflow exposes: start time, finish time, execution duration, producer, consumer, state, outcome. Every event is traceable from creation to completion.
+
+## 22. Architectural Rules
+
+Rule 1 — Domains communicate only through published contracts.
+Rule 2 — Events are immutable.
+Rule 3 — Execution order belongs only to the Workflow Orchestrator.
+Rule 4 — Every analytical cycle produces exactly one immutable Snapshot.
+Rule 5 — Consumers must be idempotent.
+Rule 6 — Feedback travels through events, not reverse dependencies.
+Rule 7 — No recommendation may bypass the complete workflow.
+Rule 8 — Every recommendation is traceable to exactly one Snapshot.
+Rule 9 — All workflows are observable.
+Rule 10 — Failures are isolated and recoverable.
+
+## 23. Chapter Summary
+
+AlphaSpot Quant is an event-driven platform coordinated by a central Workflow Orchestrator. Domains never communicate directly. Events are immutable, versioned, traceable, and idempotent. Recommendations originate only from completed analytical snapshots. Execution is deterministic, reproducible, scalable, and resilient to failures.
+
+END OF CHAPTER 2.2
