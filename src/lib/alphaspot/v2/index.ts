@@ -45,6 +45,7 @@ export * from './trade-flow' // Trade flow intelligence — volume delta, sessio
 export * from './feature-extraction' // Feature extraction — 17 feature categories, deterministic triggers, forward-fill, immutable vectors, temporal integrity (Chapter 3.9)
 export * from './feature-processing' // Feature processing & store — validation, imputation, rolling normalization, scaling, online/offline store, lineage (Chapter 3.10)
 export * from './ai-platform' // AI platform — prediction framework, probability vs confidence, multi-horizon, uncertainty, explainability, governance, deterministic inference (Chapter 4.1)
+export * from './decision-intelligence' // Decision intelligence — signal generation, Canonical Signal Contract, hysteresis, regime compatibility (Chapter 5.1)
 export * from './lanes/lane-a-realtime'
 export * from './lanes/lane-b-analytical'
 export * from './lanes/lane-c-research'

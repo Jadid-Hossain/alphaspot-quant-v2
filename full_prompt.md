@@ -2038,3 +2038,85 @@ Rule 15 — No AI component may access raw market data. All inputs from Feature 
 The AI Platform transforms processed feature datasets into calibrated probabilistic forecasts. Separates prediction from decision making, enforces deterministic inference, quantifies uncertainty, preserves explainability, applies rigorous governance. Creates a robust, extensible AI layer for multiple prediction horizons, model families, and future research with full reproducibility and institutional-grade standards.
 
 END OF CHAPTER 4.1
+
+---
+
+# CHAPTER 5.1 — SIGNAL GENERATION ENGINE
+
+## 1. Purpose
+
+The SGE transforms ML predictions into standardized, deterministic, auditable, strategy-independent trading signals. Exclusive bridge between AI Layer and Decision Intelligence Layer. Performs: prediction interpretation, signal generation, confidence/uncertainty evaluation, quality assessment, threshold evaluation, regime compatibility, normalization, versioning, governance, metadata, lineage. Performs NO: feature engineering, training, inference, portfolio, risk, sizing, execution, strategy implementation.
+
+## 2. Design Philosophy
+
+Predictions are not trading decisions. SGE determines whether predictions satisfy minimum statistical requirements for downstream decision making. Deterministic, reproducible, statistically consistent, auditable, strategy independent, configurable, versioned. Independent of strategies/sizing/portfolio/execution/brokers. Same prediction tuple → same signal under identical config.
+
+## 3. Input Contract
+
+Consumes: Canonical Prediction Tuples (Ch 4.11), Approved Targets (Ch 4.2), Confidence, Uncertainty, Metadata, Market Regime, Signal/Threshold/Governance Config. Never: raw market data, exchange events, trading decisions, portfolio positions, broker orders, execution results.
+
+## 4. Output Contract
+
+Every signal: Signal ID, Version, Prediction ID, Target, Horizon, Signal Type, Direction, Strength, Confidence, Uncertainty, Quality Score, Regime Compatibility Score, Threshold Status, Validity Horizon, Metadata, Governance Metadata. Immutable. Canonical Signal Contract.
+
+## 5. Signal Generation Pipeline
+
+13-stage canonical workflow (no skips): Prediction Reception → Validation → Compatibility Verification → Confidence Evaluation → Uncertainty Evaluation → Threshold Evaluation → Quality Assessment → Regime Compatibility → Signal Construction → Validation → Publication → Metadata Recording → Completion.
+
+## 6. Canonical Signal Contract
+
+Direction, Strength, Confidence, Uncertainty, Quality Score, Prediction Horizon, Regime Compatibility Score, **Validity Horizon** (max temporal lifetime — after expiry → NO_ACTION automatically). All downstream consume only Canonical Signal Contract. No alternative formats. Closes stale-state vulnerability.
+
+## 7. Signal Types
+
+BUY, SELL, HOLD, NO_ACTION, REDUCE_POSITION, INCREASE_POSITION, EXIT_LONG, EXIT_SHORT. Configurable. Versioned.
+
+## 8. Signal Threshold Management + Stateful Hysteresis (Rule 17)
+
+Configurable thresholds: min confidence, max uncertainty, min expected return, min risk-adjusted score, min stability, min model agreement, min regime compatibility. Failing mandatory → not promoted. Versioned.
+
+**Stateful Hysteresis**: asymmetric entry/exit boundaries to prevent signal chatter. Entry threshold ≠ exit threshold. Example: BUY entry ≥ 1.00%, BUY exit < 0.80%. Parameters: entry threshold, exit threshold, min persistence, direction change margin, confidence delta, uncertainty delta, time-based debounce window. Versioned + auditable.
+
+## 9. Signal Quality Assessment (Rule 8, Rule 18)
+
+Quality ≠ Prediction Confidence (Rule 8). Quality factors: confidence, uncertainty, ensemble agreement, historical reliability, calibration quality, prediction stability, feature quality, regime compatibility. Additionally: signal freshness, validity horizon remaining, temporal consistency, hysteresis state, signal age. Expired signals → fail quality (Rule 18).
+
+## 10. Regime Compatibility
+
+Bull, Bear, Sideways, High Vol, Low Vol, Trending, Mean-Reverting, Crisis. Incompatible → downgrade or reject.
+
+## 11-12. Versioning & Governance
+
+7 version dimensions. Approval, validation, creation timestamp, governance notes, audit history, review status. Mandatory.
+
+## 13-16. Performance, Observability, Scalability, Failure Recovery
+
+Parallel, streaming, low-latency, batch, incremental, distributed. Metrics: signals generated, acceptance/rejection rate, confidence/uncertainty distribution, latency, threshold violations, regime compatibility rate, governance events. Invalid signals never published.
+
+## 17. Architectural Rules
+
+Rule 1 — Only Canonical Prediction Tuples (Ch 4.11).
+Rule 2 — Independent of strategies/risk/portfolio/execution.
+Rule 3 — Unique Signal ID.
+Rule 4 — Canonical Signal Contract.
+Rule 5 — Complete lineage.
+Rule 6 — Thresholds configurable + versioned.
+Rule 7 — Historical immutable.
+Rule 8 — Signal Quality ≠ Prediction Confidence.
+Rule 9 — Confidence and Uncertainty independent.
+Rule 10 — Failing thresholds → never promoted.
+Rule 11 — Complete governance metadata.
+Rule 12 — Deterministic.
+Rule 13 — Never modify predictions.
+Rule 14 — Only Canonical Signal Contract consumed downstream.
+Rule 15 — Signal generation only. Strategy/risk/portfolio/execution in subsequent chapters.
+Rule 16 — Validity Horizon. Expired → NO_ACTION automatically.
+Rule 17 — Stateful Hysteresis. Asymmetric entry/exit. Versioned + auditable.
+Rule 18 — Signal freshness continuously verified. Expired → rejected before publication.
+Rule 19 — Expiration never modifies historical records. Affects only downstream eligibility.
+
+## 18. Chapter Summary
+
+The SGE transforms ML predictions into standardized, statistically governed trading signals. Separates prediction interpretation from strategy/risk/portfolio/execution. Deterministic signal generation, configurable thresholds, regime-aware qualification, immutable versioning, complete lineage, enterprise governance. Canonical Signal Contract = standardized decision interface for all downstream strategies.
+
+END OF CHAPTER 5.1
