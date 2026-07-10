@@ -1853,3 +1853,100 @@ Rule 10 — Feature vectors immutable.
 The FEE converts canonical market intelligence into deterministic quantitative features — the exclusive input to AlphaSpot's ML pipeline. Separates extraction from preprocessing and training, ensuring temporal purity, deterministic replay, bounded computation, and modular extensibility.
 
 END OF CHAPTER 3.9
+
+---
+
+# CHAPTER 3.10 — FEATURE PROCESSING & FEATURE STORE
+
+## 1. Purpose
+
+The Feature Processing & Feature Store (FPFS) transforms deterministic Feature Vectors (Ch 3.9) into ML-ready datasets. Performs: validation, missing value handling, rolling normalization, online scaling, versioning, storage, retrieval, lineage. Performs NO extraction, engineering, training, inference, or trading decisions.
+
+## 2. Design Philosophy
+
+Feature extraction creates facts. Feature processing prepares facts. ML never accesses raw Feature Vectors directly. All preprocessing deterministic, versioned, reproducible, temporally correct. Identical Feature Vectors → identical processed datasets.
+
+## 3. Input Contract
+
+Consumes only Feature Vectors from Ch 3.9. Raw market data, raw candles, market intelligence snapshots prohibited.
+
+## 4. Output Contract
+
+Processed dataset: Symbol, Timestamp, Feature Version, Processing Version, Scaling Version, Missing Data Version, Processed Feature Vector, Feature Mask, Processing Metadata, Dataset Version.
+
+## 5. Feature Validation
+
+Checks: Missing Features, Invalid Numbers, Infinite Values, NaN Detection, Duplicate Features, Schema Validation, Version Compatibility. Invalid → quarantine.
+
+## 6. Missing Value Handling
+
+Strategies: Forward Fill, Rolling Median, Rolling Mean, Constant Replacement, Statistical Imputation. Configurable. Every imputation recorded.
+
+## 7. Online Normalization
+
+Methods: Rolling Z-Score, Rolling Min-Max, Robust Scaling, EWMA Standardization, Median Absolute Deviation. Configurable windows. Future observations PROHIBITED.
+
+## 8. Feature Scaling
+
+Methods: Standard, Robust, Min-Max, Quantile, Log. Scaling parameters versioned.
+
+## 9. Feature Versioning
+
+Records: Feature Version, Processing Version, Scaling Version, Schema Version, Metadata Version. Historical datasets immutable.
+
+## 10. Feature Store
+
+Online Store (live inference, low latency, latest features, no historical editing). Offline Store (training, backtesting, research, validation, benchmarking, replay). Training/Validation/Replay/Research stores with independent retention.
+
+## 11. Online Feature Store
+
+Optimized for: live inference, low latency, fast retrieval, atomic reads, latest features. Historical editing prohibited.
+
+## 12. Offline Feature Store
+
+Separates metadata (transactional DB: dataset ID, versions, lineage, statistics, storage location) from payloads (columnar: Parquet, Arrow — optimized for ML training, batch loading, vectorized processing, fast sequential reads). Transactional DBs NEVER store large feature payloads. Historical datasets immutable. Modifications create new versions.
+
+## 13. Feature Lineage
+
+Every processed feature records: Original Feature Vector, Transformation Chain, Normalization Method, Scaling Method, Imputation Method, Processing Timestamp, Dependency Versions. Fully traceable.
+
+## 14. Data Leakage Protection
+
+No Future Data, No Label Leakage, No Cross-Validation Leakage, No Training-Test Contamination. Temporal integrity mandatory.
+
+## 15. Performance
+
+Incremental processing, constant-memory algorithms, parallel workers, lock-free reads, batch processing, cache locality, streaming updates.
+
+## 16. Observability
+
+Processing Latency, Validation Errors, Imputation Count, Scaling Latency, Feature Throughput, Worker Utilization, Dataset Growth, Version Distribution.
+
+## 17. Scalability
+
+Additional assets, exchanges, feature families, processing pipelines, distributed workers, cloud storage without redesign.
+
+## 18. Architectural Rules
+
+Rule 1 — Only Feature Vectors from Ch 3.9.
+Rule 2 — Deterministic.
+Rule 3 — Identical inputs → identical outputs.
+Rule 4 — Future information prohibited.
+Rule 5 — All normalization uses rolling historical windows only.
+Rule 6 — Scaling parameters versioned.
+Rule 7 — Every imputation recorded.
+Rule 8 — Processed datasets immutable.
+Rule 9 — Online and Offline stores logically independent.
+Rule 10 — Full lineage traceability.
+Rule 11 — Online incremental statistics. Rolling normalization updates incrementally without rescanning history.
+Rule 12 — Offline training parameters never overwrite online. Independent processing state.
+Rule 13 — Writes atomic and versioned. No partially processed vectors.
+Rule 14 — Historical datasets immutable. Modifications create new versions.
+Rule 15 — Independent of ML models. No model-specific preprocessing.
+Rule 16 — Offline Store: metadata in transactional DB, payloads in immutable columnar storage. Large feature matrices in transactional DBs PROHIBITED.
+
+## 19. Chapter Summary
+
+The FPFS transforms Feature Vectors into ML-ready datasets through validation, imputation, normalization, scaling, versioning, and storage. Separates preprocessing from extraction and ML, guaranteeing temporal correctness, deterministic replay, full lineage, reproducibility, and scalable online/offline feature management. This is the final data contract before AI consumes market information.
+
+END OF CHAPTER 3.10
