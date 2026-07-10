@@ -2472,3 +2472,417 @@ Execution authorization remains exclusively within subsequent Portfolio Construc
 The Strategy Intelligence Engine establishes AlphaSpot's canonical architecture for transforming standardized trading signals into deterministic, strategy-specific investment decisions. By separating statistical signal generation from investment policy, portfolio construction, risk management, and execution, the architecture guarantees reproducible decision making, configurable strategy rules, immutable versioning, complete lineage, and enterprise-grade governance. Through the Canonical Strategy Decision Contract, the Strategy Intelligence Engine enables multiple independent trading strategies to consume identical trading signals while preserving deterministic behavior, operational transparency, and long-term maintainability across evolving quantitative investment systems.
 
 END OF CHAPTER 5.2
+
+---
+
+# ALPHASPOT QUANT V2
+# CHAPTER 5.3
+# PORTFOLIO CONSTRUCTION ENGINE
+# Version 1.0
+
+## 1. PURPOSE
+The Portfolio Construction Engine (PCE) establishes the canonical architecture for transforming validated Strategy Decision Contracts into portfolio-level investment allocations through deterministic, configurable, and fully governed portfolio construction methodologies.
+The Portfolio Construction Engine serves as the exclusive bridge between Strategy Intelligence and Risk Management.
+The PCE aggregates multiple strategy decisions, evaluates portfolio-wide constraints, allocates investment intent, and constructs a coherent portfolio while preserving complete separation between investment decisions, risk controls, position sizing, and execution.
+The Portfolio Construction Engine performs:
+Portfolio Construction
+Strategy Aggregation
+Capital Allocation Planning
+Exposure Aggregation
+Asset Selection
+Portfolio Constraint Evaluation
+Diversification Assessment
+Correlation Assessment
+Portfolio Versioning
+Portfolio Governance
+Portfolio Metadata Generation
+Allocation Lineage Management
+The PCE performs NO:
+Machine Learning
+Signal Generation
+Strategy Selection
+Position Sizing
+Risk Limit Enforcement
+Broker Communication
+Order Execution
+
+## 2. DESIGN PHILOSOPHY
+Strategy decisions represent investment intent.
+A portfolio represents a globally optimized investment structure.
+Portfolio construction shall remain:
+deterministic
+reproducible
+configurable
+version controlled
+fully auditable
+Portfolio construction shall optimize capital deployment while preserving strategy independence.
+The same Strategy Decision Contracts shall always produce the same Portfolio Construction under identical configurations whenever mathematically possible.
+
+## 3. INPUT CONTRACT
+The Portfolio Construction Engine consumes only:
+Canonical Strategy Decision Contracts (Chapter 5.2)
+Portfolio Configuration
+Asset Metadata
+Capital Constraints
+Exposure Constraints
+Diversification Constraints
+Portfolio Metadata
+Current Portfolio State
+Current Positions
+Cash Balances
+Reserved Capital
+Pending Rebalance Metadata
+Governance Configuration
+The engine never consumes:
+Raw Market Data
+Machine Learning Models
+Trading Signals
+Broker Orders
+Execution Reports
+
+## 4. OUTPUT CONTRACT
+Every portfolio construction produces:
+Portfolio ID
+Portfolio Version
+Allocation ID
+Strategy Decision IDs
+Portfolio Timestamp
+Portfolio Allocation Plan
+Target Portfolio State
+Current Portfolio State
+Rebalancing Delta
+Capital Adjustment Plan
+Asset Weights
+Exposure Summary
+Diversification Metrics
+Constraint Evaluation
+Allocation Metadata
+Governance Metadata
+Portfolio outputs remain immutable.
+Every portfolio shall conform to the Canonical Portfolio Contract defined by this chapter.
+
+## 5. PORTFOLIO CONSTRUCTION PIPELINE
+Every portfolio follows the canonical workflow:
+Strategy Decision Reception
+↓
+Decision Validation
+↓
+Current Portfolio State Loading
+↓
+Portfolio Constraint Loading
+↓
+Target Portfolio Optimization
+↓
+Rebalancing Delta Calculation
+↓
+Strategy Aggregation
+↓
+Strategy Aggregation
+↓
+Asset Selection
+↓
+Capital Allocation Planning
+↓
+Diversification Assessment
+↓
+Correlation Assessment
+↓
+Portfolio Construction
+↓
+Portfolio Validation
+↓
+Portfolio Publication
+↓
+Metadata Recording
+↓
+Portfolio Completion
+No stage may be skipped.
+
+## 6. CANONICAL PORTFOLIO CONTRACT
+Every portfolio shall produce:
+Portfolio Allocation Plan
+Target Asset Weights
+Current Portfolio Snapshot
+Allocation Delta
+Allocation Confidence
+Diversification Metrics
+Exposure Summary
+Portfolio Constraints
+Portfolio Metadata
+Alternative portfolio formats are prohibited.
+
+## 7. PORTFOLIO CONSTRUCTION METHODS
+The Portfolio Construction Engine supports multiple portfolio optimization methodologies for constructing target portfolio allocations from validated Strategy Decision Contracts.
+Supported portfolio construction methodologies include:
+Equal Weight
+Fixed Allocation
+Market Capitalization Weight
+Equal Risk Contribution (ERC)
+Risk Parity
+Minimum Variance
+Mean-Variance Optimization
+Black-Litterman Optimization
+Hierarchical Risk Parity (HRP)
+Maximum Diversification
+Bayesian Portfolio Optimization
+Expected Utility Optimization
+Uncertainty-Aware Portfolio Optimization
+Liquidity-Constrained Portfolio Optimization
+Transaction Cost-Aware Optimization
+Multi-Objective Portfolio Optimization
+Custom Optimization Frameworks
+Portfolio construction methodologies remain fully configurable, version controlled, reproducible, and independently governed.
+
+### 7.1 AI-Uncertainty-Aware Portfolio Optimization
+The Portfolio Construction Engine may incorporate Machine Learning prediction quality into portfolio optimization.
+Optimization algorithms may consider:
+Expected Return
+Prediction Confidence
+Epistemic Uncertainty
+Aleatoric Uncertainty
+Historical Calibration Quality
+Strategy Reliability
+Signal Stability
+Model Agreement
+Ensemble Confidence
+Prediction Horizon
+When enabled, higher epistemic uncertainty shall proportionally reduce effective portfolio allocation, thereby preventing excessive capital allocation toward statistically uncertain investment opportunities.
+Prediction uncertainty shall act exclusively as an allocation penalty and shall never increase portfolio allocation.
+Uncertainty-aware optimization methodologies remain configurable and fully version controlled.
+
+### 7.2 Liquidity-Constrained Portfolio Optimization
+Portfolio optimization shall respect the physical execution capacity of financial markets.
+Optimization algorithms may incorporate:
+Average Daily Volume (ADV)
+Average Daily Dollar Volume (ADDV)
+Order Book Depth
+Market Impact Estimates
+Participation Rate Limits
+Expected Slippage
+Bid-Ask Spread
+Asset Liquidity Scores
+Exchange Capacity Constraints
+Turnover Constraints
+Portfolio allocations exceeding configurable liquidity thresholds shall be automatically reduced before publication.
+Liquidity constraint methodologies remain configurable, reproducible, and fully version controlled.
+
+### 7.3 Transaction Cost-Aware Optimization
+Portfolio optimization may explicitly account for expected trading costs.
+Supported transaction cost components include:
+Commission Costs
+Exchange Fees
+Spread Costs
+Market Impact Costs
+Slippage Estimates
+Borrow Costs
+Funding Costs
+Currency Conversion Costs
+Tax Considerations (where applicable)
+Optimization objectives may maximize expected risk-adjusted return after estimated transaction costs.
+Transaction cost models remain independently configurable and version controlled.
+
+### 7.4 Multi-Objective Portfolio Optimization
+The Portfolio Construction Engine supports simultaneous optimization across multiple competing objectives.
+Optimization objectives may include:
+Expected Return Maximization
+Portfolio Risk Minimization
+Diversification Maximization
+Liquidity Preservation
+Capital Efficiency
+Strategy Balance
+Exposure Control
+Transaction Cost Minimization
+Uncertainty Reduction
+Regulatory Constraint Satisfaction
+Objective weighting methodologies remain configurable and version controlled.
+
+### 7.5 Optimization Governance
+Every portfolio optimization process records:
+Optimization Method
+Optimization Version
+Objective Function Version
+Constraint Version
+Configuration Version
+Random Seed (where applicable)
+Solver Version
+Solver Configuration
+Optimization Timestamp
+Optimization Metadata
+Historical optimization records remain immutable and fully auditable.
+
+## 8. CAPITAL ALLOCATION
+Portfolio construction supports:
+Fixed Allocation
+Dynamic Allocation
+Strategy-Based Allocation
+Asset-Class Allocation
+Sector Allocation
+Region Allocation
+Liquidity-Based Allocation
+Volatility-Based Allocation
+Allocation policies remain version controlled.
+
+The Portfolio Construction Engine computes the mathematical difference between the Target Portfolio State and the Current Portfolio State.
+
+The resulting Rebalancing Delta defines the portfolio adjustments required to reach the desired allocation.
+
+The delta computation includes:
+
+Position Increases
+
+Position Reductions
+
+Position Closures
+
+New Position Openings
+
+Cash Reallocation
+
+Capital Reservation Updates
+
+Pending Allocation Adjustments
+
+Only Rebalancing Delta outputs are forwarded to downstream Risk Management.
+
+Historical Target Portfolios and Rebalancing Plans remain immutable.
+
+## 9. DIVERSIFICATION MANAGEMENT
+Portfolio diversification evaluates:
+Asset Concentration
+Sector Concentration
+Country Concentration
+Exchange Concentration
+Currency Concentration
+Strategy Concentration
+Average Daily Volume (ADV)
+Expected Market Impact
+Order Book Depth
+Participation Rate
+Liquidity Capacity
+Execution Capacity
+Estimated Slippage
+Turnover Constraints
+
+Diversification policies remain configurable.
+Portfolio construction shall reject target allocations exceeding configurable liquidity capacity constraints.
+
+Liquidity policies remain configurable and fully version controlled.
+
+## 10. CORRELATION MANAGEMENT
+The engine continuously evaluates:
+Asset Correlation
+Strategy Correlation
+Factor Correlation
+Sector Correlation
+Market Correlation
+Cross-Asset Correlation
+Highly correlated allocations may be reduced.
+
+## 11. PORTFOLIO VERSIONING
+Every portfolio records:
+Portfolio Version
+Strategy Version
+Allocation Version
+Constraint Version
+Configuration Version
+Governance Version
+Historical portfolios remain immutable.
+
+## 12. PORTFOLIO GOVERNANCE
+Every portfolio records:
+Approval Status
+Validation Status
+Review History
+Audit History
+Creation Timestamp
+Retirement Status
+Governance Metadata
+Complete governance history is mandatory.
+
+## 13. PERFORMANCE
+The Portfolio Construction Engine supports:
+Parallel Portfolio Construction
+Streaming Allocation Updates
+Incremental Portfolio Updates
+Distributed Optimization
+Cloud Deployment
+
+## 14. OBSERVABILITY
+Metrics include:
+Portfolio Builds
+Allocation Latency
+Allocation Efficiency
+Portfolio Diversification
+Constraint Violations
+Capital Utilization
+Governance Events
+
+## 15. SCALABILITY
+Supports:
+Additional Assets
+Additional Exchanges
+Additional Strategies
+Additional Constraints
+Additional Portfolio Models
+Distributed Infrastructure
+Multi-Region Deployment
+without architectural redesign.
+
+## 16. FAILURE RECOVERY
+Supports:
+Portfolio Reconstruction
+Allocation Recovery
+Constraint Recovery
+Failure Logging
+Graceful Degradation
+Portfolio Quarantine
+Invalid portfolios shall never be published.
+
+## 17. ARCHITECTURAL RULES
+Rule 1
+Only Canonical Strategy Decision Contracts generated by Chapter 5.2 may enter the Portfolio Construction Engine.
+Rule 2
+Portfolio construction shall remain independent of Machine Learning, Strategy Intelligence, Risk Management, Position Sizing, and Order Execution.
+Rule 3
+Every portfolio shall generate a unique Portfolio ID.
+Rule 4
+Every portfolio shall conform to the Canonical Portfolio Contract.
+Rule 5
+Historical portfolio records are immutable.
+Rule 6
+Portfolio construction methodologies shall remain fully configurable and version controlled.
+Rule 7
+Portfolio construction shall preserve complete lineage linking strategy decisions, configurations, constraints, and governance metadata.
+Rule 8
+Portfolio construction shall never modify Strategy Decision Contracts.
+Portfolio construction shall consume the Current Portfolio State and compute a deterministic Rebalancing Delta.
+
+Target allocations shall never be interpreted as executable trades.
+
+Rule 9
+Diversification constraints shall remain configurable and fully version controlled.
+Rule 10
+Correlation evaluation shall remain mathematically independent from diversification assessment.
+Portfolio optimization may incorporate Prediction Confidence and Epistemic Uncertainty as allocation penalties.
+
+Prediction uncertainty shall never increase portfolio allocation.
+
+Rule 11
+Only approved Canonical Portfolio Contracts may enter the Risk Management Engine.
+Rule 12
+Portfolio governance shall remain independent of deployment topology.
+Rule 13
+Portfolio construction shall produce investment allocations rather than executable market orders.
+Portfolio allocations shall respect configurable liquidity capacity constraints.
+
+Allocations exceeding allowable participation rates, market depth limits, or liquidity thresholds shall be reduced prior to publication.
+
+Rule 14
+Allocation confidence shall remain mathematically independent from Strategy Decision Confidence.
+Rule 15
+This chapter governs only portfolio construction. Risk controls, position sizing, execution optimization, and broker connectivity are defined exclusively in subsequent chapters.
+
+## 18. CHAPTER SUMMARY
+The Portfolio Construction Engine establishes AlphaSpot's canonical architecture for transforming validated Strategy Decision Contracts into coherent portfolio-level investment allocations. By separating portfolio construction from strategy intelligence, risk enforcement, position sizing, and execution, the architecture guarantees deterministic allocation generation, configurable optimization methodologies, immutable versioning, complete lineage, and enterprise-grade governance. Through the Canonical Portfolio Contract, the Portfolio Construction Engine provides a standardized portfolio representation that enables downstream Risk Management and Position Sizing components to operate consistently, reproducibly, and independently of upstream investment logic.
+
+END OF CHAPTER 5.3
