@@ -2120,3 +2120,355 @@ Rule 19 — Expiration never modifies historical records. Affects only downstrea
 The SGE transforms ML predictions into standardized, statistically governed trading signals. Separates prediction interpretation from strategy/risk/portfolio/execution. Deterministic signal generation, configurable thresholds, regime-aware qualification, immutable versioning, complete lineage, enterprise governance. Canonical Signal Contract = standardized decision interface for all downstream strategies.
 
 END OF CHAPTER 5.1
+
+---
+
+# ALPHASPOT QUANT V2
+# CHAPTER 5.2
+# STRATEGY INTELLIGENCE ENGINE
+# Version 1.0
+
+## 1. PURPOSE
+The Strategy Intelligence Engine (SIE) establishes the canonical architecture for transforming standardized trading signals into strategy-specific trading decisions through deterministic, auditable, and configurable decision logic.
+The Strategy Intelligence Engine serves as the exclusive bridge between Signal Generation and Portfolio Construction.
+The SIE evaluates trading signals within the context of individual trading strategies while preserving complete separation between statistical forecasting and investment decision making.
+The Strategy Intelligence Engine performs:
+Strategy Selection
+Strategy Evaluation
+Signal Qualification
+Strategy Rule Evaluation
+Multi-Strategy Coordination
+Strategy Conflict Resolution
+Strategy State Management
+Strategy Versioning
+Strategy Governance
+Strategy Metadata Generation
+Decision Lineage Management
+The SIE performs NO:
+Feature Engineering
+Machine Learning Inference
+Portfolio Optimization
+Position Sizing
+Risk Management
+Order Execution
+Broker Communication
+
+## 2. DESIGN PHILOSOPHY
+Trading signals are informational.
+Trading strategies are decision systems.
+A valid signal does not automatically imply a trade.
+Every strategy independently determines whether a signal satisfies its investment objectives.
+Strategy execution shall remain:
+deterministic
+reproducible
+configurable
+version controlled
+fully auditable
+strategy independent
+Multiple strategies may consume the same signal simultaneously without influencing one another.
+
+## 3. INPUT CONTRACT
+The Strategy Intelligence Engine consumes only:
+Canonical Signal Contracts (Chapter 5.1)
+Strategy Definitions
+Strategy Configuration
+Strategy Metadata
+Strategy State
+Regime Metadata
+Portfolio Capacity Metadata
+Capital Reservation Metadata
+Exposure Constraints
+Governance Configuration
+The engine never consumes:
+Raw Market Data
+Raw Feature Vectors
+Machine Learning Models
+Broker Orders
+Execution Reports
+The Strategy Intelligence Engine consumes only portfolio-level capacity metadata required to determine whether a strategy decision is operationally feasible.
+The engine shall never allocate capital, modify positions, calculate leverage, or perform portfolio optimization.
+
+This preserves separation of responsibilities while preventing impossible decisions.
+
+## 4. OUTPUT CONTRACT
+Every strategy decision produces:
+Strategy Decision ID
+Strategy Version
+Strategy ID
+Signal ID
+Decision Timestamp
+Decision Type
+Decision Confidence
+Decision Strength
+Strategy State
+Decision Reason
+Requested Capital
+Capital Reservation Status
+Exposure Intent
+Strategy Metadata
+Governance Metadata
+Decision outputs remain immutable.
+Every decision shall conform to the Canonical Strategy Decision Contract defined by this chapter.
+
+Notice this is Intent, not actual allocation.
+
+## 5. STRATEGY DECISION PIPELINE
+Every strategy decision follows the canonical workflow:
+Canonical Signal Reception
+↓
+Signal Validation
+↓
+Strategy Selection
+↓
+Strategy State Loading
+↓
+Rule Evaluation
+↓
+Regime Compatibility Assessment
+↓
+Decision Construction
+↓
+Decision Validation
+↓
+Decision Publication
+↓
+Metadata Recording
+↓
+Decision Completion
+No stage may be skipped.
+
+## 6. CANONICAL STRATEGY DECISION CONTRACT
+Every strategy decision shall produce:
+Decision Type
+Decision Confidence
+Decision Strength
+Decision Horizon
+Strategy Identifier
+Strategy Version
+Decision Reason
+Exposure Intent
+Requested Capital
+Capital Reservation Status
+Strategy Metadata
+The Strategy Decision represents an investment intent rather than an executable order.
+Portfolio Construction (Chapter 5.3) remains solely responsible for capital allocation, leverage determination, exposure optimization, and final position construction.
+Alternative decision formats are prohibited.
+
+This creates a clean API between Chapters 5.2 and 5.3.
+
+## 7. STRATEGY TYPES
+The engine supports:
+Trend Following
+Mean Reversion
+Breakout
+Momentum
+Statistical Arbitrage
+Market Making
+Pairs Trading
+Swing Trading
+Scalping
+Volatility Trading
+Options Strategies
+Hybrid Strategies
+Strategy taxonomies remain configurable.
+
+## 8. STRATEGY RULE EVALUATION
+Strategy rules may evaluate:
+Signal Direction
+Signal Strength
+Signal Confidence
+Signal Quality
+Regime Compatibility
+Prediction Horizon
+Signal Freshness
+Strategy State
+Time Constraints
+Strategy rules remain deterministic.
+
+## 9. MULTI-STRATEGY COORDINATION
+The engine supports:
+Independent Strategies
+Cooperative Strategies
+Hierarchical Strategies
+Parallel Strategies
+Meta Strategies
+Composite Strategies
+Strategies remain logically isolated.
+
+Cross-Strategy Decision Reconciliation:
+Prior to publication, the Strategy Intelligence Engine shall evaluate all active Strategy Decisions for logical conflicts affecting the same tradable instrument.
+Conflict analysis may include:
+Opposing Direction Detection
+Net Exposure Calculation
+Strategy Priority
+Strategy Confidence
+Strategy Horizon
+Capital Efficiency
+Historical Strategy Reliability
+The engine may generate:
+Independent Decisions
+Consolidated Decisions
+Partially Offset Decisions
+Deferred Decisions
+Decision reconciliation shall preserve complete lineage linking every original Strategy Decision to the resulting consolidated output.
+Individual strategy logic remains unchanged.
+Only downstream decision publication may be consolidated.
+
+This prevents internal self-trading.
+
+## 10. STRATEGY STATE MANAGEMENT
+Every strategy maintains state information including:
+Current State
+Previous Decision
+Active Signals
+Historical Decisions
+Consecutive Wins
+Consecutive Losses
+Drawdown State
+Cooldown Status
+Cooldown Remaining
+Suspension Status
+State Metadata
+State transitions remain deterministic and fully version controlled.
+Strategies may transition through states including:
+Active
+Cooldown
+Suspended
+Recovery
+Observation
+Retired
+Cooldown transitions may be triggered by:
+Consecutive Loss Threshold
+Drawdown Threshold
+Risk Governance Events
+Manual Governance Actions
+Cooldown policies remain configurable.
+
+Now the strategy has institutional lifecycle management.
+
+## 11. STRATEGY VERSIONING
+Every strategy records:
+Strategy Version
+Configuration Version
+Rule Version
+Signal Version
+Model Version
+Governance Version
+Historical strategies remain immutable.
+
+## 12. STRATEGY GOVERNANCE
+Every strategy records:
+Approval Status
+Validation Status
+Review History
+Audit History
+Creation Timestamp
+Retirement Status
+Governance Metadata
+Complete governance history is mandatory.
+
+## 13. PERFORMANCE
+The Strategy Intelligence Engine supports:
+Parallel Strategy Evaluation
+Streaming Decisions
+Low-Latency Processing
+Incremental Updates
+Distributed Evaluation
+Cloud Deployment
+
+## 14. OBSERVABILITY
+Metrics include:
+Strategy Decisions
+Strategy Acceptance Rate
+Decision Latency
+Decision Distribution
+Strategy Utilization
+Strategy Conflicts
+Governance Events
+Decision Throughput
+
+## 15. SCALABILITY
+Supports:
+Additional Strategies
+Additional Assets
+Additional Exchanges
+Additional Signal Types
+Additional Decision Policies
+Distributed Infrastructure
+Multi-Region Deployment
+without architectural redesign.
+
+## 16. FAILURE RECOVERY
+Supports:
+Strategy Reload
+Configuration Recovery
+Decision Quarantine
+Failure Logging
+Graceful Degradation
+State Recovery
+Invalid strategy decisions shall never be published.
+Failure recovery additionally supports:
+Strategy Suspension
+Cooldown Recovery
+State Restoration
+Cross-Strategy Reconciliation Recovery
+Capital Reservation Recovery
+
+## 17. ARCHITECTURAL RULES
+Rule 1
+Only Canonical Signal Contracts generated by Chapter 5.1 may enter the Strategy Intelligence Engine.
+Rule 2
+Strategy decisions shall remain completely independent of portfolio optimization, position sizing, execution infrastructure, and broker connectivity.
+Rule 3
+Every strategy decision shall generate a unique Strategy Decision ID.
+Rule 4
+Every decision shall conform to the Canonical Strategy Decision Contract.
+Rule 5
+Historical strategy decisions are immutable.
+Rule 6
+Strategy rules shall remain fully configurable and version controlled.
+Rule 7
+Multiple strategies shall never modify one another's internal state.
+Rule 8
+Strategy state transitions shall remain deterministic.
+Rule 9
+Strategies shall preserve complete lineage linking signals, configurations, versions, and governance metadata.
+Rule 10
+Strategy execution shall never modify Canonical Signal Contracts.
+Rule 11
+Strategy governance shall remain independent of deployment topology.
+Rule 12
+Only approved Strategy Decision Contracts may enter Portfolio Construction.
+Rule 13
+Decision confidence shall remain mathematically independent from signal confidence.
+Rule 14
+Historical strategy versions are immutable.
+Rule 15
+This chapter governs only strategy intelligence. Portfolio optimization, risk management, capital allocation, and execution are defined exclusively in subsequent chapters.
+Rule 16
+The Strategy Intelligence Engine shall reconcile simultaneously active Strategy Decisions targeting the same tradable instrument prior to downstream publication.
+Decision reconciliation shall minimize unnecessary opposing market exposure while preserving complete decision lineage.
+Rule 17
+Strategy reconciliation shall never modify the internal decision logic of constituent strategies.
+Only the published Decision Intent may be consolidated.
+Rule 18
+Every strategy shall maintain deterministic operational state including cooldown, recovery, suspension, and historical performance state.
+State transitions shall remain fully auditable and version controlled.
+Rule 19
+Cooldown policies shall support configurable activation criteria including consecutive losses, drawdown thresholds, governance events, and manual intervention.
+Cooldown expiration shall never automatically reset historical performance statistics.
+Rule 20
+Strategy Decisions may include Requested Capital and Exposure Intent for downstream capacity validation.
+The Strategy Intelligence Engine shall never perform portfolio optimization, leverage allocation, or capital allocation.
+Rule 21
+Portfolio capacity constraints may invalidate Strategy Decisions before publication.
+Such invalidation shall preserve complete audit lineage and shall never modify the originating Canonical Signal Contract.
+Rule 22
+The Strategy Intelligence Engine shall remain completely independent of execution infrastructure.
+Decision publication represents investment intent only.
+Execution authorization remains exclusively within subsequent Portfolio Construction, Risk Management, and Execution chapters.
+
+## 18. CHAPTER SUMMARY
+The Strategy Intelligence Engine establishes AlphaSpot's canonical architecture for transforming standardized trading signals into deterministic, strategy-specific investment decisions. By separating statistical signal generation from investment policy, portfolio construction, risk management, and execution, the architecture guarantees reproducible decision making, configurable strategy rules, immutable versioning, complete lineage, and enterprise-grade governance. Through the Canonical Strategy Decision Contract, the Strategy Intelligence Engine enables multiple independent trading strategies to consume identical trading signals while preserving deterministic behavior, operational transparency, and long-term maintainability across evolving quantitative investment systems.
+
+END OF CHAPTER 5.2
