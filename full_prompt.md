@@ -1950,3 +1950,91 @@ Rule 16 — Offline Store: metadata in transactional DB, payloads in immutable c
 The FPFS transforms Feature Vectors into ML-ready datasets through validation, imputation, normalization, scaling, versioning, and storage. Separates preprocessing from extraction and ML, guaranteeing temporal correctness, deterministic replay, full lineage, reproducibility, and scalable online/offline feature management. This is the final data contract before AI consumes market information.
 
 END OF CHAPTER 3.10
+
+---
+
+# CHAPTER 4.1 — AI PHILOSOPHY & PREDICTION FRAMEWORK
+
+## 1. Purpose
+
+The AI Platform transforms processed market features into probabilistic forecasts. AI provides statistical estimates of future market behavior — never trading decisions directly. Performs: probabilistic prediction, uncertainty estimation, market state classification, ranking generation, confidence estimation, model explainability, prediction governance. Performs NO: order execution, portfolio management, risk allocation, trade confirmation.
+
+## 2. Design Philosophy
+
+AI estimates probability, never predicts certainty. Every prediction = statistical belief conditioned on available information. Markets are noisy, evolve, models become obsolete, uncertainty always exists. AI outputs probabilities, never deterministic truths.
+
+## 3. AI Objective
+
+Not to predict price. Objective: estimate future opportunity. "What is the probability that this asset will produce a statistically favorable outcome over a defined prediction horizon?" Optimizes expected value rather than prediction accuracy alone.
+
+## 4. Prediction Principles
+
+Every prediction must satisfy: Temporal Integrity, Statistical Validity, Deterministic Reproducibility, Probability Calibration, Model Explainability, Governance Compliance.
+
+## 5. Prediction Types
+
+Price Direction, Return Distribution, Expected Return, Expected Drawdown, Volatility, Breakout Probability, Trend Continuation, Trend Reversal, Momentum Persistence, Liquidity Change, Market Regime, Risk Estimation. Predictions remain modular — no prediction type depends on another.
+
+## 6. Multi-Horizon Predictions
+
+Every prediction specifies its forecast horizon: 15m, 30m, 1h, 4h, 1d, 3d, 7d. Predictions from different horizons remain independent.
+
+## 7. Probability Estimation
+
+Every prediction contains: Probability, Confidence, Prediction Interval, Expected Value, Model Agreement, Calibration Score. Probability and confidence are DISTINCT: Probability = forecasted likelihood of target event (Aleatoric uncertainty). Confidence = model's certainty in its own forecast based on data density and historical familiarity (Epistemic uncertainty).
+
+## 8. Model Independence
+
+Prediction interfaces independent of specific algorithms. Supported: Gradient Boosting, Deep Learning, Linear Models, Probabilistic Models, Ensemble Models, future families. Consumers never depend on implementation details.
+
+## 9. Deterministic Inference
+
+Identical Model + Identical Features + Identical Configuration → identical predictions. Randomness during inference PROHIBITED.
+
+## 10. Model Versioning
+
+Every prediction records: Model Version, Training Dataset Version, Feature Version, Hyperparameter Version, Calibration Version, Inference Engine Version, Prediction Schema Version.
+
+## 11. Uncertainty
+
+Every prediction quantifies uncertainty: Data Uncertainty, Model Uncertainty, Feature Quality, Market Regime, Prediction Stability. Low certainty never implies high risk. High certainty never guarantees correctness.
+
+## 12. Explainability
+
+Every prediction shall be explainable: Feature Importance, Prediction Drivers, Confidence Explanation, Historical Similarity, Model Contribution. Explanation methods remain model independent.
+
+## 13. AI Governance
+
+Every prediction governed by: Version Control, Audit Trail, Calibration Monitoring, Performance Monitoring, Drift Monitoring, Promotion Policy, Rollback Policy. No model bypasses governance.
+
+## 14. Observability
+
+Prediction Latency, Prediction Throughput, Calibration Error, Inference Failures, Confidence Distribution, Model Agreement, Prediction Drift, Worker Utilization.
+
+## 15. Scalability
+
+Additional models, prediction targets, assets, distributed inference, GPU acceleration, cloud deployment without redesign.
+
+## 16. Architectural Rules
+
+Rule 1 — AI produces probabilities, not trading decisions.
+Rule 2 — Every prediction quantifies uncertainty.
+Rule 3 — Probability and confidence remain independent.
+Rule 4 — Inference deterministic.
+Rule 5 — Prediction interfaces independent of model implementations.
+Rule 6 — Every prediction versioned.
+Rule 7 — Every prediction explainable.
+Rule 8 — Every prediction preserves temporal integrity.
+Rule 9 — Calibration continuously monitored.
+Rule 10 — Model governance mandatory.
+Rule 11 — Optimize expected value, not classification accuracy alone.
+Rule 12 — Multiple horizons remain statistically independent, no shared future information.
+Rule 13 — AI remains advisory. Final decisions belong to Decision Engine.
+Rule 14 — Every prediction reproducible from recorded versions.
+Rule 15 — No AI component may access raw market data. All inputs from Feature Processing & Feature Store.
+
+## 17. Chapter Summary
+
+The AI Platform transforms processed feature datasets into calibrated probabilistic forecasts. Separates prediction from decision making, enforces deterministic inference, quantifies uncertainty, preserves explainability, applies rigorous governance. Creates a robust, extensible AI layer for multiple prediction horizons, model families, and future research with full reproducibility and institutional-grade standards.
+
+END OF CHAPTER 4.1
