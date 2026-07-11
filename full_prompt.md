@@ -3547,3 +3547,387 @@ Exchange quantity normalization, currency translation, capital reservation, and 
 The Position Sizing Engine establishes AlphaSpot's canonical architecture for converting risk-approved portfolio allocations into precise, executable trading positions. By separating position sizing from portfolio construction, risk evaluation, and execution, the architecture guarantees deterministic sizing, configurable capital allocation methodologies, exchange-compliant quantity normalization, immutable versioning, complete lineage, and enterprise-grade governance. Through the Canonical Position Contract, the Position Sizing Engine provides standardized, execution-ready position specifications that enable downstream Order Decision and Execution Engines to operate consistently, reproducibly, and independently of upstream investment logic.
 
 END OF CHAPTER 5.5
+
+---
+
+# ALPHASPOT QUANT V2
+# CHAPTER 5.6
+# ORDER DECISION ENGINE
+# Version 1.0
+
+## 1. PURPOSE
+The Order Decision Engine (ODE) establishes the canonical architecture for transforming validated Position Contracts into executable Order Intent Contracts through deterministic, configurable, transaction-cost-aware, and fully governed decision logic.
+The Order Decision Engine serves as the exclusive bridge between the Position Sizing Engine and the Execution Optimization Layer.
+The ODE determines whether approved target positions require market action by comparing desired portfolio states with current portfolio states while minimizing unnecessary trading, transaction costs, market impact, and portfolio turnover.
+The ODE performs:
+Position Delta Calculation
+Portfolio Drift Evaluation
+Rebalancing Decision
+Order Necessity Assessment
+Minimum Trade Size Validation
+Minimum Notional Validation
+Transaction Cost Screening
+Market Impact Screening
+Liquidity Verification
+Turnover Budget Evaluation
+Order Intent Construction
+Parent Order Construction
+Order Versioning
+Order Governance
+Order Metadata Generation
+Order Lineage Management
+The ODE performs NO:
+Machine Learning
+Signal Generation
+Strategy Selection
+Portfolio Construction
+Risk Evaluation
+Position Sizing
+Smart Order Routing
+Broker Communication
+Market Execution
+
+## 2. DESIGN PHILOSOPHY
+Approved target positions do not necessarily require immediate execution.
+Every market order introduces:
+Transaction Costs
+Bid-Ask Spread Costs
+Market Impact
+Slippage
+Portfolio Turnover
+The Order Decision Engine determines whether the expected portfolio improvement justifies these execution costs.
+Order decisions shall remain:
+deterministic
+reproducible
+configurable
+version controlled
+fully auditable
+Order generation shall remain completely independent of:
+Machine Learning
+Strategy Intelligence
+Portfolio Optimization
+Risk Policy Definition
+Broker Connectivity
+Execution Algorithms
+Identical Position Contracts and portfolio states shall always generate identical Order Intent Contracts under identical configurations whenever mathematically possible.
+
+## 3. INPUT CONTRACT
+The Order Decision Engine consumes only:
+Canonical Position Contracts (Chapter 5.5)
+Current Portfolio State
+Active Positions
+Pending Orders
+Capital Reservation State
+Real-Time Price Oracle
+FX Conversion Oracle
+Transaction Cost Model
+Market Impact Model
+Liquidity Model
+Turnover Budget Configuration
+Exchange Trading Rules
+Governance Configuration
+The engine never consumes:
+Raw Market Data
+Machine Learning Models
+Trading Signals
+Broker Execution Reports
+
+## 4. OUTPUT CONTRACT
+Every order decision produces:
+Order Decision ID
+Order Version
+Position ID
+Asset Identifier
+Order Intent
+Parent Order ID
+Rebalancing Delta
+Target Quantity
+Current Quantity
+Order Quantity
+Order Side
+Transaction Cost Estimate
+Market Impact Estimate
+Turnover Estimate
+Execution Urgency
+Pending Order Status
+Order Freshness Timestamp
+Decision Confidence
+Decision Reason
+Validity Horizon
+Order Metadata
+Governance Metadata
+Outputs remain immutable.
+Every decision shall conform to the Canonical Order Intent Contract defined by this chapter.
+
+## 5. ORDER DECISION PIPELINE
+Every Position Contract follows the canonical workflow:
+Position Contract Reception
+↓
+Position Validation
+↓
+Current Portfolio State Loading
+↓
+Pending Order Synchronization
+↓
+Pending Order Freshness Verification
+↓
+Position Delta Calculation
+↓
+Portfolio Drift Evaluation
+↓
+Minimum Trade Size Validation
+↓
+Minimum Notional Validation
+↓
+Transaction Cost Estimation
+↓
+Market Impact Estimation
+↓
+Liquidity Verification
+↓
+Turnover Budget Evaluation
+↓
+Temporal Rebalancing Cooldown Verification
+↓
+Order Necessity Decision
+↓
+Execution Urgency Classification
+↓
+Parent Order Construction
+↓
+Order Validation
+↓
+Order Publication
+↓
+Metadata Recording
+↓
+Order Completion
+
+No stage may be skipped.
+
+## 6. CANONICAL ORDER INTENT CONTRACT
+Every Order Intent Contract shall produce:
+Order Intent
+Order Side
+Order Quantity
+Target Quantity
+Rebalancing Delta
+Transaction Cost Estimate
+Market Impact Estimate
+Turnover Estimate
+Decision Confidence
+Decision Reason
+Execution Urgency
+Pending Order Status
+Order Freshness Timestamp
+Validity Horizon
+Order Metadata
+Alternative order formats are prohibited.
+
+## 7. ORDER DECISION TYPES
+The engine supports:
+BUY
+SELL
+REBALANCE
+HOLD
+NO_ACTION
+REDUCE_POSITION
+INCREASE_POSITION
+CLOSE_POSITION
+OPEN_POSITION
+Decision taxonomies remain configurable.
+
+## 8. REBALANCING MANAGEMENT
+Order generation supports:
+Absolute Drift Threshold
+Relative Drift Threshold
+Minimum Quantity Threshold
+Minimum Notional Threshold
+Turnover Threshold
+Portfolio Drift Threshold
+Strategy Drift Threshold
+Time-Based Rebalancing
+Event-Based Rebalancing
+Thresholds remain configurable and version controlled.
+
+## 9. TRANSACTION COST EVALUATION
+Every order undergoes transaction-cost assessment.
+Evaluation includes:
+Exchange Fees
+Broker Fees
+Bid-Ask Spread
+Estimated Slippage
+Market Impact
+Funding Costs
+Borrow Costs
+FX Conversion Costs
+Orders failing minimum economic benefit requirements shall not be promoted.
+
+## 10. LIQUIDITY MANAGEMENT
+Every proposed order evaluates:
+Average Daily Volume
+Order Book Depth
+Available Liquidity
+Participation Rate
+Volume Profile
+Spread Conditions
+Volatility Conditions
+Market Hours
+Orders violating liquidity constraints may be reduced or rejected.
+
+Pending orders are continuously monitored for execution freshness.
+Liquidity management additionally verifies:
+Pending Order Age
+Fill Heartbeat Status
+Exchange Acknowledgement Status
+Partial Fill Status
+Cancellation Eligibility
+Pending orders exceeding configurable freshness thresholds shall automatically enter a stale-order recovery workflow.
+The recovery workflow may:
+Cancel stale orders
+Release reserved quantities
+Recompute portfolio deltas
+Trigger fresh Order Decision evaluation
+
+## 11. TURNOVER MANAGEMENT
+The engine continuously evaluates:
+Portfolio Turnover
+Daily Turnover
+Strategy Turnover
+Asset Turnover
+Historical Turnover
+Cost Efficiency
+Turnover policies remain configurable.
+
+To prevent excessive portfolio churn under rapidly oscillating market conditions, the engine supports configurable temporal rebalancing cooldowns.
+Cooldown policies include:
+Asset-Level Cooldown
+Strategy-Level Cooldown
+Portfolio-Level Cooldown
+Emergency Cooldown Override
+During an active cooldown period, additional Order Intent generation may be suppressed unless catastrophic portfolio drift exceeds configurable emergency thresholds.
+Cooldown policies remain fully version controlled.
+
+## 12. ORDER VERSIONING
+Every order records:
+Order Version
+Position Version
+Portfolio Version
+Risk Version
+Configuration Version
+Governance Version
+Historical orders remain immutable.
+
+## 13. ORDER GOVERNANCE
+Every order records:
+Approval Status
+Validation Status
+Review History
+Audit History
+Creation Timestamp
+Expiration Timestamp
+Governance Metadata
+Complete governance history is mandatory.
+
+## 14. PERFORMANCE
+The Order Decision Engine supports:
+Parallel Decision Processing
+Streaming Order Evaluation
+Incremental Rebalancing
+Distributed Processing
+Low-Latency Operation
+Cloud Deployment
+
+## 15. OBSERVABILITY
+Metrics include:
+Orders Generated
+Orders Suppressed
+Average Rebalancing Drift
+Transaction Cost Estimates
+Market Impact Estimates
+Turnover Utilization
+Decision Latency
+Governance Events
+
+## 16. FAILURE RECOVERY
+Supports:
+Configuration Reload
+Portfolio Reconstruction
+Decision Recovery
+Failure Logging
+Graceful Degradation
+Order Quarantine
+Invalid Order Intent Contracts shall never be published.
+
+## 17. ARCHITECTURAL RULES
+Rule 1
+Only Canonical Position Contracts generated by Chapter 5.5 may enter the Order Decision Engine.
+Rule 2
+Order decision logic shall remain completely independent of execution algorithms, smart order routing, broker connectivity, and market execution.
+Rule 3
+Every order decision shall generate a unique Order Decision ID.
+Rule 4
+Every decision shall conform to the Canonical Order Intent Contract.
+Rule 5
+Historical order decisions are immutable.
+Rule 6
+Order necessity shall be determined using configurable rebalancing thresholds rather than target positions alone.
+Rule 7
+Every order shall be generated from the delta between the Current Portfolio State and the Target Portfolio State.
+Rule 8
+Pending orders shall be incorporated into delta calculations to prevent duplicate execution of identical investment intent.
+Rule 9
+Transaction cost estimates shall remain mathematically independent from market impact estimates.
+Rule 10
+Orders whose expected implementation cost exceeds configurable economic benefit thresholds shall be suppressed automatically.
+Rule 11
+Liquidity evaluation shall precede parent order construction.
+Rule 12
+Order generation shall preserve complete lineage linking position contracts, portfolio versions, risk assessments, pricing sources, and governance metadata.
+Rule 13
+Order decisions shall never modify Canonical Position Contracts.
+Rule 14
+Every Order Intent Contract shall contain a configurable Validity Horizon. Expired order intents shall automatically become invalid and shall never enter the Execution Optimization Layer.
+Rule 15
+Atomic multi-asset rebalancing dependencies shall be preserved. If one component of an inseparable hedge or basket cannot be generated, all dependent order intents shall be rejected together.
+Rule 16
+Parent Order Construction shall produce execution intent only. Child-order decomposition is defined exclusively within the Execution Optimization Engine.
+Rule 17
+Turnover budgets shall be enforced independently of transaction cost policies.
+Rule 18
+All transaction cost, liquidity, and market impact models shall be independently versioned and fully reproducible.
+Rule 19
+Order decisions shall preserve deterministic behavior whenever identical position contracts, portfolio states, pricing inputs, and configurations are supplied.
+Rule 20
+This chapter governs only order decision making. Execution optimization, child-order generation, smart order routing, broker connectivity, and market execution are defined exclusively in subsequent chapters.
+
+Rule 21
+Pending orders shall continuously undergo freshness verification.
+Orders that exceed configurable heartbeat or acknowledgment timeouts shall automatically enter stale-order recovery.
+The Order Decision Engine shall recompute portfolio deltas after stale-order cancellation.
+
+Rule 22
+Order generation shall enforce configurable Temporal Rebalancing Cooldowns.
+Repeated Order Intent generation for the same asset shall be temporarily suppressed following successful publication unless emergency drift thresholds are exceeded.
+
+Rule 23
+Every Canonical Order Intent Contract shall include an Execution Urgency classification.
+Execution Urgency shall be generated independently of transaction cost estimates and shall communicate execution priority to downstream Execution Optimization Engines.
+Supported urgency levels remain configurable and may include:
+Immediate
+High
+Normal
+Low
+Opportunistic
+
+Rule 24
+Execution Urgency shall influence execution scheduling only.
+It shall never modify portfolio objectives, approved position sizes, or risk-approved allocations.
+
+Rule 25
+Pending Order Freshness, Execution Urgency, and Temporal Cooldown policies shall remain independently configurable, version controlled, and fully reproducible.
+
+## 18. CHAPTER SUMMARY
+The Order Decision Engine establishes AlphaSpot's canonical architecture for transforming risk-approved Position Contracts into economically justified Order Intent Contracts. By separating execution decision-making from position sizing, execution optimization, and broker interaction, the architecture guarantees deterministic rebalancing decisions, transaction-cost-aware order suppression, liquidity-aware trade qualification, immutable versioning, complete lineage, and enterprise-grade governance. Through the Canonical Order Intent Contract, the Order Decision Engine provides standardized execution intent that enables downstream execution components to optimize order placement while preserving portfolio objectives, minimizing unnecessary turnover, and maintaining complete operational auditability.
+
+END OF CHAPTER 5.6
