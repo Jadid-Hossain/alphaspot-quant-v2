@@ -3931,3 +3931,415 @@ Pending Order Freshness, Execution Urgency, and Temporal Cooldown policies shall
 The Order Decision Engine establishes AlphaSpot's canonical architecture for transforming risk-approved Position Contracts into economically justified Order Intent Contracts. By separating execution decision-making from position sizing, execution optimization, and broker interaction, the architecture guarantees deterministic rebalancing decisions, transaction-cost-aware order suppression, liquidity-aware trade qualification, immutable versioning, complete lineage, and enterprise-grade governance. Through the Canonical Order Intent Contract, the Order Decision Engine provides standardized execution intent that enables downstream execution components to optimize order placement while preserving portfolio objectives, minimizing unnecessary turnover, and maintaining complete operational auditability.
 
 END OF CHAPTER 5.6
+
+---
+
+# ALPHASPOT QUANT V2
+# CHAPTER 5.7
+# EXECUTION OPTIMIZATION ENGINE
+# Version 1.0
+
+## 1. PURPOSE
+The Execution Optimization Engine (EOE) establishes the canonical architecture for transforming validated Order Intent Contracts into optimized Execution Plans through deterministic, configurable, market-aware, and fully governed execution methodologies.
+The Execution Optimization Engine serves as the exclusive bridge between the Order Decision Engine and the Smart Order Routing Engine.
+The EOE determines the optimal execution strategy for each approved Order Intent while minimizing implementation shortfall, market impact, adverse selection, information leakage, transaction costs, and execution risk.
+The Execution Optimization Engine performs:
+Execution Algorithm Selection
+Execution Urgency Evaluation
+Child Order Planning
+Parent Order Decomposition
+Schedule Optimization
+Participation Rate Planning
+Slice Size Optimization
+Execution Cost Optimization
+Market Impact Optimization
+Liquidity Scheduling
+Time Scheduling
+Adaptive Execution Planning
+Execution Versioning
+Execution Governance
+Execution Metadata Generation
+Execution Lineage Management
+The EOE performs NO:
+Machine Learning
+Signal Generation
+Strategy Selection
+Portfolio Construction
+Risk Management
+Position Sizing
+Broker Connectivity
+Exchange Routing
+Order Execution
+
+## 2. DESIGN PHILOSOPHY
+Order Intent defines what should be traded.
+Execution Optimization determines how it should be traded.
+Execution optimization shall remain:
+deterministic
+reproducible
+configurable
+version controlled
+fully auditable
+Execution optimization minimizes execution cost while preserving investment intent.
+Execution optimization shall remain completely independent of:
+Machine Learning
+Strategy Logic
+Portfolio Construction
+Risk Policy
+Broker Infrastructure
+
+## 3. INPUT CONTRACT
+The Execution Optimization Engine consumes only:
+Canonical Order Intent Contracts (Chapter 5.6)
+Real-Time Liquidity Model
+Market Impact Model
+Execution Cost Model
+Exchange Trading Rules
+Venue Metadata
+Historical Execution Statistics
+Execution Configuration
+Governance Configuration
+The engine never consumes:
+Trading Signals
+Machine Learning Models
+Portfolio Construction Logic
+Broker Execution Reports
+Exchange Matching Events
+
+## 4. OUTPUT CONTRACT
+Every execution plan produces:
+Execution Plan ID
+Execution Version
+Parent Order ID
+Execution Algorithm
+Execution Schedule
+Child Order Plan
+Slice Quantity
+Participation Rate
+Time Schedule
+Expected Completion Time
+Expected Transaction Cost
+Expected Market Impact
+Expected Slippage
+Execution Risk Score
+Execution Metadata
+Governance Metadata
+Outputs remain immutable.
+Every execution plan shall conform to the Canonical Execution Plan Contract defined by this chapter.
+
+Every execution plan additionally produces:
+Execution State
+Remaining Parent Quantity
+Executed Quantity
+Residual Quantity
+Execution Plan Version
+Execution Interrupt Status
+Algorithm Switching Status
+Slice Randomization Metadata
+Outputs remain immutable.
+
+## 5. EXECUTION OPTIMIZATION PIPELINE
+Every Order Intent follows the canonical workflow:
+Order Intent Reception
+↓
+Order Validation
+↓
+Liquidity Model Loading
+↓
+Execution Cost Evaluation
+↓
+Market Impact Evaluation
+↓
+Execution Urgency Assessment
+↓
+Execution Algorithm Selection
+↓
+Participation Rate Optimization
+↓
+Parent Order Decomposition
+↓
+Execution Schedule Construction
+↓
+Child Order Planning
+↓
+Execution Validation
+↓
+Execution Plan Publication
+↓
+Execution State Monitoring
+↓
+Residual Quantity Monitoring
+↓
+Adaptive Execution Evaluation
+↓
+Execution Plan Re-optimization (if required)
+↓
+Metadata Recording
+↓
+Execution Completion
+
+No stage may be skipped.
+
+## 6. CANONICAL EXECUTION PLAN CONTRACT
+Every execution plan shall produce:
+Execution Algorithm
+Execution Schedule
+Child Order Plan
+Participation Rate
+Slice Quantity
+Expected Transaction Cost
+Expected Market Impact
+Expected Slippage
+Execution Risk Score
+Execution Metadata
+Alternative execution formats are prohibited.
+
+Every execution plan additionally contains:
+Execution State
+Remaining Quantity
+Residual Quantity
+Execution Plan Version
+Execution Interrupt Status
+Slice Randomization Metadata
+Alternative execution formats remain prohibited.
+
+## 7. EXECUTION ALGORITHMS
+The engine supports:
+Market Execution
+Limit Execution
+TWAP
+VWAP
+POV (Participation of Volume)
+Implementation Shortfall
+Arrival Price
+Iceberg Execution
+Sniper Execution
+Pegged Orders
+Adaptive Execution
+Hybrid Execution
+Execution algorithms remain configurable and version controlled.
+
+## 8. CHILD ORDER MANAGEMENT
+Child-order generation shall preserve complete linkage to the parent order.
+The Execution Optimization Engine maintains a Residual Re-absorption State Machine.
+Whenever a child order becomes:
+Partially Filled
+Expired
+Cancelled
+Rejected
+Unfilled beyond configurable thresholds
+the remaining quantity shall automatically return to the parent execution plan.
+Residual quantities shall trigger dynamic execution-plan recalculation without modifying historical execution records.
+All residual transitions remain version controlled and fully auditable.
+
+## 9. EXECUTION COST OPTIMIZATION
+Execution planning evaluates:
+Exchange Fees
+Maker/Taker Fees
+Bid-Ask Spread
+Slippage
+Market Impact
+Opportunity Cost
+Delay Cost
+Funding Cost
+Borrow Cost
+Execution plans shall minimize expected implementation shortfall.
+
+## 10. MARKET IMPACT MANAGEMENT
+The engine continuously evaluates:
+Order Book Depth
+Average Daily Volume
+Participation Rate
+Price Elasticity
+Liquidity Regime
+Volatility Regime
+Hidden Liquidity
+Execution schedules may be modified to reduce expected market impact.
+
+### 10A. EXECUTION ADAPTATION
+The Execution Optimization Engine continuously evaluates whether the active execution plan remains optimal.
+Adaptive evaluation includes:
+Liquidity Regime Changes
+Volatility Regime Changes
+Spread Expansion
+Spread Compression
+Participation Rate Changes
+Market Impact Changes
+Execution Urgency Changes
+Time Remaining
+Residual Quantity
+Fill Performance
+Execution adaptation may produce:
+Algorithm Upgrade
+Algorithm Downgrade
+Schedule Recalculation
+Child Order Reallocation
+Participation Rate Adjustment
+Slice Size Adjustment
+Every adaptive modification generates a new immutable Execution Plan Version.
+Historical execution plans remain unchanged.
+
+### 10B. EXECUTION FOOTPRINT RANDOMIZATION
+To reduce execution predictability, the engine supports configurable execution randomization.
+Randomization includes:
+Slice Timing Jitter
+Slice Quantity Jitter
+Randomized Participation Windows
+Randomized Iceberg Refresh Timing
+Randomized Passive Order Placement
+Randomization shall preserve:
+Parent Quantity
+Risk Constraints
+Execution Objectives
+Participation Limits
+Governance Policies
+Randomization policies remain deterministic under identical seeds and configuration versions.
+
+## 11. EXECUTION VERSIONING
+Every execution plan records:
+Execution Version
+Order Version
+Position Version
+Risk Version
+Configuration Version
+Governance Version
+Historical execution plans remain immutable.
+
+## 12. EXECUTION GOVERNANCE
+Every execution plan records:
+Approval Status
+Validation Status
+Review History
+Audit History
+Creation Timestamp
+Expiration Timestamp
+Governance Metadata
+Complete governance history is mandatory.
+
+## 13. PERFORMANCE
+The Execution Optimization Engine supports:
+Parallel Optimization
+Streaming Optimization
+Adaptive Execution
+Incremental Schedule Updates
+Distributed Computation
+Low-Latency Operation
+Cloud Deployment
+
+## 14. OBSERVABILITY
+Metrics include:
+Execution Plans Generated
+Algorithm Distribution
+Expected Transaction Cost
+Expected Market Impact
+Expected Slippage
+Participation Rate
+Child Orders Generated
+Optimization Latency
+Governance Events
+
+## 15. SCALABILITY
+Supports:
+Additional Assets
+Additional Exchanges
+Additional Execution Algorithms
+Additional Liquidity Models
+Additional Cost Models
+Distributed Infrastructure
+Multi-Region Deployment
+without architectural redesign.
+
+## 16. FAILURE RECOVERY
+Supports:
+Configuration Reload
+Execution Plan Reconstruction
+Algorithm Fallback
+Failure Logging
+Graceful Degradation
+Execution Quarantine
+Invalid execution plans shall never be published.
+
+## 17. ARCHITECTURAL RULES
+Rule 1
+Only Canonical Order Intent Contracts generated by Chapter 5.6 may enter the Execution Optimization Engine.
+Rule 2
+Execution optimization shall remain completely independent of Smart Order Routing, Broker Connectivity, and Exchange Execution.
+Rule 3
+Every execution plan shall generate a unique Execution Plan ID.
+Rule 4
+Every execution plan shall conform to the Canonical Execution Plan Contract.
+Rule 5
+Historical execution plans are immutable.
+Rule 6
+Execution algorithms shall remain fully configurable and version controlled.
+Rule 7
+Parent-order decomposition shall preserve complete investment intent and total approved quantity.
+Rule 8
+The aggregate quantity of all child orders shall exactly equal the approved parent order quantity.
+Rule 9
+Execution optimization shall preserve complete lineage linking order intents, configurations, cost models, liquidity models, and governance metadata.
+Rule 10
+Execution optimization shall never modify Canonical Order Intent Contracts.
+Rule 11
+Execution cost estimation shall remain mathematically independent from market impact estimation.
+Rule 12
+Execution schedules shall remain deterministic whenever identical Order Intent Contracts and market model inputs are supplied.
+Rule 13
+Execution algorithms shall be selected according to configurable urgency, liquidity, participation rate, and transaction cost policies.
+Rule 14
+Child-order timing and sizing policies shall remain independently version controlled.
+Rule 15
+Execution optimization shall minimize expected implementation shortfall while preserving approved portfolio objectives.
+Rule 16
+Execution plans shall remain independent of broker-specific APIs and exchange communication protocols.
+Rule 17
+Execution plans shall contain sufficient metadata to allow deterministic reconstruction and complete audit replay.
+Rule 18
+Execution plans may be recomputed when execution validity expires, provided a new immutable Execution Plan Version is created.
+Rule 19
+Execution optimization shall support adaptive execution algorithms without modifying historical execution plans.
+Rule 20
+This chapter governs only execution planning. Smart Order Routing, Broker Connectivity, Exchange Execution, and Post-Trade Monitoring are defined exclusively in subsequent chapters.
+
+Rule 21
+The Execution Optimization Engine shall maintain an active Residual Re-absorption State Machine.
+Unexecuted child-order quantities shall automatically return to the remaining parent quantity.
+Residual quantities shall trigger deterministic execution-plan recalculation.
+
+Rule 22
+Execution plans shall support asynchronous execution interrupts.
+Material changes in market conditions may terminate an active execution plan and generate a new immutable Execution Plan Version for the remaining quantity.
+Previously executed quantities shall remain immutable.
+
+Rule 23
+Execution algorithms shall support deterministic mid-flight switching.
+Algorithm transitions shall preserve:
+Executed Quantity
+Remaining Quantity
+Portfolio Objectives
+Risk Constraints
+Governance Metadata
+
+Rule 24
+Execution planning shall support configurable execution-footprint randomization.
+Slice timing and slice quantities may incorporate pseudo-random jitter to reduce execution predictability while preserving overall execution objectives.
+
+Rule 25
+Execution randomization shall never violate:
+Parent Order Quantity
+Risk Limits
+Participation Limits
+Market Constraints
+Regulatory Constraints
+
+Rule 26
+Adaptive execution decisions shall generate new immutable Execution Plan Versions.
+Historical execution plans shall never be modified.
+
+Rule 27
+Execution adaptation, residual management, algorithm switching, and execution randomization shall remain independently configurable, version controlled, reproducible, and fully auditable.
+
+## 18. CHAPTER SUMMARY
+The Execution Optimization Engine establishes AlphaSpot's canonical architecture for transforming approved Order Intent Contracts into optimized execution plans. By separating execution planning from investment decisions, routing, broker communication, and market interaction, the architecture guarantees deterministic execution optimization, configurable execution algorithms, adaptive parent-order decomposition, immutable versioning, complete lineage, and enterprise-grade governance. Through the Canonical Execution Plan Contract, the Execution Optimization Engine provides standardized execution plans that enable downstream Smart Order Routing and Execution Infrastructure to minimize implementation shortfall, market impact, and transaction costs while preserving approved investment objectives.
+
+END OF CHAPTER 5.7
