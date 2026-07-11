@@ -7,6 +7,7 @@
 // Chapter 5.5 — Position Sizing Engine.
 // Chapter 5.6 — Order Decision Engine.
 // Chapter 5.7 — Execution Optimization Engine.
+// Chapter 5.8 — Smart Order Routing Engine.
 //
 // Import from '@/lib/alphaspot/v2/decision-intelligence'.
 
@@ -17,3 +18,4 @@ export * from './risk-management'
 export * from './position-sizing'
 export * from './order-decision'
 export * from './execution-optimization'
+export * from './smart-order-routing'

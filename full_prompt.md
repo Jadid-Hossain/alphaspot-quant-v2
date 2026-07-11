@@ -4343,3 +4343,391 @@ Execution adaptation, residual management, algorithm switching, and execution ra
 The Execution Optimization Engine establishes AlphaSpot's canonical architecture for transforming approved Order Intent Contracts into optimized execution plans. By separating execution planning from investment decisions, routing, broker communication, and market interaction, the architecture guarantees deterministic execution optimization, configurable execution algorithms, adaptive parent-order decomposition, immutable versioning, complete lineage, and enterprise-grade governance. Through the Canonical Execution Plan Contract, the Execution Optimization Engine provides standardized execution plans that enable downstream Smart Order Routing and Execution Infrastructure to minimize implementation shortfall, market impact, and transaction costs while preserving approved investment objectives.
 
 END OF CHAPTER 5.7
+
+---
+
+# ALPHASPOT QUANT V2
+# CHAPTER 5.8
+# SMART ORDER ROUTING ENGINE
+# Version 1.0
+
+## 1. PURPOSE
+The Smart Order Routing Engine (SORE) establishes the canonical architecture for transforming validated Execution Plans into venue-specific Routing Decisions through deterministic, configurable, low-latency, and fully governed routing intelligence.
+The Smart Order Routing Engine serves as the exclusive bridge between the Execution Optimization Engine and the Broker Gateway.
+The SORE determines where and how each child order should be routed by evaluating venue liquidity, execution quality, latency, transaction costs, queue position probability, venue reliability, regulatory constraints, and routing policies while preserving complete separation between execution planning and broker communication.
+The SORE performs:
+Venue Discovery
+Venue Selection
+Multi-Venue Routing
+Liquidity Aggregation
+Queue Position Estimation
+Venue Cost Evaluation
+Venue Latency Evaluation
+Venue Reliability Assessment
+Routing Optimization
+Child Order Distribution
+Failover Routing
+Routing Versioning
+Routing Governance
+Routing Metadata Generation
+Routing Lineage Management
+The SORE performs NO:
+Machine Learning
+Strategy Selection
+Portfolio Construction
+Risk Management
+Position Sizing
+Execution Algorithm Design
+Broker Communication
+Exchange Order Submission
+
+## 2. DESIGN PHILOSOPHY
+Execution Plans specify how an order should be executed.
+Smart Order Routing determines where the order should be executed.
+Routing decisions shall remain:
+deterministic
+reproducible
+configurable
+version controlled
+fully auditable
+Routing shall optimize execution quality while preserving approved execution intent.
+Routing shall remain completely independent of:
+Machine Learning
+Strategy Logic
+Portfolio Construction
+Risk Policy
+Broker APIs
+
+## 3. INPUT CONTRACT
+The Smart Order Routing Engine consumes only:
+Canonical Execution Plan Contracts (Chapter 5.7)
+Venue Metadata
+Exchange Metadata
+Venue Liquidity Profiles
+Venue Latency Profiles
+Venue Fee Schedules
+Queue Position Models
+Venue Reliability Metrics
+Routing Configuration
+Governance Configuration
+The engine never consumes:
+Trading Signals
+Machine Learning Models
+Portfolio Decisions
+Broker Execution Reports
+Exchange Matching Events
+
+## 4. OUTPUT CONTRACT
+Every routing decision produces:
+Routing Decision ID
+Routing Version
+Execution Plan ID
+Parent Order ID
+Child Order ID
+Selected Venue
+Selected Exchange
+Routing Priority
+Venue Allocation
+Queue Position Estimate
+Expected Venue Latency
+Expected Venue Cost
+Expected Fill Probability
+Routing Confidence
+Routing Metadata
+Governance Metadata
+Outputs remain immutable.
+Every routing decision shall conform to the Canonical Routing Contract defined by this chapter.
+
+## 5. ROUTING PIPELINE
+Every Execution Plan follows the canonical routing workflow:
+Execution Plan Reception
+↓
+Execution Plan Validation
+↓
+Venue Discovery
+↓
+Venue Health Verification
+↓
+Liquidity Evaluation
+↓
+Queue Position Estimation
+↓
+Venue Cost Evaluation
+↓
+Latency Evaluation
+↓
+Fill Probability Estimation
+↓
+Venue Ranking
+↓
+Multi-Venue Allocation
+↓
+Routing Validation
+↓
+Routing Publication
+↓
+Metadata Recording
+↓
+Routing Completion
+No stage may be skipped.
+
+## 6. CANONICAL ROUTING CONTRACT
+Every routing decision shall produce:
+Selected Venue
+Venue Allocation
+Child Order Assignment
+Routing Priority
+Queue Position Estimate
+Expected Fill Probability
+Expected Venue Cost
+Expected Venue Latency
+Routing Confidence
+Routing Metadata
+Alternative routing formats are prohibited.
+
+## 7. ROUTING STRATEGIES
+The engine supports:
+Single Venue Routing
+Multi-Venue Routing
+Best Execution Routing
+Lowest Cost Routing
+Lowest Latency Routing
+Liquidity Seeking Routing
+Queue Position Optimization
+Dark Pool Routing
+Venue Preference Routing
+Hybrid Routing
+Routing strategies remain configurable and version controlled.
+
+## 8. VENUE EVALUATION
+Every candidate venue is evaluated using:
+Available Liquidity
+Order Book Depth
+Spread
+Historical Fill Rate
+Venue Latency
+Queue Length
+Queue Position Probability
+Maker/Taker Fees
+Reliability Score
+Historical Stability
+Venue Toxicity Assessment
+Every candidate venue shall undergo continuous toxicity evaluation before routing decisions are produced.
+Venue toxicity evaluates the probability that passive liquidity is being consumed primarily by informed or latency-advantaged participants.
+Evaluation includes:
+VPIN (Volume-Synchronized Probability of Informed Trading)
+Adverse Selection Rate
+Toxic Fill Ratio
+Post-Fill Price Drift
+Quote Fade Rate
+Aggressive Order Flow Ratio
+Fill Quality Degradation
+Information Leakage Risk
+Hidden Liquidity Reliability
+Venue Toxicity Score
+Routing policies may automatically penalize venues exhibiting elevated toxicity levels.
+Venue toxicity models shall remain independently configurable, version controlled, and reproducible.
+Venue toxicity evaluation shall remain mathematically independent from:
+Liquidity Evaluation
+Latency Evaluation
+Fee Evaluation
+Queue Position Estimation
+
+Regulatory Eligibility
+Venue scores remain reproducible.
+
+## 9. MULTI-VENUE ALLOCATION
+Child orders may be distributed across multiple execution venues using configurable allocation policies.
+Supported allocation methodologies include:
+Equal Allocation
+Liquidity-Proportional Allocation
+Cost-Optimized Allocation
+Latency-Optimized Allocation
+Queue-Optimized Allocation
+Toxicity-Aware Allocation
+Adaptive Allocation
+The aggregate routed quantity shall always equal the approved child-order quantity.
+Latency-Matched Execution Synchronization
+When routing child orders simultaneously across multiple venues, the Smart Order Routing Engine shall compensate for physical network latency differences.
+Routing synchronization includes:
+Network Transit Time Estimation
+Exchange Gateway Latency
+Geographic Distance Compensation
+Packet Release Synchronization
+Clock Synchronization
+Latency Equalization
+Venue Arrival Time Prediction
+The objective is to ensure that logically simultaneous child orders arrive at their respective matching engines within the configured synchronization tolerance.
+Latency synchronization minimizes:
+Cross-Venue Front Running
+Information Leakage
+Liquidity Migration
+Adverse Selection
+Quote Fade
+Synchronization policies remain configurable and independently version controlled.
+
+## 10. FAILOVER MANAGEMENT
+Routing continuously monitors venue health.
+Failover supports:
+Venue Failure Detection
+Latency Spike Detection
+Liquidity Collapse Detection
+Connectivity Failure Detection
+Automatic Venue Substitution
+Routing Recovery
+Failed venues shall be automatically isolated.
+
+### 10A. DYNAMIC QUEUE MANAGEMENT
+The Smart Order Routing Engine continuously monitors the execution quality of active routed child orders.
+Queue management includes:
+Queue Position Monitoring
+Queue Position Decay
+Fill Heartbeat Monitoring
+Expected Fill Time
+Remaining Queue Length
+Passive Order Aging
+Venue Queue Congestion
+Queue Abandonment Detection
+Dynamic Queue Score
+If projected execution quality deteriorates below configurable thresholds, the engine may initiate dynamic rerouting.
+Supported rerouting actions include:
+Cancel-and-Replace
+Venue Migration
+Queue Repositioning
+Order Refresh
+Alternative Venue Allocation
+Partial Quantity Migration
+Dynamic rerouting shall preserve:
+Parent Order Integrity
+Child Order Lineage
+Quantity Conservation
+Execution Auditability
+Queue management policies remain independently configurable and version controlled.
+
+## 11. ROUTING VERSIONING
+Every routing decision records:
+Routing Version
+Execution Plan Version
+Configuration Version
+Venue Model Version
+Governance Version
+Historical routing decisions remain immutable.
+
+## 12. ROUTING GOVERNANCE
+Every routing decision records:
+Approval Status
+Validation Status
+Review History
+Audit History
+Creation Timestamp
+Expiration Timestamp
+Governance Metadata
+Complete governance history is mandatory.
+
+## 13. PERFORMANCE
+The Smart Order Routing Engine supports:
+Parallel Venue Evaluation
+Streaming Routing Decisions
+Incremental Route Updates
+Distributed Routing
+Low-Latency Operation
+Multi-Region Deployment
+
+## 14. OBSERVABILITY
+Metrics include:
+Routing Decisions Generated
+Venue Utilization
+Routing Latency
+Venue Failures
+Venue Switches
+Fill Probability Distribution
+Queue Position Accuracy
+Routing Success Rate
+Governance Events
+
+## 15. SCALABILITY
+Supports:
+Additional Exchanges
+Additional Brokers
+Additional Venues
+Additional Routing Policies
+Additional Asset Classes
+Distributed Infrastructure
+Global Deployment
+without architectural redesign.
+
+## 16. FAILURE RECOVERY
+Supports:
+Venue Failover
+Routing Reconstruction
+Configuration Reload
+Route Recalculation
+Failure Logging
+Graceful Degradation
+Routing Quarantine
+Invalid routing decisions shall never be published.
+
+## 17. ARCHITECTURAL RULES
+Rule 1
+Only Canonical Execution Plan Contracts generated by Chapter 5.7 may enter the Smart Order Routing Engine.
+Rule 2
+Routing decisions shall remain completely independent of Broker APIs and Exchange Order Submission.
+Rule 3
+Every routing decision shall generate a unique Routing Decision ID.
+Rule 4
+Every routing decision shall conform to the Canonical Routing Contract.
+Rule 5
+Historical routing decisions are immutable.
+Rule 6
+Routing policies shall remain fully configurable and version controlled.
+Rule 7
+Venue evaluation shall preserve complete lineage linking execution plans, venue models, configurations, and governance metadata.
+Rule 8
+Routing shall never modify Canonical Execution Plan Contracts.
+Rule 9
+The aggregate quantity routed across all venues shall exactly equal the approved child-order quantity.
+Rule 10
+Venue cost estimation shall remain mathematically independent from latency estimation.
+Rule 11
+Venue health verification shall precede routing decisions.
+Rule 12
+Routing shall preserve deterministic behavior whenever identical execution plans and venue metadata are supplied.
+Rule 13
+Failed venues shall be automatically isolated until recovery criteria are satisfied.
+Rule 14
+Multi-venue routing shall preserve total execution intent.
+Rule 15
+Routing decisions shall support deterministic failover without modifying historical routing records.
+Rule 16
+Venue ranking models shall be independently versioned and fully reproducible.
+Rule 17
+Queue-position estimation shall remain logically independent from liquidity estimation.
+Rule 18
+Routing decisions shall contain sufficient metadata for deterministic replay and complete audit reconstruction.
+Rule 19
+Routing decisions shall remain independent of broker-specific implementations.
+Rule 20
+This chapter governs only Smart Order Routing. Broker communication, exchange connectivity, execution monitoring, and fill reconciliation are defined exclusively in subsequent chapters.
+
+Rule 21
+Venue Toxicity Assessment shall precede final venue ranking. Highly toxic venues may be penalized or excluded regardless of apparent liquidity.
+
+Rule 22
+Multi-venue routing shall support latency-matched execution synchronization to minimize cross-venue information leakage and latency arbitrage.
+
+Rule 23
+Network transit latency shall be incorporated into routing synchronization whenever multiple child orders are intended to execute simultaneously.
+
+Rule 24
+Active child orders shall undergo continuous queue-position monitoring after routing decisions are published.
+
+Rule 25
+If queue-position decay exceeds configurable statistical thresholds without acceptable fill progress, the Smart Order Routing Engine shall initiate deterministic cancel-and-replace rerouting while preserving complete audit lineage.
+
+Rule 26
+Dynamic rerouting shall preserve the total approved execution quantity, parent-child relationships, immutable routing history, and deterministic replay capability.
+
+## 18. CHAPTER SUMMARY
+The Smart Order Routing Engine establishes AlphaSpot's canonical architecture for transforming optimized execution plans into venue-specific routing decisions. By separating routing intelligence from execution planning, broker connectivity, and exchange interaction, the architecture guarantees deterministic venue selection, configurable multi-venue allocation, latency-aware routing, liquidity-aware optimization, immutable versioning, complete lineage, and enterprise-grade governance. Through the Canonical Routing Contract, the Smart Order Routing Engine enables downstream Broker Gateway components to communicate with execution venues while preserving execution quality, minimizing trading costs, and ensuring resilient, auditable market access.
+
+END OF CHAPTER 5.8
