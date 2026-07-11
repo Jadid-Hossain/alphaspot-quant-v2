@@ -8,6 +8,8 @@
 // Chapter 5.6 — Order Decision Engine.
 // Chapter 5.7 — Execution Optimization Engine.
 // Chapter 5.8 — Smart Order Routing Engine.
+// Chapter 5.9 — Broker Gateway Engine.
+// Chapter 5.10 — Exchange Execution Engine.
 //
 // Import from '@/lib/alphaspot/v2/decision-intelligence'.
 
@@ -19,3 +21,5 @@ export * from './position-sizing'
 export * from './order-decision'
 export * from './execution-optimization'
 export * from './smart-order-routing'
+export * from './broker-gateway'
+export * from './exchange-execution'
