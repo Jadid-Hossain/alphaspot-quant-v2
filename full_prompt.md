@@ -2886,3 +2886,344 @@ This chapter governs only portfolio construction. Risk controls, position sizing
 The Portfolio Construction Engine establishes AlphaSpot's canonical architecture for transforming validated Strategy Decision Contracts into coherent portfolio-level investment allocations. By separating portfolio construction from strategy intelligence, risk enforcement, position sizing, and execution, the architecture guarantees deterministic allocation generation, configurable optimization methodologies, immutable versioning, complete lineage, and enterprise-grade governance. Through the Canonical Portfolio Contract, the Portfolio Construction Engine provides a standardized portfolio representation that enables downstream Risk Management and Position Sizing components to operate consistently, reproducibly, and independently of upstream investment logic.
 
 END OF CHAPTER 5.3
+
+---
+
+# ALPHASPOT QUANT V2
+# CHAPTER 5.4
+# RISK MANAGEMENT ENGINE
+# Version 1.0
+
+## 1. PURPOSE
+The Risk Management Engine (RME) establishes the canonical architecture for evaluating portfolio construction outputs against enterprise-wide risk constraints before capital is committed to market execution.
+The Risk Management Engine serves as the exclusive bridge between Portfolio Construction and Position Sizing.
+The RME ensures that every proposed portfolio complies with configurable market, portfolio, operational, regulatory, and liquidity risk policies while preserving deterministic decision making, complete auditability, and strict separation between investment intent and execution.
+The Risk Management Engine performs:
+Portfolio Risk Evaluation
+Market Risk Assessment
+Exposure Verification
+Concentration Risk Analysis
+Liquidity Risk Assessment
+Leverage Verification
+Drawdown Protection
+Correlation Risk Analysis
+Stress Testing
+Scenario Analysis
+Risk Limit Enforcement
+Portfolio Constraint Validation
+Risk Versioning
+Risk Governance
+Risk Metadata Generation
+Risk Lineage Management
+The RME performs NO:
+Feature Engineering
+Machine Learning
+Signal Generation
+Strategy Selection
+Portfolio Optimization
+Position Sizing
+Order Execution
+Broker Communication
+
+## 2. DESIGN PHILOSOPHY
+Investment opportunities are optional.
+Risk constraints are mandatory.
+Risk evaluation shall remain:
+deterministic
+reproducible
+configurable
+version controlled
+fully auditable
+Risk policies shall remain completely independent of:
+Machine Learning
+Strategy Logic
+Portfolio Optimization
+Position Sizing
+Execution Infrastructure
+Identical portfolio proposals shall always produce identical risk decisions under identical configurations whenever mathematically possible.
+
+## 3. INPUT CONTRACT
+The Risk Management Engine consumes only:
+The Risk Management Engine consumes only:
+Canonical Portfolio Contracts (Chapter 5.3)
+Current Portfolio State
+Active Positions
+Capital Availability
+Margin Status
+Leverage Status
+Exchange Margin Configuration
+Maintenance Margin Schedules
+Exposure Limits
+Liquidity Constraints
+Transaction Limit Configuration
+Atomic Dependency Metadata
+Regulatory Constraints
+Risk Configuration
+Stress Test Configuration
+Governance Configuration
+The engine never consumes:
+Raw Market Data
+Machine Learning Models
+Trading Signals
+Broker Orders
+Execution Reports
+
+## 4. OUTPUT CONTRACT
+Every risk evaluation produces:
+Risk Assessment ID
+Risk Version
+Portfolio ID
+Risk Decision
+Risk Score
+Approved Allocation
+Rejected Allocation
+Exposure Summary
+Constraint Evaluation
+Stress Test Results
+Liquidity Assessment
+Risk Metadata
+Governance Metadata
+Outputs remain immutable.
+Every evaluation shall conform to the Canonical Risk Contract defined by this chapter.
+
+## 5. RISK EVALUATION PIPELINE
+Every portfolio follows the canonical workflow:
+Portfolio Reception
+↓
+Portfolio Validation
+↓
+Current Portfolio State Loading
+↓
+Risk Policy Loading
+↓
+Atomic Dependency Verification
+↓
+Exposure Assessment
+↓
+Liquidity Assessment
+↓
+Pre-Trade Margin Simulation
+↓
+Stress Testing
+↓
+Transactional Limit Verification
+↓
+Constraint Evaluation
+↓
+Risk Decision Construction
+↓
+Risk Validation
+↓
+Risk Publication
+↓
+Metadata Recording
+↓
+Risk Completion
+No stage may be skipped.
+
+## 6. CANONICAL RISK CONTRACT
+Every evaluation shall produce:
+Risk Decision
+Approved Allocation
+Rejected Allocation
+Risk Score
+Portfolio Exposure
+Liquidity Status
+Leverage Status
+Stress Test Results
+Constraint Violations
+Risk Metadata
+Alternative risk formats are prohibited.
+
+## 7. RISK CATEGORIES
+The engine supports:
+Market Risk
+Portfolio Risk
+Liquidity Risk
+Leverage Risk
+Concentration Risk
+Correlation Risk
+Counterparty Risk
+Operational Risk
+Regulatory Risk
+Model Risk
+Gap Risk
+Tail Risk
+Risk taxonomies remain configurable.
+
+## 8. RISK LIMIT MANAGEMENT
+Risk policies support configurable limits including:
+Maximum Position Exposure
+Maximum Portfolio Exposure
+Maximum Sector Exposure
+Maximum Asset Exposure
+Maximum Leverage
+Maximum Drawdown
+Maximum Daily Loss
+Maximum Strategy Allocation
+Maximum Correlation
+Maximum Participation Rate
+Minimum Liquidity Requirement
+Portfolios violating mandatory limits shall not be promoted.
+Risk configurations remain fully versioned.
+
+Risk policies additionally support:
+Maximum Single Transaction Size
+Maximum Rebalancing Delta
+Maximum Order Flow Rate
+Maximum Capital Deployment Rate
+Maximum Exchange Participation Rate
+Maximum Margin Utilization
+Maximum Liquidation Probability
+
+Transactional limits remain independent from portfolio-level limits and shall be evaluated before position sizing.
+
+## 9. STRESS TESTING
+Every portfolio undergoes stress evaluation.
+Supported methodologies include:
+Historical Stress Testing
+Hypothetical Scenario Testing
+Monte Carlo Simulation
+Volatility Shock
+Liquidity Shock
+Correlation Breakdown
+Flash Crash Simulation
+Black Swan Scenarios
+Stress methodologies remain configurable.
+
+## 10. RISK STATE MANAGEMENT
+The engine maintains:
+Current Risk State
+Historical Risk State
+Active Violations
+Emergency Status
+Circuit Breaker Status
+Risk Metadata
+State transitions remain version controlled.
+
+The engine additionally maintains:
+Atomic Portfolio Groups
+Dependency Graph State
+Margin Simulation State
+Transaction Rate State
+
+State transitions remain fully version controlled.
+
+## 11. RISK VERSIONING
+Every evaluation records:
+Risk Version
+Portfolio Version
+Constraint Version
+Configuration Version
+Governance Version
+Historical evaluations remain immutable.
+
+## 12. RISK GOVERNANCE
+Every evaluation records:
+Approval Status
+Validation Status
+Review History
+Audit History
+Creation Timestamp
+Retirement Status
+Governance Metadata
+Complete governance history is mandatory.
+
+## 13. PERFORMANCE
+The Risk Management Engine supports:
+Parallel Risk Evaluation
+Streaming Risk Monitoring
+Incremental Updates
+Distributed Computation
+Low-Latency Validation
+Cloud Deployment
+
+## 14. OBSERVABILITY
+Metrics include:
+Risk Evaluations
+Risk Acceptance Rate
+Constraint Violations
+Exposure Distribution
+Drawdown Events
+Leverage Usage
+Liquidity Violations
+Stress Test Failures
+Risk Latency
+Governance Events
+
+## 15. SCALABILITY
+Supports:
+Additional Assets
+Additional Exchanges
+Additional Risk Models
+Additional Portfolio Types
+Additional Constraints
+Distributed Infrastructure
+Multi-Region Deployment
+without architectural redesign.
+
+## 16. FAILURE RECOVERY
+Supports:
+Risk Policy Reload
+Configuration Recovery
+Risk Quarantine
+Failure Logging
+Graceful Degradation
+State Recovery
+Unsafe portfolios shall never be approved.
+
+## 17. ARCHITECTURAL RULES
+Rule 1
+Only Canonical Portfolio Contracts generated by Chapter 5.3 may enter the Risk Management Engine.
+Rule 2
+Risk evaluation shall remain completely independent of Machine Learning, Strategy Intelligence, Portfolio Construction, Position Sizing, and Order Execution.
+Rule 3
+Every evaluation shall generate a unique Risk Assessment ID.
+Rule 4
+Every evaluation shall conform to the Canonical Risk Contract.
+Rule 5
+Historical risk records are immutable.
+Rule 6
+Risk policies shall remain fully configurable and version controlled.
+Rule 7
+Risk evaluation shall preserve complete lineage linking portfolio versions, constraint versions, configurations, and governance metadata.
+Rule 8
+Risk evaluation shall never modify Canonical Portfolio Contracts. It may only approve, reject, or partially approve allocations.
+Rule 9
+Stress testing shall remain logically independent from standard constraint evaluation.
+Rule 10
+Liquidity constraints shall remain mathematically independent from leverage constraints.
+Rule 11
+Only approved Canonical Risk Contracts may enter the Position Sizing Engine.
+Rule 12
+Risk governance shall remain independent of deployment topology.
+Rule 13
+Risk evaluation shall produce approved investment allocations rather than executable market orders.
+Rule 14
+Risk scores shall remain mathematically independent from allocation confidence.
+Rule 15
+Risk evaluation may support partial approval only for allocations that are mathematically independent.
+Portfolio allocations belonging to an Atomic Dependency Group (including statistical arbitrage pairs, delta-neutral portfolios, option hedges, spread trades, and multi-leg strategies) shall be evaluated atomically.
+If any mandatory component of an Atomic Dependency Group violates a risk constraint, the entire dependency group shall be rejected to preserve portfolio neutrality and prevent unintended directional exposure.
+Rule 16
+Emergency circuit breakers may immediately invalidate all pending portfolio approvals without modifying historical records.
+Rule 17
+Risk policy changes shall never retroactively alter historical evaluations.
+Rule 18
+Constraint violations shall generate immutable governance events.
+Rule 19
+All stress-testing methodologies shall be versioned independently of portfolio construction methodologies.
+Rule 20
+This chapter governs only risk management. Position sizing, execution optimization, broker connectivity, and market execution are defined exclusively in subsequent chapters.
+
+Rule 21
+Before approving any allocation, the Risk Management Engine shall perform exchange-specific pre-trade margin simulation using current portfolio state, projected portfolio state, exchange maintenance margin schedules, leverage configuration, and liquidation thresholds. Allocations that would violate exchange margin requirements shall be rejected before position sizing.
+Rule 22
+The Risk Management Engine shall enforce configurable transactional hard limits including maximum single-transaction size, maximum portfolio rebalancing delta, maximum capital deployment rate, and maximum exchange participation rate. These limits shall remain independent from portfolio-level exposure constraints.
+Rule 23
+Risk evaluation shall preserve atomic consistency across mathematically linked portfolio allocations. Approval, rejection, or modification of one allocation shall never invalidate the risk characteristics of dependent allocations.
+
+## 18. CHAPTER SUMMARY
+The Risk Management Engine establishes AlphaSpot's canonical architecture for validating proposed portfolio allocations against enterprise-wide risk constraints before capital reaches execution. By separating risk evaluation from portfolio construction, position sizing, and execution, the architecture guarantees deterministic risk decisions, configurable constraint enforcement, immutable versioning, complete lineage, stress-tested portfolio validation, and enterprise-grade governance. Through the Canonical Risk Contract, the Risk Management Engine provides the final institutional risk gate that ensures only compliant investment allocations proceed to the Position Sizing Engine. The Risk Management Engine additionally enforces atomic portfolio integrity, exchange-specific pre-trade margin simulation, and transactional hard-cap protection, ensuring that mathematically linked portfolio structures remain intact, approved allocations remain executable under real exchange margin rules, and catastrophic execution events caused by oversized transactions are prevented before position sizing begins.
+
+END OF CHAPTER 5.4
