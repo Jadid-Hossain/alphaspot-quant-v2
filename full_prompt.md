@@ -3227,3 +3227,323 @@ Risk evaluation shall preserve atomic consistency across mathematically linked p
 The Risk Management Engine establishes AlphaSpot's canonical architecture for validating proposed portfolio allocations against enterprise-wide risk constraints before capital reaches execution. By separating risk evaluation from portfolio construction, position sizing, and execution, the architecture guarantees deterministic risk decisions, configurable constraint enforcement, immutable versioning, complete lineage, stress-tested portfolio validation, and enterprise-grade governance. Through the Canonical Risk Contract, the Risk Management Engine provides the final institutional risk gate that ensures only compliant investment allocations proceed to the Position Sizing Engine. The Risk Management Engine additionally enforces atomic portfolio integrity, exchange-specific pre-trade margin simulation, and transactional hard-cap protection, ensuring that mathematically linked portfolio structures remain intact, approved allocations remain executable under real exchange margin rules, and catastrophic execution events caused by oversized transactions are prevented before position sizing begins.
 
 END OF CHAPTER 5.4
+
+---
+
+# ALPHASPOT QUANT V2
+# CHAPTER 5.5
+# POSITION SIZING ENGINE
+# Version 1.0
+
+## 1. PURPOSE
+The Position Sizing Engine (PSE) establishes the canonical architecture for transforming risk-approved portfolio allocations into executable position sizes through deterministic, configurable, capital-aware, and fully governed sizing methodologies.
+The Position Sizing Engine serves as the exclusive bridge between the Risk Management Engine and the Order Decision Engine.
+The PSE converts approved investment allocations into concrete trading quantities while preserving complete separation between portfolio construction, risk management, execution optimization, and broker connectivity.
+The Position Sizing Engine performs:
+Position Size Calculation
+Capital Allocation
+Quantity Calculation
+Lot Size Normalization
+Tick Size Normalization
+Exchange Constraint Validation
+Volatility-Based Position Sizing
+Kelly-Based Position Sizing
+Risk Budget Allocation
+Capital Utilization Optimization
+Position Versioning
+Position Governance
+Position Metadata Generation
+Position Lineage Management
+The PSE performs NO:
+Machine Learning
+Signal Generation
+Strategy Selection
+Portfolio Construction
+Risk Evaluation
+Order Routing
+Broker Communication
+Market Execution
+
+## 2. DESIGN PHILOSOPHY
+Risk determines whether a trade is permitted.
+Position sizing determines how much capital is committed.
+Position sizing shall remain:
+deterministic
+reproducible
+configurable
+version controlled
+fully auditable
+Sizing methodologies shall remain completely independent of:
+Machine Learning
+Strategy Intelligence
+Portfolio Construction
+Risk Policies
+Execution Infrastructure
+Identical approved allocations shall always produce identical position sizes under identical configurations whenever mathematically possible.
+
+## 3. INPUT CONTRACT
+The Position Sizing Engine consumes only:
+Canonical Risk Contracts (Chapter 5.4)
+Approved Portfolio Allocations
+Current Portfolio State
+Available Capital
+Atomic Capital Reservation State
+Capital Reservation Status
+Real-Time Price Oracle
+FX Conversion Oracle
+Asset Metadata
+Exchange Trading Rules
+Contract Specifications
+Tick Size Configuration
+Lot Size Configuration
+Position Sizing Configuration
+Governance Configuration
+The engine never consumes:
+Raw Market Data
+Machine Learning Models
+Trading Signals
+Broker Orders
+Execution Reports
+
+## 4. OUTPUT CONTRACT
+Every position sizing operation produces:
+Position ID
+Position Version
+Risk Assessment ID
+Portfolio ID
+Asset Identifier
+Target Position Size
+Target Quantity
+Capital Allocation
+Estimated Notional Value
+Lot Size
+Tick Size
+Position Sizing Method
+Position Metadata
+Governance Metadata
+Position outputs remain immutable.
+Every position shall conform to the Canonical Position Contract defined by this chapter.
+
+## 5. POSITION SIZING PIPELINE
+Every approved allocation follows the canonical workflow:
+Risk Contract Reception
+↓
+Risk Validation
+↓
+Atomic Capital Lock Acquisition
+↓
+Capital Availability Verification
+↓
+Capital Reservation Verification
+↓
+Price & FX Translation
+↓
+Position Sizing Method Selection
+↓
+Position Size Calculation
+↓
+Volatility Adjustment
+↓
+Mathematical Hard-Cap Enforcement
+↓
+Exchange Constraint Normalization
+↓
+Quantity Construction
+↓
+Position Validation
+↓
+Capital Reservation Commit
+↓
+Position Publication
+↓
+Metadata Recording
+↓
+Position Completion
+
+No stage may be skipped.
+
+## 6. CANONICAL POSITION CONTRACT
+Every position shall produce:
+Target Position Size
+Target Quantity
+Capital Allocation
+Notional Value
+Position Sizing Method
+Position Confidence
+Exchange Normalization Status
+Position Metadata
+Alternative position formats are prohibited.
+
+## 7. POSITION SIZING METHODS
+The engine supports:
+Fixed Fractional Sizing
+Fixed Dollar Sizing
+Fixed Risk Sizing
+Kelly Criterion
+Fractional Kelly
+Volatility Targeting
+ATR-Based Position Sizing
+Risk Budgeting
+Equal Risk Allocation
+Dynamic Capital Allocation
+Conviction-Based Position Sizing
+Custom Position Sizing Models
+Every sizing methodology shall execute within configurable mathematical safety boundaries. Independent hard-cap policies may override theoretical outputs generated by Kelly, Fractional Kelly, Volatility Targeting, ATR-Based Sizing, Risk Budgeting, or custom algorithms. Safety constraints remain version controlled and reproducible.
+
+## 8. CAPITAL MANAGEMENT
+Position sizing supports:
+Capital Reservation
+Available Capital Verification
+Dynamic Capital Allocation
+Strategy Capital Budgets
+Portfolio Capital Limits
+Cash Buffer Management
+Margin Allocation
+Capital Utilization Monitoring
+Atomic Capital Locking
+Capital Reservation Transactions
+Reservation Timeout Management
+Reservation Rollback
+Capital policies remain fully versioned.
+
+## 9. EXCHANGE NORMALIZATION
+Every position undergoes exchange compatibility verification.
+Normalization includes:
+Minimum Lot Size
+Maximum Lot Size
+Tick Size
+Contract Multipliers
+Fractional Quantity Rules
+Position Precision
+Currency Precision
+Exchange Quantity Constraints
+Invalid quantities shall never be promoted.
+
+## 10. POSITION STATE MANAGEMENT
+The engine maintains:
+Current Position State
+Pending Positions
+Reserved Capital
+Position Metadata
+State transitions remain version controlled.
+
+## 11. POSITION VERSIONING
+Every position records:
+Position Version
+Risk Version
+Portfolio Version
+Configuration Version
+Governance Version
+Historical positions remain immutable.
+
+## 12. POSITION GOVERNANCE
+Every position records:
+Approval Status
+Validation Status
+Review History
+Audit History
+Creation Timestamp
+Retirement Status
+Governance Metadata
+Complete governance history is mandatory.
+
+## 13. PERFORMANCE
+The Position Sizing Engine supports:
+Parallel Position Sizing
+Streaming Position Updates
+Incremental Recalculation
+Distributed Processing
+Low-Latency Operation
+Cloud Deployment
+
+## 14. OBSERVABILITY
+Metrics include:
+Positions Generated
+Position Size Distribution
+Capital Utilization
+Position Rejections
+Quantity Normalization Events
+Position Latency
+Governance Events
+
+## 15. SCALABILITY
+Supports:
+Additional Assets
+Additional Exchanges
+Additional Position Models
+Additional Capital Policies
+Distributed Infrastructure
+Multi-Region Deployment
+without architectural redesign.
+
+## 16. FAILURE RECOVERY
+Supports:
+Configuration Reload
+Capital Recovery
+Position Reconstruction
+Failure Logging
+Graceful Degradation
+Position Quarantine
+Invalid positions shall never be published.
+
+## 17. ARCHITECTURAL RULES
+Rule 1
+Only Canonical Risk Contracts generated by Chapter 5.4 may enter the Position Sizing Engine.
+Rule 2
+Position sizing shall remain completely independent of Machine Learning, Strategy Intelligence, Portfolio Construction, Risk Policy Definition, Order Routing, and Execution Infrastructure.
+Rule 3
+Every position shall generate a unique Position ID.
+Rule 4
+Every position shall conform to the Canonical Position Contract.
+Rule 5
+Historical position records are immutable.
+Rule 6
+Position sizing methodologies shall remain fully configurable and version controlled.
+Rule 7
+Position sizing shall preserve complete lineage linking risk assessments, portfolio allocations, sizing configurations, exchange rules, and governance metadata.
+Rule 8
+Position sizing shall never modify Canonical Risk Contracts. It may only transform approved allocations into executable quantities.
+Rule 9
+Capital allocation shall remain mathematically independent from quantity normalization.
+Rule 10
+Exchange normalization shall never increase approved portfolio risk. Normalization may reduce position size but shall never enlarge it.
+Rule 11
+Only approved Canonical Position Contracts may enter the Order Decision Engine.
+Rule 12
+Position governance shall remain independent of deployment topology.
+Rule 13
+Capital reservation shall occur before position publication to prevent over-allocation across concurrent strategies.
+Rule 14
+Kelly-based sizing, volatility targeting, ATR sizing, and other sizing methodologies shall be independently versioned and reproducible.
+Rule 15
+Position sizing shall preserve deterministic behavior whenever identical approved allocations, capital states, exchange rules, and configurations are supplied.
+Rule 16
+If exchange-imposed quantity constraints prevent full execution of an approved allocation, the engine shall generate the nearest valid executable quantity without violating approved risk limits.
+Rule 17
+Capital reserved for pending positions shall not be simultaneously allocated to additional positions until released or executed.
+Rule 18
+Position sizing shall remain independent of execution price optimization, smart order routing, slippage control, and broker-specific behavior.
+Rule 19
+All exchange-specific trading rules (tick size, lot size, contract multipliers, precision) shall be versioned independently and included in complete position lineage.
+Rule 20
+This chapter governs only position sizing. Order generation, execution optimization, broker connectivity, and market execution are defined exclusively in subsequent chapters.
+
+Rule 21
+The Position Sizing Engine shall acquire an atomic capital reservation lock before any sizing calculation begins. Concurrent sizing requests shall never allocate identical capital simultaneously.
+
+Rule 22
+Notional allocations approved by the Risk Management Engine shall be translated into asset quantities exclusively through approved Real-Time Price and Foreign Exchange Conversion Oracles. Translation sources shall be versioned and recorded in complete position lineage.
+
+Rule 23
+Every position sizing methodology shall execute within configurable mathematical hard-cap constraints. Safety limits may reduce theoretical allocations but shall never increase them.
+
+Rule 24
+Capital reservations shall remain transactional. If position generation, validation, or publication fails, all temporary reservations shall be automatically rolled back without affecting unrelated allocations.
+
+Rule 25
+Exchange quantity normalization, currency translation, capital reservation, and mathematical safety enforcement shall preserve deterministic behavior whenever identical approved allocations, pricing inputs, exchange rules, and configurations are supplied.
+
+## 18. CHAPTER SUMMARY
+The Position Sizing Engine establishes AlphaSpot's canonical architecture for converting risk-approved portfolio allocations into precise, executable trading positions. By separating position sizing from portfolio construction, risk evaluation, and execution, the architecture guarantees deterministic sizing, configurable capital allocation methodologies, exchange-compliant quantity normalization, immutable versioning, complete lineage, and enterprise-grade governance. Through the Canonical Position Contract, the Position Sizing Engine provides standardized, execution-ready position specifications that enable downstream Order Decision and Execution Engines to operate consistently, reproducibly, and independently of upstream investment logic.
+
+END OF CHAPTER 5.5
