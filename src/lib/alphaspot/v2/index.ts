@@ -51,6 +51,7 @@ export * from './alternative-data-engine' // Ch 5.17 — Alternative Data Manage
 export * from './market-simulation-engine' // Ch 5.18 — Market Simulation & Backtesting Engine: Canonical Simulation Contract, 17-stage pipeline, 8 methodologies, market replay (Rule 8), execution simulation (Rule 10/11), point-in-time AI inference (Rule 9A), look-ahead bias prevention (Rule 17), performance evaluation (§10), versioning, governance
 export * from './paper-trading-engine' // Ch 5.19 — Paper Trading & Shadow Execution Engine: Canonical Paper Trading Contract, 17-stage pipeline, dual mode (paper simulation + shadow execution Rule 7/18A), virtual portfolio (Rule 9), deployment readiness (Rule 13/19), drift monitoring (Rule 14/18), versioning, governance
 export * from './configuration-engine' // Ch 5.20 — Configuration & Version Control Engine: Canonical Configuration Contract, 13-stage pipeline, composite cryptographic hash (Rule 18), hot-reload streaming (Rule 18A), secret rejection (Rule 18B), rollback (Rule 8), drift detection (Rule 15), four-eyes approval (§10), versioning, governance
+export * from './user-api-engine' // Ch 5.21 — User API & Access Management Engine: Canonical Access Contract, 14-stage pipeline, 11 auth methods, RBAC+ABAC (Rule 9), API key management (Rule 8 — never plaintext), rate limiting (Rule 14 — independent), tenant isolation (Rule 19), webhook signing (Rule 21), versioning, governance
 export * from './lanes/lane-a-realtime'
 export * from './lanes/lane-b-analytical'
 export * from './lanes/lane-c-research'

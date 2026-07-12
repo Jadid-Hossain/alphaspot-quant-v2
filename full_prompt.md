@@ -7261,3 +7261,70 @@ Rule 19: Every AlphaSpot engine reproducible solely from immutable configuration
 Rule 20: This chapter governs only configuration and version management
 
 END OF CHAPTER 5.20
+
+---
+
+# ALPHASPOT QUANT V2
+# CHAPTER 5.21
+# USER API & ACCESS MANAGEMENT ENGINE
+# Version 1.0
+
+## 1. PURPOSE
+The User API & Access Management Engine (UAAME) establishes the canonical architecture for authenticating users, authorizing platform access, governing API consumption, managing customer API credentials, enforcing subscription entitlements, securing external integrations, and exposing deterministic programmatic interfaces throughout the AlphaSpot ecosystem.
+The UAAME serves as the exclusive gateway between external clients and all authorized AlphaSpot platform services. Guarantees every authenticated request is securely validated, rate-limited, authorized, fully auditable, version-controlled, and governed.
+
+## 2. DESIGN PHILOSOPHY
+Every external request shall be authenticated before authorization.
+Every authorized request shall remain: deterministic, secure, auditable, version controlled, fully traceable, least-privilege compliant
+Independent of: AI Models, Trading Decisions, Portfolio Accounting, Execution Logic, Market Data Processing, Risk Analytics
+
+## 3. INPUT CONTRACT
+Consumes: Authenticated User Requests, API Requests, OAuth Tokens, JWT Tokens, API Keys, Webhook Requests, Subscription Metadata, User Profiles, Role Definitions, Permission Policies, Organization Metadata, Tenant Configuration, Access Policies, Governance Configuration, API Version Definitions
+Never consumes: Trading Signals, Market Data, Portfolio Accounting, Performance Contracts, Risk Contracts, Exchange Master Credentials, Infrastructure Secrets
+
+## 4. OUTPUT CONTRACT
+Every authenticated request produces: Access Event ID, Request Identifier, API Version, User Identifier, Organization Identifier, API Key Identifier, Authentication Status, Authorization Status, Granted Permissions, Subscription Status, Rate Limit & Quota Metadata, Usage Metadata, Governance Metadata
+Outputs remain immutable. Every access evaluation conforms to Canonical Access Contract.
+
+## 5. ACCESS PIPELINE (14 stages, no skips)
+Request Reception → Authentication → Credential Validation → Subscription Validation → Authorization Evaluation → Rate Limit Evaluation → Permission Resolution → API Version Resolution → Request Signing Validation → Access Decision → Audit Recording → Outbound Payload Signing → Request Forwarding → Access Completion
+
+## 6. CANONICAL ACCESS CONTRACT
+Access Event ID, Request Identifier, API Version, User Identifier, Organization Identifier, API Key Identifier, Authentication Status, Authorization Status, Granted Permissions, Subscription Status, Rate Limit & Quota Metadata, Usage Metadata, Governance Metadata. Alternative formats prohibited.
+
+## 7. AUTHENTICATION MANAGEMENT
+Username, Email, OAuth 2.0, OpenID Connect, JWT, API Keys, Session, Multi-Factor, Passkeys (WebAuthn), Single Sign-On, Device Authentication
+
+## 8. AUTHORIZATION MANAGEMENT
+RBAC, ABAC, Resource-Level Permissions, Organization Isolation, Multi-Tenant Authorization, Subscription Entitlements, Feature Flags, Permission Inheritance, Temporary Permissions, Emergency Access
+
+## 9. API MANAGEMENT
+REST, gRPC, WebSocket, Streaming, Webhook, API Versioning, Documentation, SDK, Developer Portal, Usage Monitoring, SSE
+
+## 10. API KEY MANAGEMENT
+Key Generation, Rotation, Expiration, Revocation, Scoped Permissions, Read-Only, Read/Write, Webhook Keys, Service Account Keys
+
+## 17. ARCHITECTURAL RULES (21 rules)
+Rule 1: Only authenticated external requests may enter
+Rule 2: Access management independent of AI/portfolio/execution/trading
+Rule 3: Unique Access Event ID
+Rule 4: Canonical Access Contract
+Rule 5: Historical access records immutable
+Rule 6: Complete lineage
+Rule 7: Authentication always precedes authorization
+Rule 8: API Keys never stored/transmitted in plaintext
+Rule 9: Least privilege principle
+Rule 10: Every request evaluated against immutable policy versions
+Rule 11: Subscription validation precedes service access
+Rule 12: Deterministic replay
+Rule 13: API versioning independently configurable
+Rule 14: Rate limiting independent from authorization
+Rule 15: Every access event references immutable policy versions
+Rule 16: Deterministic event ordering
+Rule 17: Authentication failures never expose protected services
+Rule 18: Every request cryptographically protected (transport encryption + authenticated credentials)
+Rule 19: Multi-tenant isolation mathematically enforced (no cross-tenant visibility/escalation)
+Rule 20: This chapter governs only user auth, authz, API management, customer access
+Rule 21: Every outbound webhook/callback/payload cryptographically signed with tenant-specific secrets; deterministic, version controlled, auditable
+
+END OF CHAPTER 5.21
