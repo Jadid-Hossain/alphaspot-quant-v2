@@ -6244,3 +6244,418 @@ Short positions shall generate corresponding financing liability entries. Long i
 The Portfolio Accounting Engine establishes AlphaSpot's canonical architecture for transforming reconciled execution records into the authoritative institutional portfolio ledger. By separating accounting from reconciliation, execution management, risk evaluation, and performance analysis, the architecture guarantees deterministic double-entry bookkeeping, immutable ledger management, configurable cost-basis methodologies, comprehensive tax-lot tracking, multi-currency accounting, complete lineage, and enterprise-grade governance. Through the Canonical Portfolio Accounting Contract, the Portfolio Accounting Engine provides the single source of financial truth that enables downstream PnL attribution, settlement, compliance, taxation, performance measurement, and regulatory reporting while preserving reproducibility, auditability, and institutional-grade accounting integrity.
 
 END OF CHAPTER 5.12
+
+---
+
+# ALPHASPOT QUANT V2
+# CHAPTER 5.13
+# PNL & PERFORMANCE ATTRIBUTION ENGINE
+# Version 1.0
+
+## 1. PURPOSE
+The PnL & Performance Attribution Engine (PPAE) establishes the canonical architecture for transforming immutable Portfolio Accounting records into institutionally consistent profit and loss calculations, return measurements, attribution analyses, and performance analytics through deterministic, event-driven, mathematically rigorous, and fully governed computation workflows.
+The PnL & Performance Attribution Engine serves as the exclusive bridge between the Portfolio Accounting Engine and downstream Compliance, Reporting, Risk Analytics, Client Reporting, Regulatory Reporting, Strategy Evaluation, and Business Intelligence systems.
+The PPAE maintains the official institutional record of:
+Realized Profit & Loss
+Unrealized Profit & Loss
+FX Profit & Loss
+Funding Profit & Loss
+Borrow Cost Attribution
+Dividend Attribution
+Interest Attribution
+Transaction Cost Attribution
+Slippage Attribution
+Strategy Attribution
+Asset Attribution
+Sector Attribution
+Currency Attribution
+Benchmark Attribution
+Portfolio Return
+Risk-Adjusted Performance
+Performance Metadata
+Performance Lineage
+The PPAE performs NO:
+Machine Learning
+Strategy Selection
+Portfolio Construction
+Portfolio Accounting
+Trade Reconciliation
+Execution Management
+Order Generation
+Settlement Processing
+Compliance Decision Making
+
+## 2. DESIGN PHILOSOPHY
+The Portfolio Accounting Engine records financial truth.
+The PnL & Performance Attribution Engine measures financial outcomes.
+Performance analytics shall remain:
+deterministic
+reproducible
+mathematically consistent
+event-driven
+version controlled
+fully auditable
+Performance computation shall remain completely independent of:
+Trading Strategies
+Machine Learning
+Portfolio Construction
+Risk Models
+Compliance Policies
+Identical accounting records shall always generate identical performance metrics whenever mathematically possible.
+
+## 3. INPUT CONTRACT
+The PPAE consumes only:
+Canonical Portfolio Accounting Contracts (Chapter 5.12)
+Market Valuation Data
+FX Market Rates
+Benchmark Data
+Risk-Free Rate
+Performance Configuration
+Attribution Configuration
+Governance Configuration
+The engine never consumes:
+Trading Signals
+Exchange Events
+Broker APIs
+Portfolio Decisions
+Risk Decisions
+
+## 4. OUTPUT CONTRACT
+Every performance calculation produces:
+Performance Event ID
+Performance Version
+Portfolio ID
+Position ID
+Realized PnL
+Unrealized PnL
+Total PnL
+FX PnL
+Funding PnL
+Borrow Cost
+Dividend Income
+Interest Income
+Transaction Cost
+Slippage Cost
+Portfolio Return
+Benchmark Return
+Active Return
+Attribution Breakdown
+Performance Metadata
+Governance Metadata
+Valuation State
+Pricing Snapshot Version
+Pricing Source Version
+Performance Restatement ID
+Intraday Performance State
+Official Performance State
+Outputs remain immutable.
+Every performance calculation shall conform to the Canonical Performance Contract defined by this chapter.
+
+## 5. PERFORMANCE PIPELINE
+Every Portfolio Accounting Contract follows the workflow:
+Accounting Reception
+↓
+Validation
+↓
+Market Valuation Loading
+↓
+Pricing Source Validation
+↓
+Valuation State Selection
+↓
+FX Translation
+↓
+Benchmark Loading
+↓
+PnL Calculation
+↓
+Return Calculation
+↓
+Derivative Attribution
+↓
+Performance Attribution
+↓
+Risk-Adjusted Metric Calculation
+↓
+Performance Validation
+↓
+Performance Publication
+↓
+Metadata Recording
+↓
+Performance Completion
+No stage may be skipped.
+
+## 6. CANONICAL PERFORMANCE CONTRACT
+Every performance event produces:
+Realized PnL
+Unrealized PnL
+Total PnL
+Return Metrics
+Attribution Results
+Benchmark Comparison
+Risk-Adjusted Metrics
+Performance Metadata
+Valuation State
+Pricing Snapshot Version
+Pricing Source Version
+Performance Restatement ID
+Alternative performance formats are prohibited.
+
+## 7. PNL CALCULATION
+The engine supports:
+Realized PnL
+Unrealized PnL
+Mark-to-Market PnL
+FX PnL
+Dividend PnL
+Interest PnL
+Borrow Cost
+Funding Cost
+Carry PnL
+Transaction Cost PnL
+Slippage PnL
+All PnL methodologies remain configurable and independently version controlled.
+
+## 8. RETURN CALCULATION
+Supports:
+Absolute Return
+Simple Return
+Log Return
+Time-Weighted Return (TWR)
+Money-Weighted Return (MWR)
+Modified Dietz Return
+Geometric Return
+Annualized Return
+Cumulative Return
+Return methodologies remain configurable.
+
+## 9. PERFORMANCE ATTRIBUTION
+Supports:
+Strategy Attribution
+Asset Attribution
+Sector Attribution
+Industry Attribution
+Country Attribution
+Currency Attribution
+Factor Attribution
+Benchmark Attribution
+Allocation Effect
+Selection Effect
+Interaction Effect
+Attribution methodologies remain version controlled.
+
+### 9A. DERIVATIVE & FINANCING ATTRIBUTION
+The engine supports:
+Delta Attribution
+Gamma Attribution
+Vega Attribution
+Theta Attribution
+Rho Attribution
+Cross-Gamma Attribution
+Volatility Attribution
+Carry Attribution
+Funding Attribution
+Borrow Attribution
+Financing Cost Attribution
+Cross-Asset Attribution
+Derivative attribution methodologies remain independently configurable and version controlled.
+
+## 10. BENCHMARK MANAGEMENT
+Supports:
+Single Benchmark
+Composite Benchmark
+Dynamic Benchmark
+Strategy Benchmark
+Risk-Free Benchmark
+Relative Performance
+Tracking Difference
+Tracking Error
+
+### 10A. VALUATION STATE MANAGEMENT
+The engine maintains two independent valuation universes.
+Supports:
+Streaming Intraday Valuation
+Official End-of-Day Valuation
+Official Closing Auction Valuation
+Indicative Market Valuation
+NAV Valuation
+Provisional Valuation
+Final Valuation
+Valuation Freeze
+Valuation Approval
+Valuation Restatement
+Intraday valuation shall never overwrite Official End-of-Day valuation.
+Official valuation shall use only approved pricing sources.
+
+## 11. RISK-ADJUSTED PERFORMANCE
+Supports:
+Sharpe Ratio
+Sortino Ratio
+Information Ratio
+Treynor Ratio
+Jensen's Alpha
+Beta
+Calmar Ratio
+Omega Ratio
+Maximum Drawdown
+Volatility
+Risk-adjusted metrics remain reproducible.
+
+## 12. PERFORMANCE VERSIONING
+Every performance calculation records:
+Performance Version
+Accounting Version
+Benchmark Version
+Configuration Version
+Governance Version
+Historical performance records remain immutable.
+
+## 13. PERFORMANCE GOVERNANCE
+Every performance calculation records:
+Approval Status
+Validation Status
+Review History
+Audit History
+Creation Timestamp
+Calculation Timestamp
+Governance Metadata
+Complete governance history is mandatory.
+
+## 14. PERFORMANCE
+The PPAE supports:
+Streaming Performance Updates
+Parallel Calculations
+Incremental PnL Updates
+Distributed Computation
+Low-Latency Processing
+Cloud Deployment
+
+## 15. OBSERVABILITY
+Metrics include:
+PnL Events
+Portfolio Returns
+Benchmark Returns
+Attribution Events
+Drawdown
+Volatility
+Calculation Latency
+Governance Events
+Intraday Valuation Updates
+Official NAV Publications
+Performance Restatements
+Pricing Corrections
+Benchmark Revisions
+Greeks Attribution Latency
+
+## 16. SCALABILITY
+Supports:
+Additional Benchmarks
+Additional Asset Classes
+Additional Attribution Models
+Additional Return Methodologies
+Distributed Infrastructure
+Multi-Region Deployment
+without architectural redesign.
+
+## 17. FAILURE RECOVERY
+Supports:
+Performance Replay
+PnL Reconstruction
+Configuration Reload
+Calculation Recovery
+Failure Logging
+Graceful Degradation
+Performance Quarantine
+Pricing Snapshot Replay
+Historical Restatement Replay
+Valuation Reconstruction
+Benchmark Reconstruction
+Incomplete performance calculations shall never be published.
+
+### 17A. PERFORMANCE RESTATEMENT
+Supports:
+Market Data Restatement
+Benchmark Restatement
+Corporate Action Restatement
+FX Rate Restatement
+Pricing Vendor Correction
+Historical NAV Restatement
+Performance Recalculation
+Immutable Version Increment
+Historical Performance Preservation
+Historical performance records shall never be modified.
+Every correction shall generate a new immutable Performance Version.
+
+## 18. ARCHITECTURAL RULES
+Rule 1
+Only Canonical Portfolio Accounting Contracts generated by Chapter 5.12 may enter the PnL & Performance Attribution Engine.
+Rule 2
+Performance analytics shall remain completely independent of accounting, reconciliation, execution management, compliance decisions, and investment strategy.
+Rule 3
+Every performance calculation shall generate a unique Performance Event ID.
+Rule 4
+Every performance calculation shall conform to the Canonical Performance Contract.
+Rule 5
+Historical performance records are immutable.
+Rule 6
+Performance calculations shall never modify Portfolio Accounting records.
+Rule 7
+Every calculation shall preserve complete lineage linking accounting records, market valuations, benchmark versions, configurations, and governance metadata.
+Rule 8
+PnL calculations shall remain mathematically independent from performance attribution.
+Rule 9
+Benchmark calculations shall remain logically independent from portfolio return calculations.
+Rule 10
+Risk-adjusted performance metrics shall be computed independently of raw return calculations.
+Rule 11
+All attribution methodologies shall remain independently configurable and version controlled.
+Rule 12
+Market valuation data shall never modify historical accounting records.
+Rule 13
+Historical benchmark revisions shall generate new immutable Performance Versions rather than modifying previous calculations.
+Rule 14
+Performance calculations shall support deterministic replay for complete audit reconstruction.
+Rule 15
+FX translation methodologies shall remain independently version controlled.
+Rule 16
+Portfolio performance shall always be reconstructable from immutable accounting records and immutable market valuation snapshots.
+Rule 17
+Performance timestamps shall preserve deterministic event ordering.
+Rule 18
+Performance calculations shall remain reproducible whenever identical accounting records, valuation inputs, benchmark data, and configurations are supplied.
+Rule 19
+Performance analytics shall remain logically independent from regulatory reporting and client reporting.
+Rule 20
+This chapter governs only PnL and performance attribution. Regulatory reporting, client reporting, compliance monitoring, taxation, and business intelligence are defined exclusively in subsequent chapters.
+Rule 21
+Intraday valuation shall remain logically independent from Official End-of-Day valuation.
+Rule 22
+Official End-of-Day valuation shall use only approved and governed pricing sources.
+Rule 23
+Derivative attribution shall remain mathematically independent from price attribution and benchmark attribution.
+Rule 24
+Historical performance records shall never be modified.
+All corrections shall generate new immutable Performance Versions preserving complete audit lineage.
+Rule 25
+Pricing Snapshot Versions shall remain immutable and fully reproducible.
+Rule 26
+Benchmark revisions shall never overwrite historical performance calculations.
+Benchmark corrections shall generate new Performance Versions.
+Rule 27
+Every performance calculation shall reference immutable Pricing Snapshot Versions, Benchmark Versions, and FX Snapshot Versions.
+Rule 28
+Real-time performance calculations shall remain logically independent from legally recognized Net Asset Value (NAV) calculations.
+Rule 29
+Funding, financing, borrow cost, carry, and derivative Greeks shall be attributed independently to preserve complete explainability of portfolio returns.
+Rule 30
+Performance analytics shall preserve deterministic replay whenever identical accounting records, pricing snapshots, benchmark versions, valuation states, and configurations are supplied.
+
+## 19. CHAPTER SUMMARY
+The PnL & Performance Attribution Engine establishes AlphaSpot's canonical architecture for transforming immutable portfolio accounting records into institutionally consistent profit and loss calculations, return measurements, performance attribution, benchmark analysis, derivative attribution, and risk-adjusted performance metrics. By separating financial measurement from accounting, reconciliation, execution management, and investment decision-making, the architecture guarantees deterministic PnL computation, configurable attribution methodologies, immutable valuation versioning, complete lineage, enterprise-grade governance, and mathematically reproducible performance analytics.
+
+The architecture further distinguishes between real-time provisional valuation and officially governed End-of-Day valuation, enabling both low-latency portfolio monitoring and institutionally compliant fund accounting. Through immutable pricing snapshots, derivative attribution, valuation-state management, and performance restatement workflows, the engine preserves complete auditability while supporting benchmark revisions, pricing corrections, corporate action adjustments, and historical replay without compromising the integrity of previously published performance records.
+
+Through the Canonical Performance Contract, the PnL & Performance Attribution Engine provides standardized, reproducible performance analytics that enable downstream compliance, regulatory reporting, client reporting, strategy evaluation, business intelligence, and executive portfolio oversight while maintaining institutional-grade financial integrity, explainability, and auditability.
+
+END OF CHAPTER 5.13
