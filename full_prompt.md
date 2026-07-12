@@ -5857,3 +5857,390 @@ Rollback orchestration shall remain logically independent from Portfolio Account
 The Post-Trade Reconciliation Engine establishes AlphaSpot's canonical architecture for transforming exchange execution events into institutionally reconciled trade records. By separating reconciliation from execution management, accounting, and performance analytics, the architecture guarantees deterministic trade verification, configurable multi-source matching, immutable versioning, complete lineage, rigorous exception handling, and enterprise-grade governance. Through the Canonical Reconciliation Contract, the Post-Trade Reconciliation Engine provides the single authoritative source of truth for downstream Portfolio Accounting, ensuring that only verified and reconciled executions influence portfolio state, PnL, settlement, compliance, and financial reporting.
 
 END OF CHAPTER 5.11
+
+---
+
+# ALPHASPOT QUANT V2
+# CHAPTER 5.12
+# PORTFOLIO ACCOUNTING ENGINE
+# Version 1.0
+
+## 1. PURPOSE
+The Portfolio Accounting Engine (PAE) establishes the canonical architecture for transforming reconciled execution records into the authoritative institutional portfolio ledger through deterministic, event-driven, double-entry, immutable, and fully governed accounting workflows.
+The Portfolio Accounting Engine serves as the exclusive bridge between the Post-Trade Reconciliation Engine and downstream financial, risk, performance, compliance, reporting, settlement, taxation, and analytics systems.
+The PAE maintains the official institutional record of all portfolio assets, liabilities, cash balances, cost bases, accrued income, realized gains, unrealized gains, corporate action adjustments, and accounting events.
+The Portfolio Accounting Engine performs:
+Portfolio Ledger Management
+Position Ledger Management
+Cash Ledger Management
+Double-Entry Accounting
+Position Bookkeeping
+Cost Basis Management
+Average Cost Accounting
+FIFO/LIFO Accounting
+Specific Identification Accounting
+Multi-Currency Accounting
+FX Translation
+Accrual Accounting
+Dividend Accrual
+Interest Accrual
+Corporate Action Posting
+Position Adjustment
+Portfolio Versioning
+Accounting Governance
+Accounting Metadata Generation
+Accounting Lineage Management
+The Portfolio Accounting Engine performs NO:
+Machine Learning
+Strategy Selection
+Portfolio Construction
+Signal Generation
+Risk Evaluation
+Trade Reconciliation
+PnL Attribution
+Performance Analytics
+Settlement Processing
+Compliance Reporting
+
+## 2. DESIGN PHILOSOPHY
+The Portfolio Accounting Engine establishes the single institutional source of truth for portfolio ownership.
+Only reconciled accounting events may alter the portfolio ledger.
+Accounting records shall remain:
+deterministic
+immutable
+reproducible
+event-driven
+version controlled
+fully auditable
+The accounting engine shall remain completely independent of:
+Trading Strategies
+Machine Learning
+Execution Logic
+Portfolio Optimization
+Risk Models
+Identical reconciled events shall always generate identical accounting states whenever mathematically possible.
+
+## 3. INPUT CONTRACT
+The Portfolio Accounting Engine consumes only:
+Canonical Reconciliation Contracts (Chapter 5.11)
+Settlement Escrow Events
+Corporate Action Events
+FX Translation Rates
+Accounting Configuration
+Cost Basis Configuration
+Tax Lot Configuration
+Governance Configuration
+The engine never consumes:
+Trading Signals
+Machine Learning Models
+Broker APIs
+Exchange Events
+Risk Decisions
+
+## 4. OUTPUT CONTRACT
+Every accounting event produces:
+Accounting Event ID
+Accounting Version
+Portfolio ID
+Position ID
+Ledger Entry ID
+Asset Identifier
+Currency
+Quantity
+Cost Basis
+Average Cost
+Cash Balance
+Accrued Income
+Ledger State
+Portfolio State
+Accounting Metadata
+Governance Metadata
+Outputs remain immutable.
+Every accounting update shall conform to the Canonical Portfolio Accounting Contract defined by this chapter.
+
+### 4A. BI-TEMPORAL ACCOUNTING
+The Portfolio Accounting Engine maintains bi-temporal accounting records.
+Every accounting event records:
+Record Time — when the event was recorded by AlphaSpot.
+Effective Time — when the economic event became effective in the market.
+Correction Time — when a correction or adjustment was applied.
+Bi-temporal accounting enables:
+Time-travel portfolio reconstruction
+Historical state replay
+Regulatory audit reconstruction
+Corporate-action restatements
+Trade correction replay
+Custodian adjustment replay
+Record Time and Effective Time shall remain logically independent.
+
+## 5. ACCOUNTING PIPELINE
+Every Canonical Reconciliation Contract follows the workflow:
+Reconciliation Reception
+↓
+Validation
+↓
+Settlement Escrow Evaluation
+↓
+Corporate Action Loading
+↓
+FX Translation
+↓
+Tax Lot Identification
+↓
+Cost Basis Calculation
+↓
+Double Entry Posting
+↓
+Ledger Validation
+↓
+Portfolio State Update
+↓
+Accounting Publication
+↓
+Metadata Recording
+↓
+Accounting Completion
+No stage may be skipped.
+
+## 6. CANONICAL PORTFOLIO ACCOUNTING CONTRACT
+Every accounting event produces:
+Portfolio Ledger
+Position Ledger
+Cash Ledger
+Tax Lot State
+Cost Basis
+Average Cost
+Portfolio State
+Accounting Metadata
+Alternative accounting formats are prohibited.
+
+## 7. LEDGER MANAGEMENT
+The engine maintains:
+Portfolio Ledger
+Position Ledger
+Cash Ledger
+Currency Ledger
+Corporate Action Ledger
+Adjustment Ledger
+Historical Ledger
+Audit Ledger
+All ledgers remain immutable.
+
+### 7A. COMPENSATING JOURNAL MANAGEMENT
+The engine supports immutable compensating journal entries.
+Compensating journals include:
+Trade Bust Reversal
+Trade Correction Adjustment
+Corporate Action Reversal
+Fee Reversal
+Funding Reversal
+Settlement Adjustment
+Every compensating journal shall:
+Reference the original Accounting Event ID.
+Post mathematically opposite ledger entries.
+Preserve complete historical chronology.
+Create a new immutable accounting event rather than modifying prior entries.
+Reversals shall never overwrite historical ledger records.
+
+## 8. COST BASIS MANAGEMENT
+Supported methodologies include:
+Average Cost
+FIFO
+LIFO
+Specific Identification
+Weighted Average
+Regulatory Cost Basis
+Cost basis methodologies remain independently configurable and version controlled.
+
+## 9. TAX LOT MANAGEMENT
+Supports:
+Tax Lot Creation
+Tax Lot Closure
+Lot Splitting
+Lot Merging
+Lot Identification
+Wash Sale Tracking
+Holding Period Tracking
+Lot Versioning
+
+## 10. CASH ACCOUNTING
+Supports:
+Cash Deposits
+Cash Withdrawals
+Trade Settlement
+Dividend Payments
+Interest Payments
+Margin Cash
+Borrow Cash
+Pending Cash
+Escrow Cash
+
+### 10A. BIFURCATED POSITION STATES
+The Portfolio Accounting Engine maintains two parallel portfolio states.
+Traded Position State
+Updated immediately when a trade becomes reconciled or escrow-approved.
+Used for:
+Execution eligibility
+Risk monitoring
+Intraday portfolio management
+Capital availability
+Settled Position State
+Updated only after final custodian settlement confirmation.
+Used for:
+Official accounting balances
+Settlement reporting
+Regulatory reporting
+Financial statements
+Traded Position State and Settled Position State shall remain logically independent while preserving deterministic reconciliation between them.
+
+## 11. MULTI-CURRENCY ACCOUNTING
+Supports:
+Base Currency
+Trading Currency
+Settlement Currency
+FX Translation
+Historical FX Rates
+Realized FX Gain/Loss
+Unrealized FX Gain/Loss
+
+### 11A. SHORT POSITION & FINANCING ACCOUNTING
+The engine supports native short-position accounting.
+Short accounting includes:
+Short Inventory Ledger
+Borrow Liability Ledger
+Margin Liability Ledger
+Stock Loan Tracking
+Borrow Fee Accrual
+Funding Payment Accrual
+Rebate Accrual
+Short Position Settlement
+Long inventory and short obligations shall remain isolated ledger classes.
+Negative traded quantities shall not be represented solely as negative asset balances; they shall generate corresponding financing liability entries.
+
+## 12. CORPORATE ACTION ACCOUNTING
+Supports:
+Stock Split
+Reverse Split
+Dividend
+Special Dividend
+Rights Issue
+Spin-Off
+Merger
+Acquisition
+Delisting
+Symbol Change
+Corporate actions generate immutable accounting events.
+
+## 13. ACCOUNTING VERSIONING
+Every accounting event records:
+Accounting Version
+Reconciliation Version
+Portfolio Version
+Configuration Version
+Governance Version
+Historical accounting records remain immutable.
+
+## 14. ACCOUNTING GOVERNANCE
+Every accounting event records:
+Approval Status
+Validation Status
+Review History
+Audit History
+Creation Timestamp
+Posting Timestamp
+Governance Metadata
+Complete governance history is mandatory.
+
+## 15. PERFORMANCE
+The Portfolio Accounting Engine supports:
+Streaming Ledger Updates
+Parallel Ledger Posting
+Distributed Accounting
+Incremental Portfolio Updates
+Low-Latency Processing
+Cloud Deployment
+
+## 16. OBSERVABILITY
+Metrics include:
+Accounting Events
+Ledger Updates
+Cash Balance Changes
+Position Changes
+Corporate Actions
+FX Adjustments
+Ledger Latency
+Governance Events
+
+## 17. SCALABILITY
+Supports:
+Additional Asset Classes
+Additional Currencies
+Additional Ledgers
+Additional Tax Jurisdictions
+Distributed Infrastructure
+Multi-Region Deployment
+without architectural redesign.
+
+## 18. FAILURE RECOVERY
+Supports:
+Ledger Replay
+Event Replay
+Portfolio Reconstruction
+Configuration Reload
+Failure Logging
+Graceful Degradation
+Ledger Quarantine
+Incomplete ledger states shall never be published.
+
+## 19. ARCHITECTURAL RULES
+Rule 1
+Only Canonical Reconciliation Contracts generated by Chapter 5.11 may enter the Portfolio Accounting Engine.
+Rule 2
+Portfolio accounting shall remain completely independent of PnL attribution, performance measurement, compliance reporting, taxation, and investment decision logic.
+Rule 3
+Every accounting event shall generate a unique Accounting Event ID.
+Rule 4
+Every accounting event shall conform to the Canonical Portfolio Accounting Contract.
+Rule 5
+Historical accounting records are immutable.
+Rule 6
+Only reconciled or escrow-approved reconciliation records may modify the portfolio ledger.
+Rule 7
+Every accounting update shall preserve complete lineage linking reconciliations, corporate actions, FX translations, tax lots, configurations, and governance metadata.
+Rule 8
+Accounting events shall never modify Canonical Reconciliation Contracts.
+Rule 9
+Every ledger posting shall follow deterministic double-entry accounting principles.
+Rule 10
+Portfolio state shall always be reconstructable solely from immutable bi-temporal accounting events.
+Rule 11
+Cost basis calculations shall remain mathematically independent from market valuation.
+Rule 12
+Corporate actions shall generate new accounting events rather than modifying historical ledger entries.
+Rule 13
+Multi-currency translations shall preserve both native and translated values.
+Rule 14
+Tax-lot identification methodologies shall remain independently configurable and version controlled.
+Rule 15
+Portfolio accounting shall support deterministic replay for complete audit reconstruction.
+Rule 16
+Escrow accounting shall remain logically independent from final settlement accounting.
+Rule 17
+Ledger balances shall never become internally inconsistent; every debit shall have a corresponding credit.
+Rule 18
+Historical accounting records shall never be deleted or overwritten.
+Rule 19
+Accounting timestamps shall preserve deterministic event ordering.
+Rule 20
+This chapter governs only portfolio accounting. Realized and unrealized PnL calculation, performance attribution, settlement processing, compliance reporting, taxation, and analytics are defined exclusively in subsequent chapters.
+Rule 21
+Trade reversals, trade busts, corporate-action corrections, and settlement adjustments shall be implemented exclusively through immutable compensating journal entries linked to the original Accounting Event ID.
+Rule 22
+The Portfolio Accounting Engine shall maintain both Traded Position State and Settled Position State. Intraday trading eligibility may consume the traded state, while official financial reporting shall consume the settled state.
+Rule 23
+Short positions shall generate corresponding financing liability entries. Long inventory balances and short obligations shall remain isolated accounting classes throughout the ledger lifecycle.
+
+## 20. CHAPTER SUMMARY
+The Portfolio Accounting Engine establishes AlphaSpot's canonical architecture for transforming reconciled execution records into the authoritative institutional portfolio ledger. By separating accounting from reconciliation, execution management, risk evaluation, and performance analysis, the architecture guarantees deterministic double-entry bookkeeping, immutable ledger management, configurable cost-basis methodologies, comprehensive tax-lot tracking, multi-currency accounting, complete lineage, and enterprise-grade governance. Through the Canonical Portfolio Accounting Contract, the Portfolio Accounting Engine provides the single source of financial truth that enables downstream PnL attribution, settlement, compliance, taxation, performance measurement, and regulatory reporting while preserving reproducibility, auditability, and institutional-grade accounting integrity.
+
+END OF CHAPTER 5.12
