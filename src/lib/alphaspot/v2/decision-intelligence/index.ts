@@ -1,5 +1,5 @@
 // AlphaSpot Quant V2 — Decision Intelligence Barrel Export
-// Chapters 5.1–5.14
+// Chapters 5.1–5.15
 
 export * from './signal-generation'
 export * from './strategy-engine'
@@ -15,3 +15,4 @@ export * from './post-trade-reconciliation'
 export * from './portfolio-accounting'
 export * from './pnl-performance'
 export * from './risk-analytics'
+export * from './compliance-regulatory'

@@ -6787,3 +6787,109 @@ Rule 30: Dynamic covariance switching, enterprise netting, dual-speed risk never
 The Risk Analytics & Exposure Engine establishes AlphaSpot's canonical architecture for transforming immutable portfolio accounting records and performance analytics into institutionally consistent risk measurements, exposure analytics, scenario analyses, and enterprise risk intelligence. By separating risk computation from accounting, execution, compliance, and investment decision-making, the architecture guarantees deterministic exposure measurement, configurable risk methodologies, adaptive market-regime detection, hierarchical enterprise netting, dual-speed risk processing, immutable versioning, complete lineage, and enterprise-grade governance.
 
 END OF CHAPTER 5.14
+
+---
+
+# ALPHASPOT QUANT V2
+# CHAPTER 5.15
+# COMPLIANCE & REGULATORY CONTROL ENGINE
+# Version 1.0
+
+## 1. PURPOSE
+The Compliance & Regulatory Control Engine (CRCE) establishes the canonical architecture for transforming immutable Portfolio Accounting, Performance, and Risk Contracts into institutionally compliant trading, investment, operational, and regulatory control decisions through deterministic, rule-driven, jurisdiction-aware, event-driven, and fully governed compliance workflows.
+The CRCE serves as both:
+the Pre-Trade Compliance Gatekeeper positioned between the Order Intent Engine (Chapter 5.6) and downstream Execution Planning (Chapter 5.7), and
+the Post-Trade Compliance Authority positioned after the Risk Analytics & Exposure Engine for continuous regulatory surveillance, mandate monitoring, and operational governance.
+The CRCE maintains the official institutional record of:
+Pre-Trade Compliance, Post-Trade Compliance, Investment Mandate Compliance, Portfolio Restriction Monitoring, Regulatory Rule Validation, Jurisdiction Compliance, Client Restriction Compliance, Internal Policy Compliance, Risk Limit Compliance, Market Abuse Surveillance, Trade Surveillance, Restricted Securities Monitoring, Insider Trading Controls, AML Rule Integration, KYC Status Integration, Compliance Exceptions, Compliance Metadata, Compliance Lineage
+The CRCE performs NO:
+Machine Learning, Portfolio Construction, Execution Management, Trade Reconciliation, Portfolio Accounting, PnL Calculation, Risk Analytics, Order Routing, Strategy Generation, Settlement Processing
+
+## 2. DESIGN PHILOSOPHY
+Accounting establishes financial truth. Performance measures financial outcomes. Risk measures uncertainty. Compliance prevents prohibited activity before execution and continuously monitors regulatory integrity after execution.
+Compliance decisions shall remain: deterministic, reproducible, rule-driven, event-driven, version controlled, fully auditable
+Compliance computation shall remain completely independent of: Trading Strategies, Machine Learning, Execution Infrastructure, Broker APIs, Exchange Connectivity
+Identical accounting records, performance contracts, risk contracts, regulatory rules, and compliance configurations shall always generate identical compliance outcomes.
+
+## 3. INPUT CONTRACT
+Pre-Trade Inputs: Canonical Order Intent Contracts (Ch 5.6), Investment Mandates, Regulatory Rule Libraries, Client Restrictions, Jurisdiction Rules, AML Status, KYC Status, Restricted Security Lists, Compliance Configuration, Governance Configuration
+Post-Trade Inputs: Canonical Portfolio Accounting Contracts (Ch 5.12), Canonical Performance Contracts (Ch 5.13), Canonical Risk Contracts (Ch 5.14), Corporate Action Metadata, Regulatory Updates
+Never consumes: Trading Signals, Machine Learning Models, Broker APIs, Exchange Events, Execution Plans, Smart Order Routing Decisions
+
+## 4. OUTPUT CONTRACT
+Every compliance evaluation produces: Compliance Event ID, Compliance Version, Portfolio ID, Position ID, Evaluation Context (Pre-Trade/Post-Trade), Compliance Decision, Approval Status, Rule Evaluation Results, Violation Classification, Restriction Status, Escalation Status, Required Actions, Enforcement Action, Compliance Metadata, Governance Metadata
+Outputs remain immutable. Every compliance evaluation shall conform to the Canonical Compliance Contract.
+
+## 5. COMPLIANCE PIPELINE (Dual workflow)
+Pre-Trade: Order Intent Reception → Validation → Regulatory Rule Loading → Jurisdiction Rule Loading → Client Restriction Loading → Investment Mandate Loading → AML/KYC Validation → Compliance Rule Evaluation → Decision Framework → APPROVED/WARNING/HARD_VETO → Metadata Recording → Completion
+Post-Trade: Portfolio State Reception → Validation → Risk Contract Loading → Performance Contract Loading → Mandate Evaluation → Surveillance Evaluation → Passive Breach Detection → Escalation Framework → Publication → Metadata Recording → Completion
+No stage may be skipped.
+
+## 6. CANONICAL COMPLIANCE CONTRACT
+Every compliance event produces: Compliance Status, Rule Evaluation Results, Restriction Results, Violation Results, Approval Status, Exception Status, Compliance Metadata, Evaluation Context, Compliance Decision, Enforcement Action, Escalation Status
+Alternative formats are prohibited.
+
+### 6A. COMPLIANCE DECISION FRAMEWORK
+Pre-Trade: APPROVED, WARNING, HARD_VETO
+Post-Trade: PASSIVE_BREACH_ALERT, MANDATORY_REVIEW, ESCALATION_REQUIRED, EMERGENCY_HALT
+Only one enforcement action may be produced for each Compliance Event.
+
+## 7. REGULATORY COMPLIANCE
+SEC Rules, FINRA Rules, MiFID II, EMIR, Dodd-Frank, Basel Framework, IOSCO Standards, FCA Regulations, MAS Regulations, Local Jurisdiction Rules
+Regulatory frameworks remain independently configurable and version controlled.
+
+### 7A. DETERMINISTIC COMPLIANCE RULE ENCODING (Compliance DSL)
+Domain-Specific Compliance Language (Compliance DSL), Mathematical Rule Expressions, Constraint Matrices, Rule Dependency Graphs, Jurisdiction Rule Packs, Client Rule Packs, Investment Policy Rule Packs, Rule Versioning, Rule Validation, Rule Simulation
+Natural-language legal documents shall never be evaluated directly during compliance execution. Only compiled deterministic rule representations may be executed.
+
+## 8. INVESTMENT MANDATE COMPLIANCE
+Maximum Position Size, Minimum Diversification, Sector Limits, Country Limits, Issuer Limits, ESG Constraints, Leverage Limits, Liquidity Constraints, Benchmark Constraints, Client Mandates
+
+## 9. CLIENT RESTRICTIONS
+Restricted Securities, Restricted Countries, Restricted Industries, Ethical Restrictions, ESG Restrictions, Tax Restrictions, Investment Eligibility, Client-Specific Constraints
+
+## 10. MARKET SURVEILLANCE
+Wash Trade Detection, Spoofing Detection, Layering Detection, Market Manipulation Indicators, Abnormal Trading Patterns, Cross-Market Surveillance, Order Concentration Monitoring, Insider Trading Indicators
+
+## 11. AML & KYC INTEGRATION
+Customer Verification, AML Status, KYC Status, Sanctions Screening, PEP Screening, Beneficial Ownership, Identity Verification, Compliance Hold Status
+
+## 12. COMPLIANCE VERSIONING
+Compliance Version, Accounting Version, Performance Version, Risk Version, Configuration Version, Governance Version. Historical records remain immutable.
+
+## 13. COMPLIANCE GOVERNANCE
+Approval Status, Validation Status, Review History, Audit History, Creation Timestamp, Evaluation Timestamp, Governance Metadata
+
+## 15. OBSERVABILITY
+Compliance Events, Rule Violations, Restriction Violations, AML Alerts, KYC Alerts, Market Surveillance Alerts, Approval Events, Compliance Latency, Governance Events, Orders Approved, Orders Vetoed, Pre-Trade Latency, Passive Breach Alerts, Mandatory Reviews, Rule Compilation Errors, DSL Version Changes
+
+## 17. FAILURE RECOVERY
+Compliance Replay, Rule Replay, Configuration Reload, Rule Reconstruction, Failure Logging, Graceful Degradation, Compliance Quarantine
+If deterministic rule evaluation cannot be completed during Pre-Trade validation, the engine shall fail closed and reject order authorization until compliance evaluation becomes available.
+
+## 18. ARCHITECTURAL RULES (20 rules)
+Rule 1: Only Canonical Order Intent/Accounting/Performance/Risk Contracts may enter
+Rule 2: Pre-Trade compliance must complete before Order Intent enters Execution Planning
+Rule 3: HARD_VETO orders never proceed to downstream execution
+Rule 4: Post-Trade compliance never modifies historical execution/accounting
+Rule 5: Unique Compliance Event ID
+Rule 6: Historical compliance records immutable
+Rule 7: Complete lineage preserved
+Rule 8: All regulatory requirements execute through deterministic compiled Compliance DSL
+Rule 9: Natural-language documents never evaluated directly
+Rule 10: Client restrictions independent from jurisdiction regulations
+Rule 11: Investment mandates independent from statutory requirements
+Rule 12: AML and KYC independently version controlled
+Rule 13: Historical rule changes generate new immutable Compliance Versions
+Rule 14: Deterministic event ordering
+Rule 15: Every decision references immutable rule-library + DSL versions
+Rule 16: Compliance exceptions never overwrite historical records
+Rule 17: Deterministic replay
+Rule 18: Market surveillance independent from investment-mandate validation
+Rule 19: Compliance never modifies upstream contracts; may prevent propagation but never alters contents
+Rule 20: This chapter governs only compliance monitoring and regulatory control
+
+## 19. CHAPTER SUMMARY
+The Compliance & Regulatory Control Engine establishes AlphaSpot's canonical architecture for deterministic regulatory enforcement across both Pre-Trade and Post-Trade workflows. Through the Canonical Compliance Contract, the CRCE provides institution-grade regulatory control, complete auditability, deterministic replay, and legally defensible compliance decisions.
+
+END OF CHAPTER 5.15
