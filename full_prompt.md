@@ -7042,3 +7042,82 @@ Rule 20: Reproducible whenever identical provider data + configurations supplied
 Rule 21: This chapter governs only alternative data acquisition and governance
 
 END OF CHAPTER 5.17
+
+---
+
+# ALPHASPOT QUANT V2
+# CHAPTER 5.18
+# MARKET SIMULATION & BACKTESTING ENGINE
+# Version 1.0
+
+## 1. PURPOSE
+The Market Simulation & Backtesting Engine (MSBE) establishes the canonical architecture for evaluating trading strategies, AI prediction models, portfolio allocation methodologies, and execution logic through deterministic, event-driven, historically reproducible, market-realistic, and institutionally governed simulation workflows.
+The MSBE serves as the exclusive bridge between Alternative Data Management Engine, Feature Store Engine, AI Prediction Layer, and Paper Trading / Shadow Execution Engine.
+Guarantees every research experiment evaluated using identical historical market conditions, alternative datasets, execution assumptions, transaction cost models, and governance configurations.
+
+## 2. DESIGN PHILOSOPHY
+Historical simulation estimates future robustness. Simulation never guarantees profitability.
+Backtesting shall remain: deterministic, reproducible, event-driven, historically accurate, version controlled, fully auditable
+Every simulation shall reproduce historical market conditions as they were actually observable.
+Independent of: Live Trading, Broker Infrastructure, Exchange APIs, Portfolio Accounting, Regulatory Reporting
+
+## 3. INPUT CONTRACT
+Consumes: Canonical Feature Contracts (Ch 5.16), Canonical Alternative Data Contracts (Ch 5.17), Canonical Market Data Contracts, AI Model Configuration, Model Inference Graph, Model Version, Portfolio Configuration, Simulation Configuration, Execution Configuration, Transaction Cost Models, Exchange Fee Models, Liquidity Models, Slippage Models, Benchmark Configuration, Governance Configuration
+Never consumes: Live Broker APIs, Live Exchange Orders, Live Portfolio Accounting, Settlement Contracts, Compliance Decisions, Pre-computed AI Predictions, Live Trading Signals
+
+## 4. OUTPUT CONTRACT
+Every simulation produces: Simulation Event ID, Simulation Version, Simulation Identifier, Strategy Identifier, Model Identifier, Feature Version, Dataset Version, Portfolio Configuration Version, Performance Metrics, Risk Metrics, Benchmark Comparison, Trade Log, Order Log, Simulation Metadata, Governance Metadata
+Outputs remain immutable. Every simulation conforms to Canonical Simulation Contract.
+
+## 5. SIMULATION PIPELINE (17 stages, no skips)
+Simulation Configuration → Historical Dataset Loading → Point-in-Time Dataset Validation → Canonical Feature Snapshot Loading → Canonical Alternative Dataset Loading → AI Model Loading → Point-in-Time AI Inference Generation → Market Event Replay → Order Execution Simulation → Portfolio Evolution → Performance Calculation → Risk Evaluation → Benchmark Comparison → Simulation Validation → Simulation Publication → Metadata Recording → Simulation Completion
+
+## 6. CANONICAL SIMULATION CONTRACT
+Simulation Event ID, Simulation Identifier, Simulation Version, Strategy Identifier, Portfolio Identifier, Portfolio Configuration Version, Dataset Version, Feature Version, Alternative Dataset Version, Model Identifier, Model Version, Trade History, Order History, Portfolio Evolution, Performance Metrics, Risk Metrics, Benchmark Results, Simulation Metadata, Governance Metadata. Alternative formats prohibited.
+
+## 7. MARKET REPLAY
+Tick Replay, Candle Replay, Trade Replay, Order Book Replay, Funding Replay, Liquidation Replay, On-Chain Replay, News Replay, Social Sentiment Replay, Macroeconomic Replay. Independently configurable.
+
+## 8. EXECUTION SIMULATION
+Market Orders, Limit Orders, Stop Orders, Partial Fills, Slippage, Spread Modeling, Market Impact, Liquidity Constraints, Latency Simulation, Exchange Fee Simulation. Configurable.
+
+## 9. SIMULATION METHODOLOGIES
+Historical Replay, Walk-Forward Validation, Rolling Window Validation, Expanding Window Validation, Monte Carlo Simulation, Bootstrap Resampling, Regime Switching, Scenario Analysis. Independently configurable.
+
+## 10. PERFORMANCE EVALUATION
+CAGR, Total Return, Annualized Return, Sharpe Ratio, Sortino Ratio, Calmar Ratio, Profit Factor, Win Rate, Maximum Drawdown, Recovery Factor, Expectancy, Trade Statistics
+
+## 11. SIMULATION VERSIONING
+Simulation Version, Dataset Version, Feature Version, Model Version, Configuration Version, Governance Version. Historical immutable.
+
+## 12. SIMULATION GOVERNANCE
+Approval Status, Validation Status, Review History, Audit History, Creation Timestamp, Completion Timestamp, Governance Metadata. Complete history mandatory.
+
+## 17. ARCHITECTURAL RULES (20 rules + 2 sub-rules)
+Rule 1: Only Canonical Feature + Alternative Data Contracts may enter
+Rule 2: Historical simulations independent of live trading
+Rule 3: Unique Simulation Event ID
+Rule 4: Canonical Simulation Contract
+Rule 5: Historical simulation records immutable
+Rule 6: Complete lineage
+Rule 7: Simulation datasets never modified during execution
+Rule 8: Historical replay preserves original event ordering
+Rule 9: Simulation uses only information available at each historical timestamp (point-in-time)
+Rule 9A: Point-in-time AI inference during simulation using immutable model versions + historical feature snapshots. Pre-computed predictions never replayed as substitutes.
+Rule 10: Execution assumptions independently configurable + version controlled
+Rule 11: Transaction costs, fees, slippage, spreads, liquidity explicitly modeled
+Rule 12: Simulation methodologies independently version controlled
+Rule 13: Deterministic replay
+Rule 14: Performance calculations never modify historical simulation records
+Rule 15: Every simulation references immutable dataset versions
+Rule 15A: Every simulation explicitly references Strategy ID, Portfolio ID, Model Version, Feature Version, Dataset Version, Simulation Config Version
+Rule 16: Deterministic event ordering
+Rule 17: Look-ahead bias, survivorship bias, data leakage, future information leakage explicitly prevented through point-in-time data validation + deterministic event sequencing
+Rule 18: Walk-forward + out-of-sample evaluation logically independent from in-sample optimization
+Rule 19: Simulation failures never generate partially published performance results
+Rule 20: This chapter governs only market simulation and historical backtesting
+
+## 18. CHAPTER SUMMARY
+The MSBE establishes AlphaSpot's canonical architecture for executing deterministic point-in-time AI inference over immutable historical feature snapshots, trading strategies, and portfolio policies through deterministic, event-driven, and historically faithful market simulation. Minimizes look-ahead bias, survivorship bias, and unrealistic execution assumptions.
+
+END OF CHAPTER 5.18

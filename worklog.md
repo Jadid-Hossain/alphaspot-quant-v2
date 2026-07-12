@@ -1077,3 +1077,17 @@ Stage Summary:
 - Key institutional feature 3: **Dual Timestamps** (Rule 18) — Event Timestamp (when underlying event occurred) + Ingestion Timestamp (when AlphaSpot ingested). Historical replay, simulation, backtesting use Ingestion Timestamp when reproducing production availability.
 - Key institutional feature 4: **Quality Validation** (§8, Rule 9) — 14 validation types. Rule 9 — quality validated before publication. Invalid datasets never published. Provider reliability scoring.
 - Key institutional feature 5: **Multi-Source Fusion** (§5, Rule 10) — Timestamp synchronization precedes fusion. Multiple data sources fused into canonical dataset.
+
+---
+Task ID: MDS-CH5.18
+Agent: main (Z.ai Code)
+Task: Chapter 5.18 of the MDS — Market Simulation & Backtesting Engine (MSBE). The exclusive bridge between Alternative Data, Feature Store, AI Prediction Layer, and Paper Trading. Evaluates strategies via deterministic, event-driven, historically reproducible simulation.
+
+Work Log:
+- Appended Chapter 5.18 verbatim to full_prompt.md (now 7123 lines, 46 chapters).
+- Created src/lib/alphaspot/v2/market-simulation-engine/ with 3 modules (232 V2 files total):
+  • types.ts — CanonicalSimulationContract (§4, §6, Rule 4). SimulationMethod (8 §9). ReplayType (10 §7). ExecutionAssumptions (§8, Rule 10). PerformanceMetrics (12 metrics §10). RiskMetrics. SimulatedTrade/SimulatedOrder. PortfolioEvolutionPoint. BenchmarkComparison. SimulationLineage (Rule 6/15A). SimulationVersionBundle (§11, Rule 5). SimulationGovernanceMetadata (§12). SimulationConfiguration (§3). DEFAULT_SIMULATION_CONFIG. SIMULATION_STAGES (17 §5). MSBE_VERSION='1.0.0'.
+  • subsystems.ts — MarketReplayEngine (§7, Rule 8 — original ordering). ExecutionSimulator (§8, Rule 10/11 — slippage/spread/impact/fees/partial fills). PerformanceCalculator (§10, Rule 14 — 12 metrics: CAGR/Sharpe/Sortino/Calmar/Profit Factor/Win Rate/Max DD/Recovery/Expectancy). RiskEvaluator (VaR95/99/ES/beta/drawdown). BenchmarkComparator. SimulationVersionRegistry (§11, Rule 5/13). SimulationGovernanceManager (§12). SimulationFailureRecovery (§16). MSBEObservabilityCollector (§14).
+  • engine.ts — MarketSimulationBacktestingEngine: simulate (§5 — 17-stage pipeline: SIMULATION_CONFIGURATION → HISTORICAL_DATASET_LOADING → POINT_IN_TIME_DATASET_VALIDATION Rule 9/17 → FEATURE_SNAPSHOT_LOADING → ALTERNATIVE_DATASET_LOADING → AI_MODEL_LOADING → POINT_IN_TIME_AI_INFERENCE Rule 9A → MARKET_EVENT_REPLAY Rule 8 → ORDER_EXECUTION_SIMULATION Rule 10/11 → PORTFOLIO_EVOLUTION → PERFORMANCE_CALCULATION Rule 14 → RISK_EVALUATION → BENCHMARK_COMPARISON → SIMULATION_VALIDATION Rule 19 → SIMULATION_PUBLICATION Rule 5 → METADATA_RECORDING → SIMULATION_COMPLETION). Rule 9A — point-in-time AI inference via modelInferenceFn callback (no pre-computed predictions). Rule 19 — failures never partially published.
+  • index.ts — Barrel export.
+- Smoke-tested all 6 subsystems: (2) FULL SIMULATION — 17 stages, 91 trades, 100 portfolio evolution points, frozen (Rule 5 ✓), full lineage (Rule 6/15A ✓). (3) Rule 9A — point-in-time inference via callback ✓. (4) Rule 8/17 — events sorted, look-ahead prevented ✓. (5) Rule 10/11 — execution simulation with slippage/spread/fees/impact ✓. (6) §14 observability — all 17 stages tracked.
