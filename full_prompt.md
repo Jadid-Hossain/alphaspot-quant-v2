@@ -7328,3 +7328,71 @@ Rule 20: This chapter governs only user auth, authz, API management, customer ac
 Rule 21: Every outbound webhook/callback/payload cryptographically signed with tenant-specific secrets; deterministic, version controlled, auditable
 
 END OF CHAPTER 5.21
+
+---
+
+# ALPHASPOT QUANT V2
+# CHAPTER 5.22
+# AI MODEL GOVERNANCE ENGINE
+# Version 1.0
+
+## 1. PURPOSE
+The AI Model Governance Engine (AMGE) establishes the canonical architecture for registering, validating, governing, versioning, approving, monitoring, promoting, demoting, retiring, and auditing every ML/DL/LLM/RL/ensemble/quantitative prediction model operating throughout AlphaSpot.
+The AMGE serves as the exclusive authority determining which AI models are eligible for Research, Backtesting, Paper Trading, Shadow Execution, Production Prediction, and Future Automated Trading.
+Guarantees every prediction originates only from institutionally approved, reproducible, version-controlled, fully auditable, performance-validated AI models.
+
+## 2. DESIGN PHILOSOPHY
+Only governed models may produce production predictions.
+Every approved model shall remain: deterministic, reproducible, version controlled, independently governed, fully auditable, cryptographically identifiable
+Independent of: Training Infrastructure, Feature Engineering, Trading Strategies, Portfolio Construction, Broker Connectivity, Execution Infrastructure
+
+## 3. INPUT CONTRACT
+Consumes: Trained Model Artifacts, Model Metadata, Model Signature, Feature Compatibility Metadata, Dataset Compatibility Metadata, Training Configuration, Hyperparameter Metadata, Performance Evaluation Results, Backtesting Results, Paper Trading Results, Explainability Reports, Governance Policies, Validation Configuration, Deployment Configuration
+Never consumes: Live Market Orders, Portfolio Accounting, Execution Commands, Broker APIs, Exchange Credentials
+
+## 4. OUTPUT CONTRACT
+Every governed model produces: Model Governance Event ID, Model Identifier, Model Version, Model Status, Deployment Eligibility, Champion Status, Challenger Status, Approval Status, Governance Deployment Signature, Validation Status, Performance Certification, Feature Compatibility Version, Dataset Compatibility Version, Governance Metadata, Audit Metadata
+Outputs remain immutable. Every decision conforms to Canonical Model Governance Contract.
+
+## 5. MODEL GOVERNANCE PIPELINES
+A. Model Onboarding & Certification (15 stages): Registration → Artifact Integrity → Signature Verification → Feature Compatibility → Dataset Compatibility → Performance Validation → Backtesting Certification → Paper Trading Certification → Governance Review → Deployment Eligibility → Champion-Challenger Evaluation → Approval Decision → Deployment Signature Generation → Publication → Completion
+B. Continuous Governance & Lifecycle (10 stages): Live Performance Monitoring → Drift Detection → Performance Threshold Evaluation → Champion-Challenger Reassessment → Governance Policy Evaluation → Promotion/Demotion/Retention Decision → Signature Update/Revocation → Status Publication → Metadata Recording → Completion
+
+## 6. CANONICAL MODEL GOVERNANCE CONTRACT
+Model Governance Event ID, Model Identifier, Model Version, Model Status, Deployment Eligibility, Champion Status, Challenger Status, Approval Status, Validation Status, Performance Certification, Feature Compatibility Version, Dataset Compatibility Version, Governance Metadata, Audit Metadata, Governance Deployment Signature. Alternative formats prohibited.
+
+## 7. MODEL LIFECYCLE MANAGEMENT
+Research, Experimental, Candidate, Challenger, Champion, Production, Deprecated, Retired, Archived
+
+## 8. PERFORMANCE CERTIFICATION
+Accuracy, Precision, Recall, F1, ROC-AUC, Trading Accuracy, Profitability, Drawdown, Sharpe, Stability, Robustness, Stress Testing
+
+## 9. MODEL DRIFT MANAGEMENT
+Feature Drift, Data Drift, Prediction Drift, Concept Drift, Performance Drift, Confidence Drift, Regime Drift, Statistical Drift Detection, Drift Alerts, Automatic Governance Review
+
+## 10. CHAMPION-CHALLENGER MANAGEMENT
+Champion Models, Challenger Models, Parallel Evaluation, Shadow Inference, Performance Comparison, Promotion Rules, Automatic Demotion, Governance Approval, Historical Comparison
+
+## 17. ARCHITECTURAL RULES (20 rules)
+Rule 1: Only validated trained model artifacts may enter
+Rule 2: Model governance independent of prediction/portfolio/execution/trading
+Rule 3: Unique Model Governance Event ID
+Rule 4: Canonical Model Governance Contract
+Rule 5: Historical model governance records immutable
+Rule 6: Complete lineage
+Rule 7: Only governance-approved models with valid Governance Deployment Signature may enter Production. Every Production Prediction Engine cryptographically verifies signature before loading. Revoked/expired/invalid/unverifiable signatures immediately disqualify.
+Rule 8: Champion and Challenger logically independent while sharing identical feature inputs
+Rule 9: Model artifacts cryptographically signed before governance approval
+Rule 10: Feature compatibility validated before deployment approval
+Rule 11: Dataset compatibility explicitly version controlled
+Rule 12: Deterministic replay
+Rule 13: Model drift generates immutable governance events without modifying historical records
+Rule 14: Every deployment approval references immutable model/dataset/feature/config versions
+Rule 15: Deterministic event ordering
+Rule 16: Performance certification precedes production approval
+Rule 17: Governance failures never generate partially approved models
+Rule 18: Every production model reproducible from immutable artifacts + feature/dataset/config versions
+Rule 19: Model retirement never invalidates historical prediction lineage
+Rule 20: This chapter governs only AI model governance and lifecycle management
+
+END OF CHAPTER 5.22
