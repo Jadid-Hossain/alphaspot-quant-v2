@@ -6893,3 +6893,82 @@ Rule 20: This chapter governs only compliance monitoring and regulatory control
 The Compliance & Regulatory Control Engine establishes AlphaSpot's canonical architecture for deterministic regulatory enforcement across both Pre-Trade and Post-Trade workflows. Through the Canonical Compliance Contract, the CRCE provides institution-grade regulatory control, complete auditability, deterministic replay, and legally defensible compliance decisions.
 
 END OF CHAPTER 5.15
+
+---
+
+# ALPHASPOT QUANT V2
+# CHAPTER 5.16
+# FEATURE STORE ENGINE
+# Version 1.0
+
+## 1. PURPOSE
+The Feature Store Engine (FSE) establishes the canonical architecture for transforming validated market, alternative, macroeconomic, blockchain, sentiment, and engineered datasets into deterministic, reusable, version-controlled, and institutionally governed machine learning features.
+The Feature Store Engine serves as the exclusive bridge between the Data Engineering Layer and all AI Prediction, Backtesting, Paper Trading, Market Simulation, and Model Training components.
+The FSE guarantees that every model throughout AlphaSpot consumes identical feature definitions, identical preprocessing logic, identical normalization methodologies, identical feature versions, and identical historical snapshots regardless of whether the model operates during training, backtesting, paper trading, or live inference.
+
+## 2. DESIGN PHILOSOPHY
+Models should never engineer features independently. Every feature shall be computed exactly once and reused everywhere.
+Feature definitions shall remain: deterministic, reproducible, version controlled, immutable, reusable, mathematically consistent, fully auditable
+Training features and production features shall always remain identical whenever mathematically possible.
+Feature engineering shall remain completely independent of: AI Models, Trading Strategies, Broker Infrastructure, Portfolio Construction, Risk Analytics, Compliance Logic
+
+## 3. INPUT CONTRACT
+Consumes only: Canonical Market Data Contracts, Alternative Data Contracts, Blockchain Data Contracts, Macroeconomic Data, News Intelligence Data, Social Sentiment Data, On-Chain Metrics, Technical Indicator Library, Feature Engineering Configuration, Data Quality Metadata, Feature Configuration, Governance Configuration
+Never consumes: Trading Signals, Portfolio Decisions, AI Predictions, Risk Contracts, Order Management Contracts
+
+## 4. OUTPUT CONTRACT
+Every feature generation produces: Feature Event ID, Feature Version, Feature Group ID, Feature Identifier, Asset Identifier, Exchange Identifier, Feature Vector, Feature Timestamp, Feature Freshness Status, Feature Quality Score, Feature Lineage, Transformation Metadata, Dependency Metadata, Governance Metadata
+Outputs remain immutable. Every feature generation shall conform to the Canonical Feature Contract.
+
+## 5. FEATURE PIPELINE (Dual workflow)
+A. Feature Generation (Write Pipeline): Data Reception → Source Validation → Data Quality Verification → Schema Harmonization → Feature Dependency Resolution → Feature Engineering → Normalization → Transformation → Feature Validation → Feature Version Assignment → Online Store Write → Offline Store Write → Metadata Recording → Feature Publication
+B. Feature Serving (Read Pipeline):
+   Online: Inference Request → Feature Lookup → Freshness Validation → Version Resolution → Low-Latency Retrieval → Feature Delivery
+   Offline: Research Request → Point-in-Time Version Resolution → Historical Snapshot Retrieval → Feature Reconstruction → Dataset Assembly → Research Delivery
+
+## 6. CANONICAL FEATURE CONTRACT
+Every feature produces: Feature Identifier, Feature Group Identifier, Asset Identifier, Exchange Identifier, Feature Version, Feature Vector, Feature Timestamp, Feature Freshness Status, Feature Quality Status, Transformation Metadata, Dependency Metadata, Governance Metadata
+Alternative representations prohibited. Every Feature Vector uniquely associated with exactly one Asset + Exchange. Historical versions immutable.
+
+## 7. FEATURE ENGINEERING
+Technical Indicators, Rolling Statistics, Window Aggregations, Lag Features, Lead Features, Price Derivatives, Volume Features, Volatility Features, Liquidity Features, Market Microstructure Features, Order Book Features, Blockchain Features, Wallet Activity Features, News Features, Sentiment Features, Macroeconomic Features, Cross-Asset Features, Cross-Exchange Features, Custom Features
+
+## 8. ONLINE FEATURE STORE
+Low-Latency Retrieval, Streaming Updates, Incremental Updates, Real-Time Serving, Event-Driven Refresh, Hot Cache, Feature Lookup API, Feature Expiration, Feature Freshness Monitoring
+
+## 9. OFFLINE FEATURE STORE
+Historical Feature Snapshots, Model Training, Dataset Reconstruction, Backtesting, Simulation, Research, Feature Replay, Time Travel Queries. Historical snapshots immutable.
+
+## 10. FEATURE VERSIONING
+Feature Version, Transformation Version, Dataset Version, Configuration Version, Governance Version. Historical versions immutable.
+
+## 11. FEATURE QUALITY MANAGEMENT
+Missing Values, Null Percentage, Duplicate Features, Outlier Detection, Statistical Stability, Distribution Shift, Drift Detection, Freshness Validation, Schema Validation, Dependency Validation. Invalid features never published.
+
+## 12. FEATURE GOVERNANCE
+Approval Status, Validation Status, Review History, Audit History, Creation Timestamp, Publication Timestamp, Governance Metadata
+
+## 17. ARCHITECTURAL RULES (21 rules)
+Rule 1: Only validated data contracts may enter
+Rule 2: Feature engineering independent of AI/strategy/portfolio/execution
+Rule 3: Unique Feature Event ID
+Rule 4: Canonical Feature Contract
+Rule 5: Historical feature versions immutable
+Rule 6: Training and production features identical when possible
+Rule 7: Complete lineage
+Rule 8: Feature definitions configurable and version controlled
+Rule 9: Online and offline stores logically synchronized, independent storage
+Rule 10: Feature serving independent from generation; online=low-latency, offline=point-in-time
+Rule 11: Feature freshness continuously monitored
+Rule 12: Drift detection generates immutable governance events, never modifies historical values
+Rule 13: Historical snapshots never overwritten
+Rule 14: Deterministic replay
+Rule 15: Feature dependencies explicitly version controlled
+Rule 16: Quality validation precedes publication
+Rule 17: Transformations mathematically reproducible
+Rule 18: Every feature references immutable source datasets
+Rule 19: Deterministic event ordering
+Rule 20: Generation failures never produce partially published vectors
+Rule 21: This chapter governs only feature engineering and serving
+
+END OF CHAPTER 5.16
