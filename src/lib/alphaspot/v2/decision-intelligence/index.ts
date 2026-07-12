@@ -10,6 +10,7 @@
 // Chapter 5.8 — Smart Order Routing Engine.
 // Chapter 5.9 — Broker Gateway Engine.
 // Chapter 5.10 — Exchange Execution Engine.
+// Chapter 5.11 — Post-Trade Reconciliation Engine.
 //
 // Import from '@/lib/alphaspot/v2/decision-intelligence'.
 
@@ -23,3 +24,4 @@ export * from './execution-optimization'
 export * from './smart-order-routing'
 export * from './broker-gateway'
 export * from './exchange-execution'
+export * from './post-trade-reconciliation'
