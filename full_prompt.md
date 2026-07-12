@@ -6659,3 +6659,131 @@ The architecture further distinguishes between real-time provisional valuation a
 Through the Canonical Performance Contract, the PnL & Performance Attribution Engine provides standardized, reproducible performance analytics that enable downstream compliance, regulatory reporting, client reporting, strategy evaluation, business intelligence, and executive portfolio oversight while maintaining institutional-grade financial integrity, explainability, and auditability.
 
 END OF CHAPTER 5.13
+
+---
+
+# ALPHASPOT QUANT V2
+# CHAPTER 5.14
+# RISK ANALYTICS & EXPOSURE ENGINE
+# Version 1.0
+
+## Purpose
+The Risk Analytics & Exposure Engine (RAEE) establishes the canonical architecture for transforming immutable Portfolio Accounting records and Performance Contracts into institutionally consistent portfolio risk measurements, exposure analytics, scenario analyses, stress testing, liquidity risk assessments, and enterprise risk metrics through deterministic, event-driven, mathematically rigorous, and fully governed computation workflows.
+The Risk Analytics & Exposure Engine serves as the exclusive bridge between the PnL & Performance Attribution Engine and downstream Compliance, Portfolio Optimization, Strategy Governance, Executive Dashboards, Capital Management, and Regulatory Reporting systems.
+The Risk Analytics & Exposure Engine additionally maintains dual-speed institutional risk states, enterprise-wide netted exposure models, adaptive market-regime detection, and hierarchical risk aggregation capable of supporting multi-strategy quantitative portfolios operating across multiple asset classes, prime brokers, and jurisdictions while preserving deterministic computation, immutable versioning, and complete audit lineage.
+The RAEE maintains the official institutional record of:
+Market Risk, Credit Risk, Liquidity Risk, Counterparty Risk, Concentration Risk, Currency Risk, Interest Rate Risk, Volatility Risk, Tail Risk, Scenario Analysis, Stress Testing, Portfolio Exposure, Leverage Exposure, Margin Exposure, Risk Limits, Risk Metadata, Risk Lineage
+The RAEE performs NO:
+Machine Learning, Strategy Generation, Portfolio Accounting, Order Management, Trade Reconciliation, Execution Planning, Portfolio Optimization, Compliance Decision Making
+
+## DESIGN PHILOSOPHY
+Portfolio Accounting records financial truth.
+Performance Attribution measures financial outcomes.
+Risk Analytics evaluates uncertainty.
+Risk computation shall remain: deterministic, reproducible, mathematically consistent, event-driven, version controlled, fully auditable
+Risk computation shall remain completely independent of: Trading Strategies, Machine Learning, Broker Infrastructure, Order Routing, Execution Algorithms
+Identical accounting records, market snapshots, and configurations shall always produce identical risk measurements whenever mathematically possible.
+
+## INPUT CONTRACT
+Consumes only: Canonical Portfolio Accounting Contracts (Ch 5.12), Canonical Performance Contracts (Ch 5.13), Market Data Snapshots, Volatility Surfaces, Correlation Matrices, Yield Curves, Credit Curves, Liquidity Metrics, Benchmark Data, FX Rates, Risk Configuration, Governance Configuration
+Never consumes: Trading Signals, Broker APIs, Exchange Events, Machine Learning Models, Strategy Decisions
+
+## OUTPUT CONTRACT
+Every risk calculation produces: Risk Event ID, Risk Version, Portfolio ID, Position ID, Portfolio Exposure, Asset Exposure, Sector Exposure, Country Exposure, Currency Exposure, Factor Exposure, Gross Exposure, Net Exposure, Leverage, Margin Utilization, VaR, Expected Shortfall, Beta, Volatility, Scenario Results, Stress Test Results, Liquidity Risk, Counterparty Risk, Risk Metadata, Governance Metadata
+Outputs remain immutable. Every calculation shall conform to the Canonical Risk Contract.
+
+## RISK PIPELINE (15 stages, no skips)
+Portfolio Reception → Validation → Market Data Loading → Correlation Loading → Volatility Loading → Exposure Calculation → Factor Calculation → Scenario Analysis → Stress Testing → Liquidity Analysis → Risk Aggregation → Risk Validation → Risk Publication → Metadata Recording → Risk Completion
+
+## CANONICAL RISK CONTRACT
+Every calculation produces: Exposure Metrics, VaR, Expected Shortfall, Stress Results, Scenario Results, Liquidity Metrics, Concentration Metrics, Risk Limits, Risk Metadata
+Alternative formats are prohibited.
+
+## EXPOSURE ANALYTICS
+Position Exposure, Gross Exposure, Net Exposure, Long Exposure, Short Exposure, Sector Exposure, Country Exposure, Currency Exposure, Strategy Exposure, Factor Exposure, Concentration Exposure
+
+## VALUE AT RISK
+Historical VaR, Parametric VaR, Monte Carlo VaR, Incremental VaR, Marginal VaR, Component VaR
+
+## EXPECTED SHORTFALL
+Historical ES, Parametric ES, Monte Carlo ES
+
+## STRESS TESTING
+Historical Crisis Replay, Hypothetical Scenarios, Interest Rate Shock, FX Shock, Equity Crash, Commodity Shock, Volatility Spike, Liquidity Crisis, Counterparty Default
+
+## SCENARIO ANALYSIS
+Macro Scenarios, Sector Rotation, Inflation Shock, Recession, Yield Curve Shift, Credit Spread Widening, Correlation Breakdown
+
+### 10A. MARKET REGIME DETECTION & DYNAMIC CORRELATION MANAGEMENT
+Market Regime Detection, Volatility Regime Detection, Correlation Breakdown Detection, Liquidity Regime Detection, Tail Event Detection, Market Stress Classification, Regime Transition Monitoring, Covariance Matrix Switching, Adaptive Correlation Modeling, Stressed Covariance Management
+When predefined regime-transition criteria are satisfied, the engine may automatically replace the active covariance model with a version-controlled stressed covariance model.
+Historical market regimes shall never be modified.
+Every regime transition generates: Regime Event ID, Previous Regime, Current Regime, Transition Timestamp, Correlation Model Version, Covariance Version, Governance Metadata
+Historical regime transitions remain immutable.
+
+## LIQUIDITY RISK
+ADV Utilization, Time-to-Liquidate, Market Impact Estimate, Liquidity Gap, Funding Liquidity, Asset Liquidity
+
+### 11A. ENTERPRISE NETTING & HIERARCHICAL RISK AGGREGATION
+Position-Level, Strategy-Level, Portfolio-Level, Fund-Level, Prime Broker Exposure, Enterprise Exposure
+Gross Exposure, Net Exposure, Cross-Strategy Netting, Cross-Portfolio Netting, Cross-Account Netting, Cross-Margin Aggregation, Prime Broker Aggregation, Enterprise Margin Optimization
+Netting calculations shall never modify underlying position exposures.
+Both gross and net exposures remain independently observable.
+Every aggregation level records: Aggregation Version, Netting Methodology, Exposure Hierarchy, Margin Methodology, Governance Metadata
+Hierarchical aggregation remains deterministic and reproducible.
+
+## CONCENTRATION RISK
+Single Asset, Sector, Country, Currency, Counterparty, Strategy, Issuer
+
+## RISK VERSIONING
+Risk Version, Accounting Version, Performance Version, Market Snapshot Version, Configuration Version, Governance Version. Historical records remain immutable.
+
+### 15A. DUAL-SPEED RISK STATES
+Streaming Intraday Risk State (real-time exposure, streaming VaR, intraday margin, circuit breakers, execution risk monitoring, portfolio supervision)
+Official End-of-Day Risk State (regulatory reporting, investor reporting, official risk reports, board reporting, capital planning, historical archives)
+Intraday calculations may continuously update. Official EOD calculations remain immutable after publication.
+Every risk calculation records: Risk State Type, Market Snapshot Version, Calculation Frequency, Publication Status, Governance Metadata
+Historical official risk states shall never be overwritten. Corrections generate new immutable Risk Versions.
+
+## RISK GOVERNANCE
+Approval Status, Validation Status, Review History, Audit History, Creation Timestamp, Calculation Timestamp, Governance Metadata
+
+## OBSERVABILITY
+VaR Events, Exposure Updates, Stress Tests, Scenario Runs, Liquidity Alerts, Margin Utilization, Concentration Alerts, Calculation Latency, Governance Events, Regime Transitions, Correlation Matrix Switches, Netting Efficiency, Enterprise Gross/Net Exposure, Intraday Risk Updates, Official Risk Publications
+
+## ARCHITECTURAL RULES (30 rules)
+Rule 1: Only Canonical Portfolio Accounting + Performance Contracts may enter
+Rule 2: Risk calculations independent of execution, accounting, compliance, optimization
+Rule 3: Unique Risk Event ID
+Rule 4: Historical risk calculations immutable
+Rule 5: Risk calculations never modify Portfolio Accounting records
+Rule 6: Market data never modifies accounting records
+Rule 7: Complete lineage preserved
+Rule 8: Scenario analysis independent from stress testing
+Rule 9: VaR mathematically independent from Expected Shortfall
+Rule 10: Liquidity risk independent from market risk
+Rule 11: Counterparty risk independent from concentration risk
+Rule 12: Historical market data corrections generate new immutable Risk Versions
+Rule 13: Deterministic replay
+Rule 14: Deterministic ordering
+Rule 15: Risk limits configurable and version controlled
+Rule 16: Every published risk calculation references immutable market snapshots
+Rule 17: Stress testing never overwrites historical risk calculations
+Rule 18: Risk aggregation preserves portfolio decomposition
+Rule 19: Exposure calculations support hierarchical aggregation
+Rule 20: This chapter governs only risk analytics and exposure measurement
+Rule 21: Dynamic market-regime detection with version-controlled covariance switching
+Rule 22: Historical covariance models and market regimes immutable
+Rule 23: Streaming Intraday and Official EOD Risk States logically independent
+Rule 24: Official EOD Risk States never modified after publication; corrections = new immutable versions
+Rule 25: Hierarchical exposure aggregation preserves individual position exposures
+Rule 26: Enterprise netting never alters canonical position ledger
+Rule 27: Cross-margin calculations independent from gross exposure calculations
+Rule 28: Market regime transitions preserve complete lineage
+Rule 29: Risk calculations under different regimes generate independent immutable Risk Versions
+Rule 30: Dynamic covariance switching, enterprise netting, dual-speed risk never modify historical accounting/performance records
+
+## CHAPTER SUMMARY
+The Risk Analytics & Exposure Engine establishes AlphaSpot's canonical architecture for transforming immutable portfolio accounting records and performance analytics into institutionally consistent risk measurements, exposure analytics, scenario analyses, and enterprise risk intelligence. By separating risk computation from accounting, execution, compliance, and investment decision-making, the architecture guarantees deterministic exposure measurement, configurable risk methodologies, adaptive market-regime detection, hierarchical enterprise netting, dual-speed risk processing, immutable versioning, complete lineage, and enterprise-grade governance.
+
+END OF CHAPTER 5.14
