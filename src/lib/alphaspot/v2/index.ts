@@ -47,6 +47,7 @@ export * from './feature-processing' // Feature processing & store — validatio
 export * from './ai-platform' // AI platform — prediction framework, probability vs confidence, multi-horizon, uncertainty, explainability, governance, deterministic inference (Chapter 4.1)
 export * from './decision-intelligence' // Decision intelligence — Ch 5.1-5.15: full institutional trading pipeline (signal → strategy → portfolio → risk → sizing → order → execution → routing → broker → exchange → reconciliation → accounting → PnL → risk analytics → compliance)
 export * from './feature-store-engine' // Ch 5.16 — Feature Store Engine: Canonical Feature Contract, dual pipeline (write 14 stages + read online 6 / offline 6), 19 feature categories, online+offline stores (Rule 9/10), quality validation (Rule 16), drift detection (Rule 12), versioning, governance
+export * from './alternative-data-engine' // Ch 5.17 — Alternative Data Management Engine: Canonical Alternative Data Contract, 16-stage pipeline, provider management (Rule 1/11), quality validation (Rule 9), unstructured data parsing (Rule 19), dual timestamps (Rule 18), multi-source fusion (Rule 10), versioning, governance
 export * from './lanes/lane-a-realtime'
 export * from './lanes/lane-b-analytical'
 export * from './lanes/lane-c-research'

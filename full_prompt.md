@@ -6972,3 +6972,73 @@ Rule 20: Generation failures never produce partially published vectors
 Rule 21: This chapter governs only feature engineering and serving
 
 END OF CHAPTER 5.16
+
+---
+
+# ALPHASPOT QUANT V2
+# CHAPTER 5.17
+# ALTERNATIVE DATA MANAGEMENT ENGINE
+# Version 1.0
+
+## 1. PURPOSE
+The Alternative Data Management Engine (ADME) establishes the canonical architecture for acquiring, validating, normalizing, governing, versioning, enriching, and distributing non-traditional financial datasets used throughout the AlphaSpot ecosystem.
+The ADME serves as the exclusive bridge between external alternative data providers and the Feature Store Engine. Guarantees every AI model consumes institutionally validated, deterministic, reproducible, and fully governed alternative datasets.
+
+## 2. DESIGN PHILOSOPHY
+Alternative data provides informational advantage. Data quality determines prediction quality.
+Datasets shall remain: deterministic, reproducible, immutable, version controlled, independently governed, fully auditable
+Independent of: AI Models, Trading Strategies, Portfolio Optimization, Risk Policies, Execution Logic, Portfolio Accounting
+
+## 3. INPUT CONTRACT
+Consumes: Blockchain Data, On-Chain Metrics, Whale Wallet Activity, Exchange Reserve Data, Stablecoin Supply, Funding Rates, Open Interest, Liquidation Data, Order Flow Data, News Intelligence, Social Media Streams, Reddit Intelligence, GitHub Activity, Google Trends, Macroeconomic Indicators, ETF Flow Data, Regulatory Announcements, Alternative Data Provider Metadata, Governance Configuration
+Never consumes: Trading Signals, Portfolio Decisions, AI Predictions, Order Management, Portfolio Accounting
+
+## 4. OUTPUT CONTRACT
+Every dataset produces: Dataset Event ID, Dataset Identifier, Dataset Version, Provider Identifier, Asset Identifier, Exchange Identifier, Event Timestamp, Ingestion Timestamp, Canonical Dataset, Quality Score, Freshness Status, Completeness Status, Lineage Metadata, Dependency Metadata, Governance Metadata
+Outputs remain immutable. Every dataset conforms to Canonical Alternative Data Contract.
+
+## 5. ALTERNATIVE DATA PIPELINE (16 stages, no skips)
+Provider Registration → Data Acquisition → Integrity Validation → Structured/Unstructured Classification → Unstructured Data Parsing (when applicable) → Schema Standardization → Timestamp Synchronization → Data Normalization → Quality Assessment → Duplicate Detection → Missing Data Validation → Multi-Source Fusion → Version Assignment → Dataset Publication → Metadata Recording → Dataset Completion
+
+## 6. CANONICAL ALTERNATIVE DATA CONTRACT
+Dataset Identifier, Dataset Version, Provider Identifier, Asset Identifier, Exchange Identifier, Event Timestamp, Ingestion Timestamp, Data Freshness, Data Quality, Canonical Dataset, Lineage Metadata, Governance Metadata. Alternative representations prohibited.
+
+## 7. DATA SOURCE MANAGEMENT
+Exchange APIs, Blockchain Nodes, News APIs, Social Media APIs, GitHub APIs, Macroeconomic Feeds, ETF Data Providers, Alternative Data Vendors, Internal Research Pipelines, Custom Data Sources. All providers independently configurable.
+
+## 8. DATA QUALITY MANAGEMENT
+Missing Data Detection, Duplicate Detection, Schema Validation, Outlier Detection, Freshness Validation, Timestamp Validation, Completeness Analysis, Statistical Validation, Provider Reliability Scoring, Consistency Verification, Unstructured Data Parsing Validation, Tokenizer Validation, Sentiment Extraction Validation, Entity Extraction Validation. Invalid datasets never published.
+
+## 9. DATA VERSIONING
+Dataset Version, Provider Version, Configuration Version, Governance Version. Historical datasets immutable.
+
+## 10. DATA LINEAGE
+Source Lineage, Provider Lineage, Transformation Lineage, Dependency Tracking, Version History, Replay Support, Audit Trail. Complete lineage mandatory.
+
+## 11. DATA GOVERNANCE
+Approval Status, Validation Status, Review History, Audit History, Creation Timestamp, Publication Timestamp, Governance Metadata. Complete history mandatory.
+
+## 17. ARCHITECTURAL RULES (21 rules)
+Rule 1: Only registered providers may enter
+Rule 2: Independent of AI/feature/strategy/execution
+Rule 3: Unique Dataset Event ID
+Rule 4: Canonical Alternative Data Contract
+Rule 5: Historical datasets immutable
+Rule 6: Complete lineage
+Rule 7: Provider failures never modify historical datasets
+Rule 8: Historical datasets never overwritten
+Rule 9: Quality validated before publication
+Rule 10: Timestamp synchronization precedes multi-source fusion
+Rule 11: Provider metadata independently version controlled
+Rule 12: Deterministic replay
+Rule 13: Freshness continuously monitored
+Rule 14: Drift generates immutable governance events
+Rule 15: Dependencies explicitly version controlled
+Rule 16: Reference immutable provider versions
+Rule 17: Publication failures never produce partially published datasets
+Rule 18: Preserve Event Timestamp + Ingestion Timestamp; historical replay uses Ingestion Timestamp when reproducing production availability
+Rule 19: Unstructured datasets transformed to canonical structured representations through version-controlled parsing pipelines before schema standardization
+Rule 20: Reproducible whenever identical provider data + configurations supplied
+Rule 21: This chapter governs only alternative data acquisition and governance
+
+END OF CHAPTER 5.17
