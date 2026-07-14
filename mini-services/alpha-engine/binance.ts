@@ -74,6 +74,46 @@ export async function fetchAllSpotSymbols(): Promise<SymbolInfo[]> {
   return out
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Fallback symbol list — used when Binance REST is unreachable (e.g. sandbox
+// IP ban / 418). Keeps the engine online in degraded mode so the frontend
+// can connect and display "Live" status. WebSocket streams will also likely
+// fail in this environment, but the HTTP/socket.io server stays up.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const FALLBACK_BASES = [
+  'BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'ADA', 'DOGE', 'AVAX', 'DOT', 'MATIC',
+  'LINK', 'TON', 'TRX', 'LTC', 'BCH', 'UNI', 'ATOM', 'XLM', 'ICP', 'FIL',
+  'ARB', 'OP', 'APT', 'NEAR', 'INJ', 'SUI', 'SEI', 'TIA', 'ORDI', 'PEPE',
+  'SHIB', 'WIF', 'BONK', 'FLOKI', 'JUP', 'PYTH', 'RNDR', 'GRT', 'AAVE', 'MKR',
+]
+
+export const FALLBACK_SYMBOLS: SymbolInfo[] = FALLBACK_BASES.map((b) => ({
+  symbol: `${b}/USDT`,
+  binanceSymbol: `${b}USDT`,
+  base: b,
+  quote: 'USDT',
+}))
+
+/**
+ * Safe wrapper: returns fetchAllSpotSymbols() on success, FALLBACK_SYMBOLS on
+ * failure. Never throws — guarantees the engine can always boot.
+ */
+export async function fetchAllSpotSymbolsSafe(): Promise<{
+  symbols: SymbolInfo[]
+  degraded: boolean
+  error: string | null
+}> {
+  try {
+    const symbols = await fetchAllSpotSymbols()
+    if (symbols.length === 0) throw new Error('exchangeInfo returned 0 symbols')
+    return { symbols, degraded: false, error: null }
+  } catch (e) {
+    console.warn(`[binance] fetchAllSpotSymbols failed — using ${FALLBACK_SYMBOLS.length} fallback symbols. Reason: ${(e as Error).message}`)
+    return { symbols: FALLBACK_SYMBOLS, degraded: true, error: (e as Error).message }
+  }
+}
+
 export interface Ticker24h {
   symbol: Symbol
   changePct: number

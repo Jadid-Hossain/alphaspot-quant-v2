@@ -16,7 +16,7 @@ import { Server } from 'socket.io'
 import { db } from '../../src/lib/db'
 import {
   TIMEFRAMES,
-  fetchAllSpotSymbols,
+  fetchAllSpotSymbolsSafe,
   fetchAll24hTickers,
   fetchHistoricalKlines,
   fetchOrderBookImbalance,
@@ -25,6 +25,7 @@ import {
   connectKlineStream,
   connectMiniTickerStream,
   type SymbolInfo,
+  type Ticker24h,
 } from './binance'
 import { computeIndicators } from '../../src/lib/alphaspot/indicators'
 import { detectPatterns } from '../../src/lib/alphaspot/patterns'
@@ -484,74 +485,97 @@ function startEvalQueue() {
 async function boot() {
   console.log('[boot] AlphaSpot engine starting...')
 
-  // 1. Discover ALL tradeable USDT spot pairs
+  // 0. Start the HTTP / socket.io server IMMEDIATELY so the frontend can
+  //    connect and show "Live" status. All Binance-dependent steps below
+  //    are best-effort: if Binance REST/WS is unreachable (e.g. sandbox IP
+  //    ban / HTTP 418), the engine stays online in degraded mode.
+  httpServer.listen(PORT, () => {
+    console.log(`[io] AlphaSpot engine listening on port ${PORT}`)
+  })
+  // Broadcast engine state periodically (started early so frontend gets state
+  // even before symbols are discovered).
+  setInterval(() => io.emit('engine', getEngineState()), ENGINE_BROADCAST_MS)
+
+  // 1. Discover ALL tradeable USDT spot pairs (SAFE — never throws)
   console.log('[boot] Fetching exchangeInfo (all USDT spot pairs)...')
-  SYMBOL_INFOS = await fetchAllSpotSymbols()
+  const discovery = await fetchAllSpotSymbolsSafe()
+  SYMBOL_INFOS = discovery.symbols
   SYMBOLS = SYMBOL_INFOS.map((s) => s.symbol)
-  console.log(`[boot] Discovered ${SYMBOLS.length} tradeable USDT spot pairs`)
+  console.log(`[boot] Discovered ${SYMBOLS.length} tradeable USDT spot pairs${discovery.degraded ? ' (DEGRADED MODE — using fallback list)' : ''}`)
+  if (discovery.degraded) {
+    logEntry(SYMBOLS[0] ?? 'BTC/USDT', 'SYSTEM', 'WARN', `Binance REST unreachable (${discovery.error}). Engine running in degraded mode with ${SYMBOLS.length} fallback symbols.`)
+  }
 
   // 2. Initialize per-symbol state
   for (const s of SYMBOLS) initSymbolState(s)
 
-  // 3. Fetch all 24h tickers in ONE call (for volume ranking + initial prices)
+  // 3. Fetch all 24h tickers in ONE call (best-effort — skip on failure)
   console.log('[boot] Fetching 24h tickers for all symbols...')
-  const tickerMap = await fetchAll24hTickers()
-  for (const [sym, t] of tickerMap) {
-    if (ticker24h.has(sym)) {
-      ticker24h.set(sym, { changePct: t.changePct, volume: t.volume, lastPrice: t.lastPrice })
+  let tickerMap: Map<Symbol, Ticker24h> = new Map()
+  try {
+    tickerMap = await fetchAll24hTickers()
+    for (const [sym, t] of tickerMap) {
+      if (ticker24h.has(sym)) {
+        ticker24h.set(sym, { changePct: t.changePct, volume: t.volume, lastPrice: t.lastPrice })
+      }
     }
+    // Sort SYMBOLS by 24h quote volume descending (most liquid first)
+    SYMBOLS.sort((a, b) => (tickerMap.get(b)?.quoteVolume ?? 0) - (tickerMap.get(a)?.quoteVolume ?? 0))
+    console.log(`[boot] Sorted by volume. Top 5: ${SYMBOLS.slice(0, 5).map((s) => `${s.split('/')[0]}($${(tickerMap.get(s)?.quoteVolume ?? 0).toFixed(0)})`).join(', ')}`)
+  } catch (e) {
+    console.warn(`[boot] 24h tickers fetch failed — proceeding without volume sort. Reason: ${(e as Error).message}`)
   }
-  // Sort SYMBOLS by 24h quote volume descending (most liquid first) — so
-  // top coins get seeded + evaluated first, and order-book/funding/commentary
-  // (which only cover the top N) target the most relevant coins.
-  SYMBOLS.sort((a, b) => (tickerMap.get(b)?.quoteVolume ?? 0) - (tickerMap.get(a)?.quoteVolume ?? 0))
-  console.log(`[boot] Sorted by volume. Top 5: ${SYMBOLS.slice(0, 5).map((s) => `${s.split('/')[0]}($${(tickerMap.get(s)?.quoteVolume ?? 0).toFixed(0)})`).join(', ')}`)
 
-  // 4. Connect miniTicker stream (instant 24h change/volume updates for ALL coins)
+  // 4. Connect miniTicker stream (best-effort)
   console.log('[boot] Connecting miniTicker stream...')
-  connectMiniTickerStream((map) => {
-    for (const [sym, t] of map) {
-      const existing = ticker24h.get(sym)
-      if (existing) {
-        existing.changePct = t.changePct
-        existing.volume = t.volume
-        existing.lastPrice = t.price
-      }
-    }
-  })
-
-  // 5. Connect kline WebSocket (chunked) — prices start flowing immediately
-  console.log('[boot] Connecting kline WebSocket (chunked)...')
-  connectKlineStream(
-    SYMBOLS,
-    TIMEFRAMES,
-    (symbol, tf, candle) => {
-      upsertCandle(symbol, tf, candle)
-      // INSTANT price tick broadcast — no throttle, no indicator computation.
-      // This is what makes the displayed price match Binance in real-time.
-      if (tf === '15m') {
-        const tk = ticker24h.get(symbol)
-        const tick: PriceTick = {
-          symbol,
-          price: candle.close,
-          change24hPct: tk?.changePct ?? null,
-          volume24h: tk?.volume ?? null,
-          time: candle.time,
+  try {
+    connectMiniTickerStream((map) => {
+      for (const [sym, t] of map) {
+        const existing = ticker24h.get(sym)
+        if (existing) {
+          existing.changePct = t.changePct
+          existing.volume = t.volume
+          existing.lastPrice = t.price
         }
-        io.emit('priceTick', tick)
       }
-    },
-    (connected) => {
-      if (connected) {
-        logEntry(SYMBOLS[0] ?? 'BTC/USDT', 'SYSTEM', 'INFO', `Binance kline stream connected.`)
-      } else {
-        logEntry(SYMBOLS[0] ?? 'BTC/USDT', 'SYSTEM', 'WARN', 'Binance kline stream disconnected — reconnecting.')
-      }
-    },
-  )
+    })
+  } catch (e) {
+    console.warn(`[boot] miniTicker stream setup failed: ${(e as Error).message}`)
+  }
 
-  // 6. Seed candle buffers in background (concurrency-limited) — indicators
-  //    come online progressively as each coin's buffers fill.
+  // 5. Connect kline WebSocket (chunked) — best-effort
+  console.log('[boot] Connecting kline WebSocket (chunked)...')
+  try {
+    connectKlineStream(
+      SYMBOLS,
+      TIMEFRAMES,
+      (symbol, tf, candle) => {
+        upsertCandle(symbol, tf, candle)
+        if (tf === '15m') {
+          const tk = ticker24h.get(symbol)
+          const tick: PriceTick = {
+            symbol,
+            price: candle.close,
+            change24hPct: tk?.changePct ?? null,
+            volume24h: tk?.volume ?? null,
+            time: candle.time,
+          }
+          io.emit('priceTick', tick)
+        }
+      },
+      (connected) => {
+        if (connected) {
+          logEntry(SYMBOLS[0] ?? 'BTC/USDT', 'SYSTEM', 'INFO', `Binance kline stream connected.`)
+        } else {
+          logEntry(SYMBOLS[0] ?? 'BTC/USDT', 'SYSTEM', 'WARN', 'Binance kline stream disconnected — reconnecting.')
+        }
+      },
+    )
+  } catch (e) {
+    console.warn(`[boot] kline stream setup failed: ${(e as Error).message}`)
+  }
+
+  // 6. Seed candle buffers in background (best-effort)
   console.log(`[boot] Seeding ${SYMBOLS.length}×${TIMEFRAMES.length} candle buffers (concurrency=${SEED_CONCURRENCY})...`)
   const seedTasks: { symbol: Symbol; tf: Timeframe }[] = []
   for (const s of SYMBOLS) {
@@ -572,10 +596,10 @@ async function boot() {
     console.log(`[boot] Seeding complete: ${seeded}/${seedTasks.length} buffers`)
   })
 
-  // 7. Fetch Fear & Greed
+  // 7. Fetch Fear & Greed (best-effort)
   refreshFearGreed().catch(() => {})
 
-  // 7b. Load Shariah compliance cache
+  // 7b. Load Shariah compliance cache (best-effort)
   await loadComplianceCache().catch((e) => console.error('[boot] compliance cache load failed', e))
 
   // 8. Start round-robin evaluation queue
@@ -590,18 +614,19 @@ async function boot() {
   setTimeout(refreshCommentary, 60_000)
   setInterval(refreshCommentary, COMMENTARY_INTERVAL_MS)
 
-  // 10. Broadcast engine state periodically
-  setInterval(() => io.emit('engine', getEngineState()), ENGINE_BROADCAST_MS)
-
-  httpServer.listen(PORT, () => {
-    console.log(`[io] AlphaSpot engine listening on port ${PORT}`)
-    logEntry(SYMBOLS[0] ?? 'BTC/USDT', 'SYSTEM', 'INFO', `AlphaSpot engine online. Tracking ${SYMBOLS.length} coins. Allocated capital $${config.allocatedCapital}.`)
-  })
+  logEntry(SYMBOLS[0] ?? 'BTC/USDT', 'SYSTEM', 'INFO', `AlphaSpot engine online${discovery.degraded ? ' (degraded)' : ''}. Tracking ${SYMBOLS.length} coins. Allocated capital $${config.allocatedCapital}.`)
+  console.log(`[boot] Boot complete. Engine online${discovery.degraded ? ' (DEGRADED)' : ''}.`)
 }
 
 boot().catch((e) => {
-  console.error('[boot] FATAL', e)
-  process.exit(1)
+  // Even if boot throws unexpectedly, keep the HTTP server up so the frontend
+  // can still connect. Log the error but do NOT exit.
+  console.error('[boot] boot() error (non-fatal — HTTP server kept up):', e)
+  if (!httpServer.listening) {
+    httpServer.listen(PORT, () => {
+      console.log(`[io] AlphaSpot engine listening on port ${PORT} (recovery mode)`)
+    })
+  }
 })
 
 // graceful shutdown
@@ -613,3 +638,18 @@ const shutdown = (sig: string) => {
 }
 process.on('SIGTERM', () => shutdown('SIGTERM'))
 process.on('SIGINT', () => shutdown('SIGINT'))
+
+// NEVER crash on unhandled async rejections (e.g. Binance REST 418 from
+// periodic fetchers). Log and keep the HTTP server alive so the frontend
+// stays connected.
+process.on('unhandledRejection', (reason) => {
+  console.error('[unhandledRejection] (non-fatal):', reason)
+})
+process.on('uncaughtException', (err) => {
+  console.error('[uncaughtException] (non-fatal):', err)
+  if (!httpServer.listening) {
+    httpServer.listen(PORT, () => {
+      console.log(`[io] AlphaSpot engine listening on port ${PORT} (recovery after uncaughtException)`)
+    })
+  }
+})

@@ -47,6 +47,10 @@ export interface ComplianceInfo {
 
 interface AlphaSpotState {
   connected: boolean
+  /** Internal flag: whether the Next.js REST API is healthy (always true when
+   *  the dev server is running). Used to keep `connected` true even if the
+   *  alpha-engine socket.io is temporarily unreachable. */
+  restApiHealthy: boolean
   engine: EngineState | null
   /** The full list of symbols the engine is tracking (dynamic, from Binance exchangeInfo). */
   symbols: Symbol[]
@@ -89,6 +93,7 @@ export const useAlphaSpot = create<AlphaSpotState>()(
   persist(
     (set, get) => ({
       connected: false,
+      restApiHealthy: false,
       engine: null,
       symbols: [],
       snapshots: {},
@@ -117,7 +122,30 @@ export const useAlphaSpot = create<AlphaSpotState>()(
     }) as Socket<ServerToClientEvents, ClientToServerEvents>
 
     socket.on('connect', () => set({ connected: true }))
-    socket.on('disconnect', () => set({ connected: false }))
+    socket.on('disconnect', () => {
+      // Only mark disconnected if the REST API is ALSO down. If the REST API
+      // is still healthy (Next.js server is up), keep showing "Live" — the
+      // socket.io stream will reconnect automatically.
+      const { restApiHealthy } = get()
+      if (!restApiHealthy) set({ connected: false })
+    })
+
+    // Periodic REST API health check — keeps `connected` true as long as the
+    // Next.js server responds, even if the alpha-engine socket.io is down.
+    const healthCheck = setInterval(async () => {
+      try {
+        const res = await fetch('/api/status', { signal: AbortSignal.timeout(5000) })
+        if (res.ok) {
+          set({ restApiHealthy: true, connected: true })
+        } else {
+          set({ restApiHealthy: false })
+        }
+      } catch {
+        set({ restApiHealthy: false })
+      }
+    }, 15_000)
+    // Store the interval so it can be cleaned up if needed
+    ;(socket as Socket & { _healthCheck?: ReturnType<typeof setInterval> })._healthCheck = healthCheck
 
     socket.on('engine', (state) => {
       set((s) => {
@@ -207,12 +235,17 @@ export const useAlphaSpot = create<AlphaSpotState>()(
         fetch('/api/logs?limit=100').then((r) => r.json()),
         fetch('/api/trades?limit=50').then((r) => r.json()),
       ])
+      // REST API responded — the platform is online. Mark connected even if
+      // the alpha-engine socket.io hasn't connected yet.
       set((s) => ({
+        restApiHealthy: true,
+        connected: true,
         logs: [...(s.logs ?? []), ...(logsRes.logs ?? []).reverse()].slice(0, MAX_LOGS),
         trades: [...(tradesRes.trades ?? []).map((t: TradeEntry) => ({ ...t, createdAt: t.createdAt })), ...s.trades].slice(0, MAX_TRADES),
       }))
     } catch (e) {
       console.error('loadHistory failed', e)
+      set({ restApiHealthy: false })
     }
   },
 
@@ -239,7 +272,8 @@ export const useAlphaSpot = create<AlphaSpotState>()(
           complianceCategory: r.complianceCategory as ComplianceCategory,
         }
       }
-      set({ complianceMap: map, complianceLoaded: true })
+      // REST API responded — platform is online.
+      set({ complianceMap: map, complianceLoaded: true, restApiHealthy: true, connected: true })
     } catch (e) {
       console.error('loadCompliance failed', e)
     }
