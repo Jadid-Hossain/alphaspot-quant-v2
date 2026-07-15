@@ -10257,3 +10257,1302 @@ Any modification to a dataset, label set, feature manifest, research configurati
 The AI Data Quality, Leakage Prevention & Research Validation Engine establishes AlphaSpot's independent certification layer for AI research. By validating datasets, labels, feature manifests, temporal integrity, partition boundaries, statistical quality, and every known form of data leakage before training begins, the engine guarantees that only trustworthy, reproducible, and governance-approved research artifacts enter the AI training pipeline. Through immutable validation certificates, comprehensive audit trails, and strict research readiness scoring, this engine serves as the final quality gate that protects AlphaSpot from lookahead bias, target leakage, feature contamination, and invalid experimentation, ensuring every downstream AI model is built upon a sound scientific foundation. The Validation Certificate produced by this engine becomes the mandatory admission ticket for every downstream AI model throughout the AlphaSpot ecosystem.
 
 END OF CHAPTER 6.5
+
+ALPHASPOT QUANT V2
+CHAPTER 6.6
+AI MARKET REGIME INTELLIGENCE ENGINE (AMRIE)
+Version 1.0
+
+1. PURPOSE
+The AI Market Regime Intelligence Engine (AMRIE) establishes the canonical architecture for detecting, classifying, validating, versioning, governing, and publishing the current structural state of cryptocurrency markets before any artificial intelligence model performs training, inference, confidence estimation, or trading decision support.
+The AMRIE transforms institutionally governed research datasets, feature manifests, market microstructure intelligence, order book intelligence, trade flow analytics, alternative data, and historical market behavior into deterministic, reproducible, and governance-approved Market Regime States.
+The Market Regime Intelligence Engine serves as the exclusive market state intelligence layer between the AI Data Quality, Leakage Prevention & Research Validation Engine (Chapter 6.5) and the AI Model Training & Experiment Orchestration Engine (Chapter 6.7).
+No downstream AI engine shall independently determine market conditions.
+Every downstream AI engine shall consume only governance-approved Market Regime States published by this engine.
+
+The AMRIE performs
+Market Regime Detection
+Market State Classification
+Market Cycle Identification
+Regime Probability Estimation
+Regime Confidence Scoring
+Regime Stability Analysis
+Regime Transition Detection
+Regime Persistence Estimation
+Trend Regime Analysis
+Volatility Regime Analysis
+Liquidity Regime Analysis
+Market Structure Classification
+Order Book Regime Analysis
+Trade Flow Regime Analysis
+Microstructure Regime Analysis
+Cross-Asset Regime Correlation
+Regime Registry Management
+Regime Metadata Management
+Regime Versioning
+Regime Lineage
+Regime Replay
+Regime Governance
+Historical Regime Reconstruction
+Research Regime Publication
+
+The AMRIE performs NO
+Dataset Construction
+Label Engineering
+Feature Selection
+Research Validation
+Model Training
+Hyperparameter Optimization
+Model Prediction
+Signal Generation
+Portfolio Construction
+Risk Management
+Order Execution
+Trade Management
+Execution Optimization
+Compliance Decisions
+
+2. DESIGN PHILOSOPHY
+Market conditions continuously evolve.
+A trading model cannot assume that today's market behaves like yesterday's.
+Artificial intelligence shall first understand the market before attempting to predict it.
+Every published Market Regime shall remain
+immutable
+deterministic
+temporally correct
+reproducible
+governance approved
+version controlled
+fully auditable
+research reproducible
+Market Regime Intelligence shall remain completely independent from
+AI Training
+Prediction
+Portfolio Decisions
+Risk Management
+Execution
+Trading Signals
+Identical datasets, feature manifests, research configurations, and regime methodologies shall always produce identical Market Regime States.
+The Market Regime Intelligence Engine never predicts price.
+It predicts market behavior.
+
+3. DUAL MARKET REGIME ARCHITECTURE
+The AMRIE maintains two permanently isolated Market Regime ecosystems.
+
+Pipeline A
+Swing Trading Market Regime Intelligence
+Purpose
+Identify medium-term structural market behavior supporting multi-day spot trading opportunities.
+Primary Research Horizons
+1 Hour
+4 Hour
+Daily
+Typical Holding Period
+2–10 Days
+Primary Intelligence Objectives
+Macro Trend Recognition
+Market Cycle Identification
+Volatility Environment
+Cross-Asset Relationships
+Liquidity Environment
+Trend Persistence
+Structural Break Detection
+Accumulation Recognition
+Distribution Recognition
+Regime Transition Forecasting
+The Swing Regime Engine emphasizes
+stability
+macro structure
+trend persistence
+institutional capital flow
+long-horizon consistency
+
+Pipeline B
+Instant Scalping Market Regime Intelligence
+Purpose
+Identify ultra-short-term execution environments supporting high-probability micro-scalping opportunities.
+Primary Research Horizon
+1 Minute
+Typical Holding Period
+1–20 Minutes
+Primary Intelligence Objectives
+Order Book State
+Liquidity Compression
+Momentum Bursts
+Spread Dynamics
+Trade Flow Pressure
+Market Microstructure
+Execution Environment
+Queue Imbalance
+Whale Activity Detection
+Volatility Expansion
+The Instant Regime Engine emphasizes
+execution quality
+microstructure awareness
+order book behavior
+latency sensitivity
+rapid adaptation
+
+The Swing and Instant Market Regime ecosystems shall remain permanently isolated.
+Cross-pipeline Market Regime generation is strictly prohibited unless explicitly approved through governance.
+No downstream AI model may consume Swing Regime States for Instant Scalping research or Instant Regime States for Swing Trading research.
+
+4. INPUT CONTRACT
+The Market Regime Intelligence Engine consumes only
+Governance-approved Datasets
+Governance-approved Feature Manifests
+Validation Certificates
+Historical Market Data
+Market State Store
+Market Microstructure Engine
+Order Book Intelligence Engine
+Trade Flow Intelligence Engine
+Alternative Data Store
+Research Configuration
+Market Calendar
+Exchange Metadata
+Asset Metadata
+Governance Metadata
+Configuration Metadata
+Feature Registry
+Validation Registry
+
+The Market Regime Intelligence Engine never consumes
+AI Predictions
+Trading Signals
+Portfolio Decisions
+Execution Commands
+Trade Outcomes
+Exchange Orders
+User Decisions
+Private Keys
+Secrets
+Live Portfolio Information
+
+5. OUTPUT CONTRACT
+Every published Market Regime produces
+Market Regime Event ID
+Market Regime Identifier
+Market Regime Version
+Research Pipeline
+Current Market Regime
+Regime Confidence
+Regime Probability Distribution
+Regime Stability Score
+Regime Transition Probability
+Expected Regime Persistence
+Market Structure Classification
+Volatility Classification
+Liquidity Classification
+Trend Classification
+Configuration Version
+Validation Metadata
+Governance Metadata
+Regime Manifest
+Regime Registry Entry
+Publication Status
+Outputs remain immutable.
+Every published Market Regime shall conform to the Canonical Market Regime Contract defined by this chapter.
+
+6. MARKET REGIME INTELLIGENCE PIPELINE
+Every Market Regime follows
+Governance-approved Dataset Retrieval
+↓
+Validation Certificate Verification
+↓
+Feature Manifest Retrieval
+↓
+Configuration Validation
+↓
+Multi-Timeframe Synchronization
+↓
+Market Structure Analysis
+↓
+Volatility Analysis
+↓
+Liquidity Analysis
+↓
+Trend Analysis
+↓
+Microstructure Analysis
+↓
+Market Cycle Analysis
+↓
+Regime Classification
+↓
+Regime Confidence Estimation
+↓
+Transition Analysis
+↓
+Stability Analysis
+↓
+Governance Validation
+↓
+Regime Publication
+↓
+Registry Registration
+↓
+Market Regime Completion
+No stage may be skipped.
+
+
+
+ALPHASPOT QUANT V2
+CHAPTER 6.6
+AI MARKET REGIME INTELLIGENCE ENGINE (AMRIE)
+Part 2
+
+7. MARKET REGIME TAXONOMY
+The Market Regime Intelligence Engine classifies every market observation into a deterministic, governance-approved Market Regime.
+Every published regime represents the current structural behavior of the market rather than a trading signal.
+A Market Regime shall describe
+Current Market Structure
+Trend Characteristics
+Volatility Environment
+Liquidity Conditions
+Microstructure Behavior
+Market Cycle Position
+Transition Risk
+Regime Confidence
+Every regime shall remain
+immutable
+version controlled
+reproducible
+temporally correct
+governance approved
+The Swing Trading and Instant Scalping pipelines maintain completely independent regime taxonomies.
+
+7.1 SWING TRADING REGIME TAXONOMY
+The Swing Trading Regime Engine identifies medium-term structural market behavior across
+1 Hour
+4 Hour
+Daily
+timeframes.
+The following canonical market regimes are supported.
+
+Regime S1
+Bull Expansion
+Characteristics
+Higher highs
+Higher lows
+Strong momentum
+Healthy volume
+Positive market breadth
+Institutional accumulation
+Typical Behaviour
+Trend continuation is statistically favored.
+Risk Level
+Medium
+Typical AI Behaviour
+Trend-following models receive higher confidence weighting.
+
+Regime S2
+Bull Exhaustion
+Characteristics
+Momentum weakening
+Volume divergence
+Increasing volatility
+Buyer fatigue
+Typical Behaviour
+Trend continuation probability decreases.
+Risk Level
+High
+Typical AI Behaviour
+Reduce confidence.
+Increase reversal monitoring.
+
+Regime S3
+Accumulation
+Characteristics
+Low volatility
+Sideways movement
+Gradual institutional buying
+Stable liquidity
+Typical Behaviour
+Potential breakout preparation.
+Risk Level
+Low
+Typical AI Behaviour
+Prepare breakout models.
+Suppress aggressive selling.
+
+Regime S4
+Distribution
+Characteristics
+Sideways market
+Large selling into strength
+Whale unloading
+Increasing volatility
+Typical Behaviour
+Higher reversal probability.
+Risk Level
+Medium
+Typical AI Behaviour
+Reduce long exposure confidence.
+Increase downside monitoring.
+
+Regime S5
+Bear Expansion
+Characteristics
+Lower highs
+Lower lows
+Increasing selling pressure
+Negative momentum
+Typical Behaviour
+Long entries become lower probability.
+Risk Level
+High
+Typical AI Behaviour
+Strongly suppress buy recommendations.
+
+Regime S6
+Capitulation
+Characteristics
+Panic selling
+Extreme volatility
+Large liquidation events
+Volume spike
+Typical Behaviour
+Market instability.
+Potential bottom formation.
+Risk Level
+Very High
+Typical AI Behaviour
+Increase uncertainty.
+Delay aggressive entries.
+
+Regime S7
+Recovery
+Characteristics
+Selling pressure decreases
+Higher lows appear
+Volume normalizes
+Confidence slowly returns
+Typical Behaviour
+Early trend reversal.
+Risk Level
+Medium
+Typical AI Behaviour
+Gradually increase bullish confidence.
+
+Regime S8
+Sideways Consolidation
+Characteristics
+Range-bound movement
+Neutral trend
+Balanced buyers and sellers
+Low directional conviction
+Typical Behaviour
+Breakout pending.
+Risk Level
+Low
+Typical AI Behaviour
+Avoid trend-following strategies.
+Increase breakout monitoring.
+
+Regime S9
+High Volatility Expansion
+Characteristics
+Rapid directional movement
+ATR expansion
+Volume expansion
+Wide candles
+Typical Behaviour
+Opportunity increases
+Risk also increases.
+Typical AI Behaviour
+Increase uncertainty estimation.
+Adjust confidence thresholds.
+
+Regime S10
+Low Volatility Compression
+Characteristics
+ATR contraction
+Volume contraction
+Price compression
+Energy accumulation
+Typical Behaviour
+Breakout probability increases.
+Typical AI Behaviour
+Prepare breakout detection.
+Increase monitoring frequency.
+
+7.2 INSTANT SCALPING REGIME TAXONOMY
+The Instant Regime Engine identifies execution environments from
+1 Minute
+market data.
+
+Regime I1
+Momentum Burst
+Characteristics
+Rapid directional movement
+Trade flow acceleration
+Buy/Sell imbalance
+Execution opportunity
+
+Regime I2
+Order Book Compression
+Characteristics
+Narrow spread
+Stacked liquidity
+Queue pressure
+Breakout preparation
+
+Regime I3
+Liquidity Vacuum
+Characteristics
+Thin order book
+Rapid price jumps
+Poor execution quality
+High slippage
+
+Regime I4
+Liquidity Absorption
+Characteristics
+Large hidden buyers/sellers
+Repeated absorption
+Whale participation
+Execution stability
+
+Regime I5
+Spread Expansion
+Characteristics
+Rapid spread widening
+Execution cost increases
+Market uncertainty
+
+Regime I6
+Spread Compression
+Characteristics
+Very tight spreads
+Efficient execution
+Low transaction cost
+
+Regime I7
+Whale Activity
+Characteristics
+Large hidden orders
+Iceberg behavior
+Abnormal trade size
+Institutional footprint
+
+Regime I8
+Micro Pullback
+Characteristics
+Short corrective movement
+Momentum pause
+Trend continuation preparation
+
+Regime I9
+Dead Market
+Characteristics
+Very low activity
+Tiny candles
+Minimal order flow
+Poor trading opportunity
+
+Regime I10
+News Shock
+Characteristics
+Explosive volatility
+Order book instability
+Rapid repricing
+Abnormal execution risk
+
+7.3 REGIME COMPOSITION
+A market may exhibit multiple simultaneous characteristics.
+Therefore every published regime shall contain
+Primary Regime
+Secondary Regime
+Regime Probability Distribution
+Example
+Primary
+Bull Expansion
+Probability
+82%
+Secondary
+High Volatility Expansion
+Probability
+14%
+Residual
+4%
+The probability distribution shall always sum to
+100%.
+
+7.4 REGIME CONFIDENCE
+Every regime publishes
+Confidence Score
+Classification Probability
+Data Completeness Score
+Feature Agreement Score
+Historical Similarity Score
+Transition Risk Score
+Confidence values remain
+deterministic
+version controlled
+fully reproducible
+
+7.5 REGIME STABILITY
+Every published regime estimates
+Expected Persistence
+Transition Probability
+Historical Stability
+Volatility Stability
+Liquidity Stability
+Trend Stability
+A stable regime shall not automatically imply a profitable trading environment.
+
+7.6 REGIME TRANSITIONS
+The engine continuously evaluates transitions between regimes.
+Examples
+Accumulation
+↓
+Bull Expansion
+Bull Expansion
+↓
+Bull Exhaustion
+Bull Exhaustion
+↓
+Distribution
+Distribution
+↓
+Bear Expansion
+Bear Expansion
+↓
+Capitulation
+Capitulation
+↓
+Recovery
+Recovery
+↓
+Accumulation
+For the Instant pipeline
+Order Book Compression
+↓
+Momentum Burst
+Momentum Burst
+↓
+Liquidity Vacuum
+Liquidity Vacuum
+↓
+Spread Expansion
+Spread Expansion
+↓
+Dead Market
+The engine shall publish
+Current Regime
+Previous Regime
+Transition Confidence
+Transition Speed
+Transition Stability
+Transition Timestamp
+
+7.7 REGIME ARTIFACT
+Every published Market Regime produces a canonical Regime State artifact containing
+Regime Event ID
+Regime Identifier
+Pipeline Identifier
+Primary Regime
+Secondary Regime
+Probability Distribution
+Confidence Score
+Transition Status
+Expected Persistence
+Stability Metrics
+Configuration Version
+Methodology Version
+Validation Metadata
+Governance Metadata
+Publication Timestamp
+The Regime State artifact shall become the single authoritative market state consumed by every downstream AlphaSpot AI engine.
+
+
+7.8 Live Runtime Classification
+The Runtime Environment shall classify every incoming observation using only the currently approved Regime Manifest.
+Classification shall use:
+deterministic rule evaluation
+threshold comparison
+lightweight mathematical calculations
+optional ONNX forward inference
+The Runtime shall never execute clustering algorithms, Hidden Markov Models, Gaussian Mixture Models, Bayesian optimization, or any statistical fitting procedures.
+Those remain exclusive to the Offline Research Environment.
+
+
+
+
+ALPHASPOT QUANT V2
+CHAPTER 6.6
+AI MARKET REGIME INTELLIGENCE ENGINE (AMRIE)
+Part 3
+
+8. MARKET REGIME DETECTION FRAMEWORK
+The Market Regime Intelligence Engine shall determine every Market Regime through a deterministic, multi-stage intelligence pipeline.
+Market regimes shall never be inferred from a single indicator, feature, or statistical model.
+Every published Market Regime shall represent the consensus of multiple independent intelligence domains.
+The regime detection framework shall remain
+deterministic
+reproducible
+temporally correct
+governance approved
+version controlled
+strategy specific
+Every detection methodology shall remain independently configurable.
+
+8.1 MULTI-DOMAIN REGIME INTELLIGENCE
+Every Market Regime shall be constructed from multiple independent intelligence domains.
+The engine supports
+Trend Intelligence
+Volatility Intelligence
+Liquidity Intelligence
+Market Structure Intelligence
+Market Cycle Intelligence
+Order Book Intelligence
+Trade Flow Intelligence
+Market Microstructure Intelligence
+Cross-Asset Intelligence
+Alternative Data Intelligence
+No single intelligence domain may independently determine the final Market Regime.
+
+8.2 TREND INTELLIGENCE
+The Trend Intelligence Module evaluates
+Trend Direction
+Trend Strength
+Trend Persistence
+Trend Acceleration
+Trend Exhaustion
+Trend Consistency
+Typical Inputs
+Multi-Timeframe Moving Averages
+ADX
+Directional Movement
+Price Structure
+Swing Highs
+Swing Lows
+EMA Alignment
+Trend Slope
+Outputs
+Bullish Trend Score
+Bearish Trend Score
+Trend Confidence
+Trend Stability
+Trend State
+
+8.3 VOLATILITY INTELLIGENCE
+The Volatility Intelligence Module evaluates
+Realized Volatility
+Historical Volatility
+ATR Expansion
+ATR Compression
+Volatility Persistence
+Volatility Regime
+Typical Inputs
+ATR
+Rolling Standard Deviation
+Parkinson Volatility
+Garman-Klass Estimator
+High-Low Range
+Outputs
+Volatility Score
+Expansion Score
+Compression Score
+Volatility Stability
+Volatility Classification
+
+8.4 LIQUIDITY INTELLIGENCE
+The Liquidity Intelligence Module evaluates
+Market Depth
+Available Liquidity
+Spread Quality
+Execution Capacity
+Liquidity Stability
+Typical Inputs
+Bid Depth
+Ask Depth
+Spread
+Volume
+Trade Frequency
+Order Book Density
+Outputs
+Liquidity Score
+Execution Score
+Liquidity Regime
+Liquidity Stability
+
+8.5 MARKET STRUCTURE INTELLIGENCE
+The Market Structure Module evaluates
+Higher High Formation
+Lower High Formation
+Higher Low Formation
+Lower Low Formation
+Support Integrity
+Resistance Integrity
+Breakout Structure
+Consolidation Structure
+Outputs
+Structural Trend
+Breakout Probability
+Reversal Probability
+Structure Confidence
+
+8.6 MARKET CYCLE INTELLIGENCE
+The Market Cycle Module identifies
+Accumulation
+Markup
+Distribution
+Markdown
+Recovery
+Expansion
+Compression
+Cycle transitions remain deterministic.
+Outputs
+Current Cycle
+Cycle Confidence
+Cycle Stability
+Transition Risk
+
+8.7 ORDER BOOK INTELLIGENCE
+The Order Book Module evaluates
+Bid Dominance
+Ask Dominance
+Liquidity Walls
+Iceberg Detection
+Queue Dynamics
+Book Imbalance
+Spread Dynamics
+Depth Evolution
+Outputs
+Order Book State
+Liquidity Pressure
+Execution Quality
+Whale Probability
+
+8.8 TRADE FLOW INTELLIGENCE
+The Trade Flow Module evaluates
+Buyer Aggression
+Seller Aggression
+Trade Imbalance
+Trade Velocity
+Volume Delta
+Large Trade Activity
+Outputs
+Trade Flow Score
+Momentum Pressure
+Aggression Score
+Trade Flow Regime
+
+8.9 MARKET MICROSTRUCTURE INTELLIGENCE
+The Market Microstructure Module evaluates
+Order Arrival Rate
+Cancellation Rate
+Fill Dynamics
+Queue Position
+Execution Friction
+Price Impact
+Latency Sensitivity
+Outputs
+Microstructure State
+Execution Environment
+Market Efficiency
+Microstructure Confidence
+
+8.10 CROSS-ASSET INTELLIGENCE
+The Cross-Asset Module evaluates
+BTC Influence
+ETH Influence
+Market Breadth
+Correlation Stability
+Sector Rotation
+Capital Rotation
+Dominance Relationships
+Outputs
+Cross-Asset Score
+Breadth Score
+Correlation State
+Market Synchronization
+
+8.11 ALTERNATIVE DATA INTELLIGENCE
+The Alternative Data Module evaluates optional external research signals.
+Examples
+Funding Rate History
+Open Interest History
+Stablecoin Flow
+Exchange Reserve Changes
+On-Chain Activity
+Fear & Greed Index
+News Sentiment
+Social Sentiment
+This module remains optional.
+AlphaSpot shall remain fully functional without alternative data.
+
+9. REGIME DECISION FUSION ENGINE
+The Market Regime shall never be determined by a single module.
+Instead, every intelligence domain produces an independent Regime Opinion.
+Example
+Trend Intelligence
+↓
+Bull Expansion
+Confidence
+82%
+Liquidity Intelligence
+↓
+Accumulation
+Confidence
+74%
+Market Structure
+↓
+Bull Expansion
+Confidence
+88%
+Trade Flow
+↓
+Bull Expansion
+Confidence
+79%
+Order Book
+↓
+Bull Expansion
+Confidence
+81%
+These independent opinions enter the Regime Decision Fusion Engine.
+The Fusion Engine performs
+Opinion Aggregation
+Conflict Resolution
+Confidence Calibration
+Consensus Analysis
+Probability Estimation
+Final Classification
+The engine publishes
+Primary Regime
+Secondary Regime
+Confidence
+Probability Distribution
+Transition Risk
+Consensus Score
+
+10. REGIME CONFIDENCE CALCULATION
+Every published Market Regime shall include multiple confidence dimensions.
+The engine evaluates
+Classification Confidence
+Data Completeness
+Feature Agreement
+Historical Similarity
+Model Agreement
+Transition Stability
+Temporal Consistency
+Confidence shall never rely on a single probability estimate.
+
+11. REGIME UNCERTAINTY ANALYSIS
+The engine continuously measures uncertainty.
+Sources include
+Missing Data
+Conflicting Signals
+Low Liquidity
+Rapid Market Changes
+Volatility Shock
+Feature Instability
+Regime Ambiguity
+High uncertainty reduces downstream AI confidence.
+The engine never hides uncertainty.
+
+12. REGIME TRANSITION INTELLIGENCE
+Markets continuously evolve.
+The engine therefore detects
+Transition Initiation
+Transition Confirmation
+Transition Completion
+Transition Failure
+False Transition
+Every transition records
+Source Regime
+Target Regime
+Transition Probability
+Transition Speed
+Transition Stability
+Historical Similarity
+Transition Timestamp
+Transition Version
+
+13. REGIME HISTORY
+The engine maintains historical Market Regime timelines.
+Every historical record includes
+Regime Identifier
+Previous Regime
+Next Regime
+Duration
+Confidence
+Transition Reason
+Configuration Version
+Methodology Version
+Historical Regime timelines remain immutable.
+
+14. REGIME REPLAY
+Historical Market Regimes shall support deterministic replay.
+Replay supports
+Research
+Backtesting
+Paper Trading
+Model Validation
+Performance Attribution
+Every replay shall reproduce identical Market Regimes using identical
+Datasets
+Feature Manifests
+Configurations
+Methodologies
+Validation Certificates
+
+
+
+
+ALPHASPOT QUANT V2
+CHAPTER 6.6
+AI MARKET REGIME INTELLIGENCE ENGINE (AMRIE)
+Part 4
+
+15. MARKET REGIME REGISTRY
+Every Market Regime published by the AMRIE shall be permanently recorded within the Market Regime Registry.
+The Registry represents the single authoritative source of Market Regime information throughout the AlphaSpot ecosystem.
+Every downstream AI engine shall retrieve Market Regime information exclusively from the Registry.
+Historical registry entries remain immutable.
+The Registry supports
+Market Regime Registration
+Version Tracking
+Publication History
+Historical Replay
+Governance Metadata
+Audit History
+Research Lineage
+Configuration Traceability
+Methodology Versioning
+Regime Manifest Storage
+No downstream engine shall modify Registry contents.
+
+15.1 REGIME REGISTRY ENTRY
+Every published Market Regime records
+Market Regime Identifier
+Market Regime Event ID
+Pipeline Identifier
+Research Version
+Methodology Version
+Configuration Version
+Feature Manifest Version
+Validation Certificate Version
+Primary Regime
+Secondary Regime
+Probability Distribution
+Confidence Score
+Transition Status
+Expected Persistence
+Publication Timestamp
+Governance Status
+Audit Metadata
+Historical registry entries remain immutable.
+
+16. MARKET REGIME VERSIONING
+Every published Market Regime shall be version controlled.
+Versioning supports
+Market Regime Version
+Methodology Version
+Configuration Version
+Feature Manifest Version
+Validation Version
+Research Version
+Pipeline Version
+Historical versions shall never be overwritten.
+New methodology versions shall create new Market Regime versions rather than modifying previous publications.
+Version history remains fully reproducible.
+
+17. REGIME MANIFEST
+Every Market Regime publication generates a canonical Regime Manifest.
+The Manifest describes every dependency used during Market Regime generation.
+The Manifest records
+Regime Identifier
+Dataset Version
+Feature Manifest Version
+Validation Certificate Version
+Methodology Version
+Configuration Version
+Research Pipeline
+Asset Identifier
+Timeframe
+Publication Timestamp
+Governance Metadata
+Audit Identifier
+Manifest records remain immutable.
+
+18. REGIME GOVERNANCE
+Every Market Regime publication shall pass governance validation before publication.
+Governance verifies
+Configuration Consistency
+Methodology Approval
+Research Integrity
+Validation Certificate Status
+Manifest Integrity
+Registry Integrity
+Version Compatibility
+Only governance-approved Market Regimes may be published.
+Governance never modifies Market Regimes.
+Governance only approves or rejects publication.
+
+19. REGIME LINEAGE
+Every published Market Regime shall preserve complete lineage.
+Lineage links
+Dataset Version
+↓
+Feature Manifest
+↓
+Validation Certificate
+↓
+Regime Methodology
+↓
+Market Regime
+↓
+Registry Entry
+↓
+Downstream AI Model
+Complete lineage shall remain permanently traceable.
+Historical lineage shall never be modified.
+
+20. REGIME VALIDATION
+Before publication, every Market Regime shall pass independent validation.
+Validation verifies
+Schema Consistency
+Configuration Compatibility
+Feature Availability
+Confidence Bounds
+Probability Consistency
+Transition Consistency
+Registry Compatibility
+Version Compatibility
+Temporal Ordering
+Governance Status
+Invalid Market Regimes shall never be published.
+
+21. REGIME OBSERVABILITY
+The engine continuously records operational metrics.
+Metrics include
+Regimes Generated
+Classification Time
+Transition Frequency
+Transition Success Rate
+Average Confidence
+Average Stability
+Registry Publications
+Validation Failures
+Governance Events
+Replay Requests
+Methodology Versions
+Pipeline Distribution
+Observability data supports
+Runtime Inference Latency
+Runtime Regime Changes
+Regime Confidence
+Manifest Version Loaded
+Performance Monitoring
+Research Analysis
+Historical Auditing
+Operational Diagnostics
+Observability metrics never influence regime classification.
+
+22. PERFORMANCE
+The AI Market Regime Intelligence Engine operates across the AlphaSpot three-environment architecture.
+
+Environment A — Runtime Intelligence (Node.js/Bun)
+The Runtime Environment executes lightweight real-time market regime inference using the latest approved Market Regime Manifest published by the Offline Research Environment.
+The runtime shall:
+Load the latest approved Regime Manifest at startup
+Load approved ONNX models (if applicable)
+Load statistical thresholds
+Load rule-based classification parameters
+Maintain in-memory rolling market state
+Continuously infer the current market regime from streaming data
+Broadcast live regime updates
+Supply regime context to downstream Signal Generation Engines
+The Runtime Environment performs forward inference only.
+It shall never perform:
+model training
+parameter optimization
+statistical fitting
+clustering
+feature discovery
+hyperparameter tuning
+offline research
+The runtime shall complete inference within strict latency limits suitable for real-time spot trading.
+It Supports:
+Real-Time Regime Retrieval
+Regime Cache
+Registry Lookup
+Version Verification
+Manifest Verification
+Downstream AI Distribution
+Fast In-Memory Access
+The Runtime Environment performs no heavy research computation.
+Its responsibility is to distribute the latest approved Market Regime to downstream engines with minimal latency.
+
+Environment B — Offline Research (Python / Google Colab)
+Supports
+Historical Regime Research
+Regime Classification Experiments
+Methodology Evaluation
+Transition Analysis
+Confidence Calibration
+Probability Calibration
+Research Benchmarking
+Regime Accuracy Evaluation
+Market Cycle Research
+Offline Validation
+This environment performs every computationally intensive research task.
+Only approved methodology versions may be published to the Registry.
+
+Environment C — Market Regime Registry
+The Registry Environment stores only governance-approved artifacts.
+Including:
+Regime Manifest
+Regime Parameters
+Threshold Versions
+ONNX Models
+Rule Definitions
+Validation Certificates
+Audit Metadata
+Version History
+The Registry performs no inference.
+The Registry performs no statistical computation.
+It acts solely as the immutable source of truth for Runtime deployment.
+
+Live Regime Inference Pipeline
+Every real-time inference follows:
+Streaming Market Data
+        ↓
+Feature Cache Update
+        ↓
+Rolling Window Update
+        ↓
+Load Active Regime Manifest
+        ↓
+Lightweight Rule Evaluation
+        ↓
+(Optional ONNX Forward Pass)
+        ↓
+Confidence Calculation
+        ↓
+Regime Stability Check
+        ↓
+Hysteresis Filter
+        ↓
+Publish Current Regime
+        ↓
+Broadcast to Decision Engines
+No historical fitting occurs inside this pipeline.
+
+
+23. SCALABILITY
+The Market Regime Intelligence Engine supports
+Additional Exchanges
+Additional Assets
+Additional Timeframes
+Additional Market Regimes
+Additional Classification Methodologies
+Additional Research Pipelines
+Additional Alternative Data Sources
+Future AI Models
+Future Asset Classes
+Scalability shall be achieved through
+modular architecture
+independent regime modules
+streaming computation
+efficient memory management
+single-node asynchronous processing
+The architecture shall remain fully operational without distributed infrastructure, cluster computing, or mandatory cloud services.
+
+24. FAILURE RECOVERY
+The engine supports
+Historical Replay
+Registry Recovery
+Manifest Recovery
+Configuration Reload
+Methodology Rollback
+Version Rollback
+Failure Logging
+Graceful Degradation
+Regime Quarantine
+If publication fails
+No partial Market Regime shall be published.
+If Registry integrity cannot be verified
+Publication shall be rejected.
+If Governance validation fails
+The Market Regime shall enter quarantine until approval.
+
+25. ARCHITECTURAL RULES
+Rule 1
+Only governance-approved datasets, feature manifests, and validation certificates may participate in Market Regime generation.
+Rule 2
+Every published Market Regime shall generate a unique Market Regime Event ID.
+Rule 3
+Every Market Regime shall conform to the Canonical Market Regime Contract.
+Rule 4
+Historical Market Regimes are immutable.
+Rule 5
+Every Market Regime shall preserve complete lineage linking datasets, feature manifests, validation certificates, methodologies, registry entries, and governance metadata.
+Rule 6
+Market Regime generation shall remain completely independent from AI model training, prediction, portfolio management, execution, and signal generation.
+Rule 7
+Swing Trading and Instant Scalping Market Regime ecosystems shall remain permanently isolated.
+Rule 8
+Every published Market Regime shall represent the consensus of multiple intelligence domains. No single indicator, feature, or intelligence module may independently determine the final Market Regime.
+Rule 9
+Only information available at or before timestamp T may participate in Market Regime classification. Future information is strictly prohibited.
+Rule 10
+Market Regime methodologies shall remain deterministic under identical datasets, feature manifests, configurations, and validation certificates.
+Rule 11
+Historical Market Regimes shall support deterministic replay.
+Rule 12
+Market Regime methodologies shall remain independently configurable.
+Rule 13
+Publication failures shall never generate partially published Market Regimes.
+Rule 14
+Every published Market Regime shall generate a complete Regime Manifest.
+Rule 15
+Every Market Regime shall preserve deterministic timestamp ordering.
+Rule 16
+Market Regime Registry entries shall remain immutable after publication.
+Rule 17
+Market Regime confidence scores and probability distributions shall remain reproducible from identical inputs.
+Rule 18
+Only governance-approved Market Regimes may be consumed by downstream AI engines.
+Rule 19
+Heavy computational research—including methodology development, probability calibration, transition modeling, and historical benchmarking—shall execute exclusively within the Offline Research Environment (Environment B). The Runtime Environment (Environment A) shall perform only Market Regime retrieval and distribution, while the Registry Environment (Environment C) shall store immutable metadata and governance records.
+Rule 20
+This chapter governs only Market Regime Intelligence. Dataset construction, label engineering, feature selection, research validation, model training, prediction, execution, portfolio management, and risk management are governed exclusively by their respective AlphaSpot engines.
+Rule 21
+The Runtime Environment shall continuously perform lightweight forward regime inference using only governance-approved Regime Manifests or approved ONNX models loaded from the Registry.
+The Runtime shall never perform model training, clustering, statistical fitting, or parameter optimization.
+
+Rule 22
+Every Runtime regime inference shall use only observations available up to timestamp T.
+Future observations shall never participate in regime classification.
+This prevents live lookahead bias.
+
+Rule 23
+Every published Regime Manifest shall be version controlled.
+The Runtime shall load only one active manifest version at any given time.
+Manifest changes shall occur atomically.
+Partial manifest loading is prohibited.
+
+Rule 24
+If the Runtime cannot load a valid Regime Manifest or approved ONNX model, regime inference shall enter Safe Mode.
+Safe Mode shall:
+stop publishing new regimes
+preserve the last valid regime
+notify monitoring systems
+prevent downstream AI modules from acting on undefined market states
+
+Rule 25
+Instant Scalping Regimes shall be inferred continuously from streaming in-memory market data.
+Persistent database retrieval alone shall never be used for live Instant Scalping regime determination.
+
+26. CHAPTER SUMMARY
+The AI Market Regime Intelligence Engine establishes AlphaSpot's canonical intelligence layer for understanding market behavior before any AI prediction or trading decision is made. By transforming governance-approved research artifacts into deterministic, reproducible, and version-controlled Market Regime States, the engine enables every downstream AI component to operate with awareness of the current market environment rather than assuming static conditions.
+Through its dual Swing Trading and Instant Scalping regime ecosystems, multi-domain consensus framework, immutable Registry, comprehensive governance, and strict separation between Runtime, Offline Research, and Registry environments, the AMRIE provides the single authoritative source of Market Regime intelligence across the AlphaSpot ecosystem. This architecture ensures that all future AI models, prediction engines, and trading strategies are context-aware, scientifically reproducible, and robust against changing market conditions while remaining compatible with AlphaSpot's zero-budget, single-node development philosophy.
+
+
+
+END OF CHAPTER 6.6
