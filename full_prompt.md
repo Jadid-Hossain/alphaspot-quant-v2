@@ -9816,3 +9816,444 @@ The local AlphaSpot runtime shall consume only immutable Feature Manifests produ
 The AI Feature Selection & Feature Intelligence Engine establishes AlphaSpot's canonical architecture for evaluating, optimizing, validating, versioning, and publishing institutionally governed machine learning feature sets. By separating feature selection from dataset construction, label engineering, model training, and prediction while enforcing immutable versioning, deterministic reproducibility, dual Swing Trading and Instant Scalping feature ecosystems, comprehensive quality analysis, complete lineage, and governance-driven publication, the architecture guarantees that every downstream AI model consumes robust, relevant, statistically validated, and leakage-free features. Through the Canonical Feature Selection Contract and Feature Registry, the AFSFIE provides the single authoritative source of AI-ready feature sets across the AlphaSpot ecosystem, enabling reproducible quantitative research, improved model generalization, reduced overfitting, and enterprise-grade AI decision support for profitable spot trading.
 
 END OF CHAPTER 6.4
+
+
+ALPHASPOT QUANT V2
+CHAPTER 6.5
+AI DATA QUALITY, LEAKAGE PREVENTION & RESEARCH VALIDATION ENGINE
+Version 1.0
+
+1. PURPOSE
+The AI Data Quality, Leakage Prevention & Research Validation Engine (AIDQLPRVE) establishes the canonical architecture for independently validating, certifying, and governing every research dataset, label set, feature manifest, and research configuration before any artificial intelligence model training begins.
+The AIDQLPRVE serves as the final research certification gateway between the AI Feature Selection & Feature Intelligence Engine (Chapter 6.4) and the AI Model Training & Experiment Orchestration Engine (Chapter 6.6).
+Its primary responsibility is to guarantee that every training experiment is built upon temporally correct, statistically valid, governance-approved, reproducible, leakage-free, and research-certified data.
+No model training may begin unless every validation stage defined by this chapter has successfully completed.
+The AIDQLPRVE performs
+Research Data Validation
+Dataset Integrity Validation
+Feature Validation
+Label Validation
+Data Quality Assessment
+Missing Value Validation
+Duplicate Detection
+Timestamp Integrity Validation
+Schema Validation
+Distribution Validation
+Dataset Completeness Analysis
+Leakage Detection
+Feature Leakage Detection
+Target Leakage Detection
+Lookahead Bias Detection
+Window Overlap Validation
+Chronological Validation
+Split Validation
+Walk-Forward Validation
+Research Configuration Validation
+Manifest Validation
+Statistical Quality Scoring
+Research Certification
+Validation Registry Management
+Validation Metadata Management
+Validation Lineage
+Validation Replay
+The AIDQLPRVE performs NO
+Dataset Construction
+Label Engineering
+Feature Selection
+Model Training
+Hyperparameter Optimization
+Ensemble Learning
+Prediction
+Trading Decisions
+Portfolio Management
+Execution
+
+2. DESIGN PHILOSOPHY
+Research integrity is more important than model accuracy.
+Every validation shall remain
+independent
+deterministic
+reproducible
+immutable
+auditable
+governance approved
+temporally correct
+statistically sound
+Validation shall never modify
+datasets
+labels
+features
+manifests
+configurations
+The engine only certifies.
+It never changes research artifacts.
+
+3. DUAL VALIDATION ARCHITECTURE
+The engine maintains two completely isolated validation ecosystems.
+
+Pipeline A
+Swing Trading Research Validation
+Purpose
+Validate datasets supporting
+Daily
+4H
+1H
+research.
+Focus
+macro consistency
+multi-timeframe alignment
+cross-asset synchronization
+long-horizon validation
+structural integrity
+
+Pipeline B
+Instant Scalping Research Validation
+Purpose
+Validate
+1-minute
+research.
+Focus
+order book synchronization
+trade flow consistency
+microstructure alignment
+latency-aware validation
+rolling ring-buffer integrity
+The two validation ecosystems remain permanently isolated.
+Cross-pipeline validation is prohibited unless explicitly approved through governance.
+
+4. INPUT CONTRACT
+Consumes only
+Approved Datasets
+Approved Label Sets
+Approved Feature Manifests
+Dataset Registry
+Label Registry
+Feature Registry
+Research Configuration
+Validation Configuration
+Governance Metadata
+Asset Metadata
+Never consumes
+Model Predictions
+Live Market Data
+Trading Orders
+Exchange APIs
+Portfolio Decisions
+Secrets
+
+5. OUTPUT CONTRACT
+Produces
+Validation Event ID
+Validation Certificate
+Validation Report
+Leakage Assessment
+Data Quality Report
+Integrity Report
+Statistical Report
+Research Readiness Score
+Certification Status
+Validation Metadata
+Validation Registry Entry
+Governance Metadata
+Outputs remain immutable.
+Only research artifacts receiving a PASS Validation Certificate may proceed to AI model training (Environment B). Only AI models originating from PASS-certified research artifacts may subsequently be admitted into the Runtime Environment (Environment A).
+
+6. RESEARCH VALIDATION PIPELINE
+Every research artifact follows
+Dataset Retrieval
+        ↓
+Label Retrieval
+        ↓
+Feature Manifest Retrieval
+        ↓
+Configuration Validation
+        ↓
+Schema Validation
+        ↓
+Temporal Validation
+        ↓
+Data Quality Validation
+        ↓
+Leakage Detection
+        ↓
+Partition Validation
+        ↓
+Statistical Validation
+        ↓
+Research Integrity Validation
+        ↓
+Research Readiness Scoring
+        ↓
+Governance Validation
+        ↓
+Validation Certificate Generation
+        ↓
+Registry Publication
+        ↓
+Research Completion
+
+No validation stage may be skipped.
+
+7. VALIDATION MODULES
+Supports
+Dataset Validation
+Missing Values
+Duplicate Records
+Invalid Values
+Timestamp Gaps
+Schema Drift
+Dataset Completeness
+
+Feature Validation
+Feature Availability
+Constant Features
+Duplicate Features
+Missing Features
+Feature Stability
+Feature Drift
+Correlation Stability
+
+Label Validation
+Missing Labels
+Class Distribution
+Label Consistency
+Barrier Validation
+Prediction Horizon Validation
+
+Statistical Validation
+Distribution Shift
+Covariate Shift
+Class Imbalance
+Outlier Detection
+Variance Stability
+Correlation Stability
+
+Research Validation
+Configuration Consistency
+Manifest Consistency
+Registry Consistency
+Version Consistency
+
+Execution Responsibility Mapping (Environment B — Offline Research)
+Executed offline within the Python research environment before AI model training.
+Supports
+Covariate Shift Detection
+Distribution Shift Detection
+Population Stability Index (PSI)
+Kolmogorov-Smirnov Testing
+Variance Stability Analysis
+Correlation Stability Analysis
+Advanced Leakage Detection
+Statistical Drift Analysis
+The engine generates an immutable Validation Certificate which is published to the Validation Registry upon successful completion.
+
+Runtime Validation (Environment A)
+Supports
+Validation Certificate Lookup
+Model Certification Verification
+Version Compatibility Verification
+Manifest Integrity Verification
+The runtime environment performs no Execution Responsibility Mapping
+Before loading any AI model into memory, the runtime verifies that a valid PASS Validation Certificate exists within the Validation Registry.
+Models lacking certification shall never be loaded.
+Registry Management (Environment C)
+Supports
+Validation Registry Storage
+Validation Metadata
+Audit History
+Validation Certificates
+Manifest Versioning
+Immutable Governance Records
+No statistical computations are performed within the Registry Environment.
+
+8. LEAKAGE PREVENTION FRAMEWORK
+Supports
+Lookahead Bias Detection
+Feature Leakage Detection
+Target Leakage Detection
+Label Leakage Detection
+Window Overlap Detection
+Train/Test Leakage Detection
+Validation/Test Leakage Detection
+Walk-Forward Leakage Detection
+Rolling Window Leakage Detection
+Index Alignment Verification
+Timestamp Boundary Validation
+Data Snooping Bias Detection
+Multiple Hypothesis Testing Validation
+Research Overfitting Detection
+Any detected leakage immediately invalidates the research artifact.
+
+9. DATA QUALITY SCORING
+Every research artifact receives independent quality scores.
+Examples
+Dataset Quality
+Label Quality
+Feature Quality
+Partition Integrity
+Window Integrity
+Chronological Integrity
+Leakage Risk
+Statistical Stability
+Research Integrity
+Temporal Integrity
+Certification Confidence
+These scores contribute to the final Research Readiness Score.
+
+10. RESEARCH CERTIFICATION
+The engine issues one of the following certifications.
+PASS
+PASS WITH WARNINGS
+REJECTED (Leakage)
+REJECTED (Corrupted)
+FAIL
+FAIL immediately blocks downstream model training.
+PASS WITH WARNINGS requires explicit governance approval.
+
+11. VALIDATION REGISTRY
+Every validation records
+Validation ID
+Dataset Version
+Label Version
+Feature Manifest Version
+Configuration Version
+Validation Version
+Validation Timestamp
+Research Score
+Leakage Assessment
+Certification Status
+Governance Status
+Git Commit Hash
+Research Experiment ID
+Training Session ID
+Historical validation records remain immutable.
+
+12. VALIDATION GOVERNANCE
+Every validation records
+Approval Status
+Validation History
+Audit History
+Review Notes
+Publication Timestamp
+Governance Metadata
+
+13. PERFORMANCE
+The AI Data Quality, Leakage Prevention & Research Validation Engine operates across three execution environments.
+Environment A — Runtime (Node.js)
+Supports
+Validation Certificate Verification
+Model Admission Control
+Manifest Integrity Verification
+Registry Lookup
+No statistical validation is performed within the runtime environment.
+
+Environment B — Offline Research Environment (Current implementation:
+Python + Google Colab)
+Supports
+Covariate Shift Detection
+Distribution Shift Detection
+Matrix Drift Analysis
+Leakage Detection
+Statistical Validation
+Walk-Forward Validation
+Research Certification
+This environment performs all computationally intensive mathematical validation before AI model training.
+
+Environment C — Registry (Node.js)
+Supports
+Validation Registry Storage
+Immutable Validation Certificates
+Governance Metadata
+Audit Records
+Version History
+No mathematical processing occurs within the registry.
+
+14. OBSERVABILITY
+Metrics include
+Validation Time
+Validation Failures
+Leakage Events
+Dataset Integrity Score
+Feature Quality Score
+Label Quality Score
+Research Readiness Score
+Certification Success Rate
+Registry Publications
+
+15. SCALABILITY
+Supports
+Additional Validation Rules
+Additional Dataset Types
+Additional Assets
+Additional Feature Categories
+Additional Label Types
+Additional AI Models
+Additional Research Pipelines
+Scalability shall be achieved through modular validation components, asynchronous processing, streaming inspection, and efficient memory management.
+The architecture shall remain fully functional on a single research workstation without distributed infrastructure or cloud services.
+
+16. FAILURE RECOVERY
+Supports
+Validation Replay
+Registry Recovery
+Configuration Reload
+Failure Logging
+Graceful Degradation
+Validation Quarantine
+Failed research artifacts shall never receive certification.
+
+17. ARCHITECTURAL RULES
+Rule 1
+Only governance-approved datasets, labels, and feature manifests may enter research validation.
+Rule 2
+Every validation shall generate a unique Validation Event ID.
+Rule 3
+Every validation shall generate a Validation Certificate.
+Rule 4
+Historical validation records are immutable.
+Rule 5
+Validation shall never modify datasets, labels, feature manifests, or research configurations.
+Rule 6
+Validation shall remain completely independent from model training.
+Rule 7
+Swing Trading and Instant Scalping validation ecosystems shall remain permanently isolated.
+Rule 8
+Every feature must be computed exclusively from observations available at or before timestamp T.
+Rule 9
+Every label must originate exclusively from observations strictly after timestamp T.
+Rule 10
+Feature index K shall never reference label index K or future observations. Label generation shall begin strictly at K+1.
+Rule 11
+Random shuffling of time-series observations is prohibited.
+Rule 12
+Train, Validation, and Test partitions shall remain strictly chronological and mutually exclusive.
+Rule 13
+Walk-forward validation windows shall never overlap across partition boundaries.
+Rule 14
+Feature selection shall be performed exclusively on the TRAIN partition.
+Rule 15
+Validation and Test partitions shall never participate in feature ranking or feature selection.
+Rule 16
+Any detected lookahead bias immediately invalidates the research artifact.
+Rule 17
+Any detected feature leakage immediately invalidates the research artifact.
+Rule 18
+Any detected target leakage immediately invalidates the research artifact.
+Rule 19
+Only research artifacts receiving a PASS certification may enter model training.
+Rule 20
+Validation results shall remain fully reproducible from immutable datasets, labels, feature manifests, configurations, and validation methodologies.
+Rule 21
+This chapter governs only research validation and certification. Dataset construction, label engineering, feature selection, model training, prediction, execution, portfolio management, and risk management are governed exclusively by their respective AlphaSpot engines.
+Rule 22
+All computationally intensive statistical validation shall execute exclusively within the Offline Research Environment (Environment B)., including covariate shift detection, distribution stability analysis, leakage detection, matrix drift analysis, and advanced statistical testing, shall execute exclusively within the Offline Research Environment (Environment B). The Runtime Environment (Environment A) shall only verify published PASS Validation Certificates before loading AI models, while the Registry Environment (Environment C) shall store immutable validation metadata and governance records. Heavy statistical computation within Runtime or Registry environments is strictly prohibited.
+
+Rule 23
+The Runtime Environment (Environment A) shall never execute training, statistical validation, leakage analysis, drift analysis, or certification logic. It shall only verify PASS Validation Certificates prior to model loading.
+Rule 24
+Any modification to a dataset, label set, feature manifest, research configuration, or validation methodology shall invalidate every previously issued Validation Certificate, requiring complete re-validation before AI model training may proceed.
+
+18. CHAPTER SUMMARY
+The AI Data Quality, Leakage Prevention & Research Validation Engine establishes AlphaSpot's independent certification layer for AI research. By validating datasets, labels, feature manifests, temporal integrity, partition boundaries, statistical quality, and every known form of data leakage before training begins, the engine guarantees that only trustworthy, reproducible, and governance-approved research artifacts enter the AI training pipeline. Through immutable validation certificates, comprehensive audit trails, and strict research readiness scoring, this engine serves as the final quality gate that protects AlphaSpot from lookahead bias, target leakage, feature contamination, and invalid experimentation, ensuring every downstream AI model is built upon a sound scientific foundation. The Validation Certificate produced by this engine becomes the mandatory admission ticket for every downstream AI model throughout the AlphaSpot ecosystem.
+
+END OF CHAPTER 6.5
