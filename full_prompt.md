@@ -9431,3 +9431,388 @@ All label-generation thresholds, prediction horizons, barrier methodologies, hol
 The AI Label Engineering & Target Generation Engine establishes AlphaSpot's canonical architecture for constructing, validating, versioning, and publishing institutionally governed AI learning targets. By separating label engineering from dataset construction, feature engineering, model training, and prediction while enforcing immutable versioning, deterministic reproducibility, dual Swing Trading and Instant Scalping label ecosystems, comprehensive validation, complete lineage, and governance-driven publication, the architecture guarantees that every downstream AI model learns from trustworthy, leakage-free, strategy-specific targets. Through the Canonical Label Contract and Label Registry, the AILETGE provides the single authoritative source of supervised learning targets across the AlphaSpot ecosystem, enabling reproducible quantitative research, robust machine learning, and high-quality AI decision support for profitable spot trading.
 
 END OF CHAPTER 6.3
+
+
+ALPHASPOT QUANT V2
+CHAPTER 6.4
+AI FEATURE SELECTION & FEATURE INTELLIGENCE ENGINE
+Version 1.0
+
+1. PURPOSE
+The AI Feature Selection & Feature Intelligence Engine (AFSFIE) establishes the canonical architecture for evaluating, ranking, selecting, validating, versioning, governing, and publishing every machine learning feature consumed by AlphaSpot artificial intelligence models.
+The AFSFIE transforms institutionally governed research datasets into optimized, statistically validated, strategy-specific feature sets while preserving deterministic reproducibility, temporal correctness, complete lineage, governance compliance, and research repeatability.
+The Feature Selection Engine serves as the exclusive feature optimization layer between the AI Label Engineering & Target Generation Engine (Chapter 6.3) and every downstream AI Training Engine implemented throughout Chapter 6.
+No AI model may independently select or discard features.
+Every AI model shall consume only governance-approved feature sets published by this engine.
+The AFSFIE performs
+Feature Selection
+Feature Ranking
+Feature Importance Analysis
+Feature Stability Analysis
+Feature Correlation Analysis
+Feature Redundancy Detection
+Feature Dependency Analysis
+Feature Drift Analysis
+Feature Quality Scoring
+Feature Explainability
+Feature Registry
+Feature Versioning
+Feature Metadata Management
+Feature Lineage
+Feature Governance
+Feature Publication
+Feature Replay
+Feature Validation
+Research Feature Management
+The AFSFIE performs NO
+Dataset Construction
+Label Engineering
+Model Training
+Hyperparameter Optimization
+Prediction
+Trading Decisions
+Execution Management
+Portfolio Optimization
+Risk Management
+Model Governance
+
+2. DESIGN PHILOSOPHY
+Better features produce better intelligence.
+Every published feature set shall remain
+immutable
+deterministic
+reproducible
+temporally correct
+strategy specific
+governance approved
+version controlled
+Feature selection shall remain completely independent of
+Model Training
+Prediction
+Execution
+Portfolio Decisions
+Trading Strategies
+Identical datasets, labels, and configurations shall always generate identical feature selections.
+
+3. DUAL FEATURE SELECTION ARCHITECTURE
+The AFSFIE maintains two completely independent feature intelligence ecosystems.
+Pipeline A
+Swing Trading Feature Intelligence
+Purpose
+Optimize features for medium-term structural trading opportunities.
+Primary Research Horizon
+2-10 Days
+Typical Feature Categories
+Trend Features
+Momentum Features
+Volatility Features
+Macro Features
+Cross-Asset Correlations
+Market Regime Features
+Alternative Data Features
+Liquidity Features
+Long-Term Statistical Features
+Feature selection prioritizes stability, robustness, and predictive persistence.
+
+Pipeline B
+Instant Scalping Feature Intelligence
+Purpose
+Optimize features for ultra-short-term execution opportunities.
+Primary Research Horizon
+1-20 Minutes
+Typical Feature Categories
+Order Book Features
+Trade Flow Features
+Market Microstructure Features
+Spread Dynamics
+Liquidity Imbalance
+Queue Position Features
+Execution Cost Features
+Short-Term Momentum Features
+Latency-Aware Features
+Feature selection prioritizes responsiveness, execution quality, and ultra-low-latency predictive power.
+The two feature ecosystems shall remain permanently isolated.
+Cross-pipeline feature selection is prohibited unless explicitly approved through governance.
+
+4. INPUT CONTRACT
+Consumes only
+Governed AI Datasets
+Governed Label Sets
+Dataset Registry
+Label Registry
+Feature Metadata
+Research Configuration
+Governance Metadata
+Configuration Metadata
+Asset Metadata
+The engine never consumes
+Model Predictions
+Trading Orders
+Execution Results
+Portfolio Decisions
+Exchange APIs
+User Decisions
+Secrets
+
+5. OUTPUT CONTRACT
+Every published feature set produces
+Feature Event ID
+Feature Set Identifier
+Feature Set Version
+Research Pipeline
+Selected Feature List
+Feature Importance Rankings
+Feature Quality Scores
+Feature Stability Scores
+Correlation Report
+Redundancy Report
+Validation Report
+Configuration Version
+Lineage Metadata
+Governance Metadata
+Publication Status
+Outputs remain immutable.
+Every published feature set shall conform to the Canonical Feature Selection Contract defined by this chapter.
+
+6. FEATURE SELECTION PIPELINE
+Every feature set follows
+Governed Dataset Retrieval
+↓
+Governed Label Retrieval
+↓
+Configuration Validation
+↓
+Feature Quality Evaluation
+↓
+Correlation Analysis
+↓
+Redundancy Elimination
+↓
+Importance Ranking
+↓
+Stability Evaluation
+↓
+Feature Selection
+↓
+Validation
+↓
+Version Assignment
+↓
+Governance Validation
+↓
+Immutable Publication
+↓
+Registry Registration
+↓
+Metadata Recording
+↓
+Feature Selection Completion
+No stage may be skipped.
+
+7. FEATURE EVALUATION METHODS
+The Feature Selection Engine supports two independent feature evaluation workflows.
+A. Local Runtime Feature Evaluation
+Designed for lightweight execution inside the AlphaSpot local research workstation.
+Supports
+Variance Threshold
+Correlation Filtering
+Missing Value Filtering
+Constant Feature Detection
+Duplicate Feature Detection
+Basic Information Gain
+Mutual Information
+Statistical Stability Analysis
+Temporal Stability Analysis
+These methods are optimized for fast local execution and dataset validation.
+
+B. Offline Research Feature Evaluation
+Executed exclusively inside the offline Python Research Environment (Google Colab or equivalent).
+Supports
+SHAP Feature Importance
+Boruta
+Recursive Feature Elimination (RFE)
+Sequential Forward Selection
+Sequential Backward Selection
+Tree-Based Feature Importance
+L1 Regularization
+Minimum Redundancy Maximum Relevance (mRMR)
+Permutation Importance
+These methodologies are computationally intensive and are intended solely for offline research, experimentation, and feature discovery.
+The resulting approved Feature Manifest shall be published to the Feature Registry and consumed by the local AlphaSpot runtime without repeating heavy computations.
+Principal Component Analysis (PCA) may be used only for experimental research and shall never replace the canonical explainable feature set used in production unless explicitly approved through governance.
+
+8. FEATURE QUALITY ANALYSIS
+Evaluates
+Predictive Power
+Feature Stability
+Temporal Stability
+Noise Sensitivity
+Missing Value Rate
+Correlation Strength
+Feature Redundancy
+Information Density
+Distribution Stability
+Market Regime Robustness
+Cross-Asset Robustness
+Quality methodologies remain independently configurable.
+
+9. FEATURE REGISTRY
+Every published feature set records
+Feature Set Identifier
+Feature Set Version
+Dataset Version
+Label Version
+Selection Method
+Configuration Version
+Creation Timestamp
+Governance Status
+Quality Score
+Storage Location
+Feature Selection Method
+Feature Importance Snapshot
+Research Experiment Identifier
+Research Environment
+Approval Reviewer
+Feature Manifest Identifier
+Historical registry entries remain immutable.
+
+10. FEATURE VERSIONING
+Every feature set records
+Feature Version
+Dataset Version
+Label Version
+Configuration Version
+Pipeline Version
+Governance Version
+Historical feature sets remain immutable.
+
+11. FEATURE VALIDATION
+Validates
+Feature Availability
+Schema Consistency
+Duplicate Features
+Missing Features
+Correlation Thresholds
+Feature Drift
+Distribution Stability
+Feature Importance Consistency
+Temporal Consistency
+Validation methodologies remain independently configurable.
+
+12. FEATURE GOVERNANCE
+Every feature set records
+Approval Status
+Validation Status
+Review History
+Audit History
+Creation Timestamp
+Publication Timestamp
+Governance Metadata
+Complete governance history is mandatory.
+
+13. PERFORMANCE
+The AI Feature Selection & Feature Intelligence Engine supports
+Local Runtime
+Single-Process Asynchronous Feature Validation
+Parallel CPU Feature Filtering
+Manifest Enforcement
+SQLite Metadata Registry
+Native Filesystem Storage
+Memory-Efficient Sequential Processing
+Offline Research Environment
+Parallel Feature Importance Analysis
+SHAP Computation
+Boruta Optimization
+Recursive Feature Elimination
+Large-Scale Feature Experiments
+Research Benchmarking
+Heavy computational feature-selection workloads shall execute exclusively within the offline Python Research Environment.
+The local AlphaSpot runtime shall consume only governance-approved Feature Manifests and shall never recompute expensive research algorithms during live operation.
+
+14. OBSERVABILITY
+Metrics include
+Feature Sets Generated
+Selection Time
+Validation Failures
+Registry Publications
+Average Feature Importance
+Feature Drift Events
+Correlation Violations
+Governance Events
+Publication Failures
+Quality Score
+
+15. SCALABILITY
+Supports
+Additional Feature Types
+Additional AI Models
+Additional Trading Strategies
+Additional Assets
+Additional Exchanges
+Additional Alternative Data Sources
+Additional Research Pipelines
+Scalability shall be achieved through modular engine decomposition, asynchronous processing, efficient memory management, and streaming computation rather than distributed infrastructure.
+The architecture shall remain fully functional on a single research workstation without requiring cluster computing or cloud infrastructure.
+
+16. FAILURE RECOVERY
+Supports
+Feature Replay
+Historical Reconstruction
+Registry Recovery
+Configuration Reload
+Failure Logging
+Graceful Degradation
+Feature Quarantine
+Incomplete feature publications shall never be published.
+
+17. ARCHITECTURAL RULES
+Rule 1
+Only institutionally governed datasets and governed label sets may participate in feature selection.
+Rule 2
+Every published feature set shall generate a unique Feature Event ID.
+Rule 3
+Every feature publication shall conform to the Canonical Feature Selection Contract.
+Rule 4
+Historical feature sets are immutable.
+Rule 5
+Every feature set shall preserve complete lineage linking datasets, labels, configurations, governance metadata, registry records, and publication metadata.
+Rule 6
+Feature selection shall never modify source datasets or labels.
+Rule 7
+Swing Trading and Instant Scalping feature ecosystems shall remain permanently isolated.
+Rule 8
+Feature evaluation shall use only information available within the corresponding historical observation window. Future information shall never influence feature selection.
+Rule 9
+Feature leakage is strictly prohibited.
+Rule 10
+Feature selection shall remain deterministic under identical datasets, labels, and configurations.
+Rule 11
+Historical feature selections shall support deterministic replay.
+Rule 12
+Feature selection methodologies shall remain independently configurable.
+Rule 13
+Publication failures shall never generate partially published feature sets.
+Rule 14
+Every published feature set shall generate a complete Feature Manifest.
+Rule 15
+Every feature set shall preserve deterministic timestamp ordering.
+Rule 16
+Feature Registry entries shall remain immutable after publication.
+Rule 17
+All feature selection methodologies shall remain independently pluggable without architectural redesign.
+Rule 18
+Every published feature set shall remain reproducible solely from immutable datasets, labels, configuration versions, governance metadata, and feature selection methodologies.
+Rule 19
+Feature importance rankings shall remain version controlled and shall never overwrite historical feature rankings.
+Rule 20
+This chapter governs only AI feature selection and feature intelligence. Dataset construction, label engineering, model training, hyperparameter optimization, prediction, execution, portfolio management, and risk management are governed exclusively by their respective AlphaSpot engines.
+
+Rule 21
+Feature importance estimation, feature ranking, feature subset optimization, and feature selection shall be performed exclusively on the TRAIN partition generated by the AI Dataset Construction Engine. Validation and Test partitions shall never participate in feature selection. Any evaluation of feature importance using Validation or Test labels constitutes irreversible target leakage and is strictly prohibited.
+Rule 22
+The local AlphaSpot runtime shall consume only immutable Feature Manifests produced by approved offline research workflows. Runtime execution shall never perform computationally intensive feature-selection algorithms or modify published Feature Manifests.
+
+18. CHAPTER SUMMARY
+The AI Feature Selection & Feature Intelligence Engine establishes AlphaSpot's canonical architecture for evaluating, optimizing, validating, versioning, and publishing institutionally governed machine learning feature sets. By separating feature selection from dataset construction, label engineering, model training, and prediction while enforcing immutable versioning, deterministic reproducibility, dual Swing Trading and Instant Scalping feature ecosystems, comprehensive quality analysis, complete lineage, and governance-driven publication, the architecture guarantees that every downstream AI model consumes robust, relevant, statistically validated, and leakage-free features. Through the Canonical Feature Selection Contract and Feature Registry, the AFSFIE provides the single authoritative source of AI-ready feature sets across the AlphaSpot ecosystem, enabling reproducible quantitative research, improved model generalization, reduced overfitting, and enterprise-grade AI decision support for profitable spot trading.
+
+END OF CHAPTER 6.4
