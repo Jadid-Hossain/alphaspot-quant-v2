@@ -8138,3 +8138,447 @@ This chapter governs only secrets, cryptographic key management, certificates, a
 The Secrets & Cryptographic Key Management Engine establishes AlphaSpot's canonical trust architecture for securely managing every cryptographic key, certificate, credential, and secret throughout the platform. By separating secrets management from authentication, configuration management, AI inference, trading workflows, and operational services while enforcing immutable versioning, strong encryption, secret leasing, certificate lifecycle management, comprehensive lineage, and enterprise-grade governance, the architecture guarantees that sensitive security artifacts remain protected, auditable, reproducible, and cryptographically trustworthy throughout their lifecycle. Through the Canonical Secret Contract, the Secrets & Cryptographic Key Management Engine provides the single authoritative root of trust that enables every AlphaSpot engine to securely access protected resources without exposing plaintext secrets, ensuring institutional-grade security, operational resilience, and long-term cryptographic integrity across the entire ecosystem.
 
 END OF CHAPTER 5.24
+
+
+ALPHASPOT QUANT V2
+CHAPTER 6.1
+AI DATASET ORCHESTRATION & RESEARCH DATA PLATFORM
+Version 1.0
+
+Why Chapter 6.1 comes first
+Everything in Chapter 6 depends on this chapter.
+Without datasets there is
+no AI
+no training
+no evaluation
+no prediction
+no backtesting
+no explainability
+This chapter builds the single source of truth for every AI dataset inside AlphaSpot.
+Every future model must consume datasets produced only by this engine.
+Never raw market data.
+
+PURPOSE
+The AI Dataset Orchestration & Research Data Platform (ADORP) establishes the canonical architecture for constructing, validating, versioning, governing, and publishing every research dataset consumed by AlphaSpot AI models.
+The platform transforms institutionally governed feature stores, alternative data, market intelligence, and historical trading records into reproducible AI-ready datasets while preserving complete lineage, deterministic reproducibility, version control, and auditability.
+The Dataset Platform serves as the exclusive gateway between the governed data platform (Chapter 3) and every AI model implemented throughout Chapter 6.
+No AI model may directly consume market data.
+Every model consumes only governed datasets produced by this chapter.
+
+DESIGN PHILOSOPHY
+Research datasets are products.
+Datasets shall remain
+immutable
+reproducible
+version controlled
+lineage preserving
+statistically validated
+governance approved
+Dataset generation shall remain completely independent of
+AI Training
+Hyperparameter Optimization
+Prediction
+Portfolio Decisions
+Trading Decisions
+Execution
+Paper Trading
+Model Deployment
+Identical dataset configurations shall always produce identical datasets.
+
+ARCHITECTURAL PHILOSOPHY
+AlphaSpot supports two completely independent AI research pipelines.
+
+Pipeline A
+Swing / Position Trading Research
+Goal
+Capture multi-day structural opportunities.
+Typical holding period
+2-10 days
+Primary timeframes
+1H
+4H
+Daily
+Features include
+technical indicators
+market structure
+volatility
+macro trend
+alternative data
+sentiment
+funding
+dominance
+cross-asset correlation
+Labels target
+Future returns over multiple hours or days.
+
+Pipeline B
+Instant Scalping Research
+Goal
+Capture short-term momentum and order-flow opportunities.
+Holding period
+1-20 minutes
+Primary timeframe
+1 minute
+Features include
+order book imbalance
+liquidity
+trade flow
+spread
+microstructure
+queue dynamics
+short-term momentum
+Labels target
+Future returns measured over minutes.
+
+Both pipelines remain
+completely isolated
+independently configurable
+independently versioned
+independently validated
+Feature leakage between research pipelines is prohibited.
+
+PURPOSE OF DUAL PIPELINES
+Different trading horizons require different statistical assumptions.
+Therefore
+Swing AI
+shall never train using
+1-minute order book features
+Instant Scalping AI
+shall never train using
+daily macro features
+unless explicitly approved by dataset governance.
+
+INPUT CONTRACT
+Consumes only
+Canonical Feature Store
+Alternative Data Store
+Historical Market Data
+Market State Store
+Trade Flow Features
+Order Book Intelligence
+Market Microstructure
+Paper Trading Results
+Backtesting Results
+Governed Labels
+Configuration Metadata
+Dataset Policies
+Research Configuration
+Calendar Metadata
+Corporate Action Metadata
+Exchange Metadata
+Governance Metadata
+The engine never consumes
+Live Trading Decisions
+Execution Commands
+Portfolio Decisions
+Prediction Results
+User Inputs
+Broker APIs
+Exchange Secrets
+
+OUTPUT CONTRACT
+Every dataset publication produces
+Dataset Event ID
+Dataset Identifier
+Dataset Version
+Dataset Type
+Research Pipeline
+Dataset Configuration Version
+Feature Manifest
+Label Manifest
+Dataset Statistics
+Training Split Metadata
+Validation Split Metadata
+Testing Split Metadata
+Leakage Validation Report
+Quality Validation Report
+Governance Metadata
+Lineage Metadata
+Publication Status
+Outputs remain immutable.
+
+DATASET GENERATION PIPELINE
+Every dataset follows
+Governed Data Collection
+↓
+Feature Resolution
+↓
+Feature Validation
+↓
+Temporal Alignment
+↓
+Missing Value Processing
+↓
+Outlier Validation
+↓
+Label Construction
+↓
+Leakage Detection
+↓
+Quality Validation
+↓
+Dataset Splitting
+↓
+Statistical Profiling
+↓
+Dataset Version Assignment
+↓
+Governance Validation
+↓
+Immutable Dataset Publication
+↓
+Metadata Recording
+↓
+Dataset Completion
+No stage may be skipped.
+
+DUAL DATASET WORKFLOWS
+Workflow A
+Swing Dataset Pipeline
+Collect
+↓
+Align Multi-Timeframe Features
+↓
+Merge Alternative Data
+↓
+Generate Swing Labels
+↓
+Leakage Validation
+↓
+Publish Swing Dataset
+
+Workflow B
+Instant Scalping Dataset Pipeline
+Collect
+↓
+Align Order Book Features
+↓
+Microstructure Features
+↓
+Trade Flow Features
+↓
+Generate Minute Labels
+↓
+Leakage Validation
+↓
+Publish Scalping Dataset
+
+The two workflows remain permanently independent.
+
+DATASET TYPES
+Supports
+Training Dataset
+Validation Dataset
+Testing Dataset
+Shadow Evaluation Dataset
+Backtesting Dataset
+Walk-Forward Dataset
+Paper Trading Dataset
+Stress Testing Dataset
+Synthetic Dataset
+Benchmark Dataset
+Reference Dataset
+Calibration Dataset
+Research Snapshot Dataset
+Offline Dataset
+Online Evaluation Dataset
+
+FEATURE MANAGEMENT
+Supports
+Technical Features
+Price Features
+Volume Features
+Volatility Features
+Liquidity Features
+Microstructure Features
+Order Book Features
+Trade Flow Features
+Alternative Data Features
+Macro Features
+Sentiment Features
+Cross-Asset Features
+Regime Features
+Temporal Features
+Statistical Features
+Derived Features
+Composite Features
+Feature methodologies remain independently configurable.
+
+LABEL MANAGEMENT
+Supports
+Binary Classification
+Multi-Class Classification
+Regression
+Probability Targets
+Expected Return
+Expected Drawdown
+Expected Volatility
+Trade Quality
+Risk Labels
+Reward Labels
+Entry Labels
+Exit Labels
+Confidence Labels
+Custom Labels
+Label methodologies remain independently configurable.
+
+DATASET VERSIONING
+Every dataset records
+Dataset Version
+Feature Version
+Label Version
+Configuration Version
+Pipeline Version
+Governance Version
+Historical datasets remain immutable.
+
+DATASET QUALITY VALIDATION
+Validates
+Missing Values
+Duplicate Records
+Temporal Integrity
+Feature Consistency
+Statistical Drift
+Distribution Shift
+Class Imbalance
+Outlier Detection
+Leakage Detection
+Timestamp Ordering
+Cross Feature Validation
+Data Freshness
+Dataset Completeness
+Schema Validation
+Dataset quality methodologies remain independently configurable.
+
+DATASET GOVERNANCE
+Every dataset records
+Approval Status
+Validation Status
+Review History
+Audit History
+Creation Timestamp
+Publication Timestamp
+Governance Metadata
+Complete governance history is mandatory.
+
+PERFORMANCE
+Supports
+Distributed Dataset Generation
+Parallel Feature Assembly
+Incremental Dataset Builds
+Dataset Caching
+Streaming Metadata Collection
+Cloud Deployment
+High Availability
+
+OBSERVABILITY
+Metrics include
+Datasets Generated
+Dataset Generation Time
+Validation Failures
+Leakage Detection Events
+Dataset Versions Published
+Dataset Size
+Dataset Freshness
+Dataset Quality Score
+Governance Events
+Publication Failures
+
+SCALABILITY
+Supports
+Additional Feature Families
+Additional AI Models
+Additional Exchanges
+Additional Assets
+Additional Research Pipelines
+Additional Dataset Types
+Distributed Infrastructure
+Multi-Region Deployment
+without architectural redesign.
+
+FAILURE RECOVERY
+Supports
+Dataset Replay
+Historical Reconstruction
+Configuration Reload
+Failure Logging
+Graceful Degradation
+Dataset Quarantine
+Incomplete datasets shall never be published.
+
+LOCAL RETRAINING PHILOSOPHY
+AlphaSpot does not perform autonomous online model retraining.
+Instead
+Prediction outcomes
+↓
+Paper trading results
+↓
+Backtesting results
+↓
+Live inference logs
+↓
+SQLite Research Database
+↓
+Manual Weekly Dataset Refresh
+↓
+Manual Research Validation
+↓
+Offline Model Retraining
+↓
+Model Governance Approval
+↓
+Production Deployment
+This architecture prevents
+catastrophic forgetting
+feedback loops
+uncontrolled model drift
+unstable production models
+while preserving deterministic reproducibility.
+
+ARCHITECTURAL RULES
+Rule 1
+Only governed feature stores may generate AI datasets.
+Rule 2
+Every dataset shall generate a unique Dataset Event ID.
+Rule 3
+Every dataset shall conform to the Canonical Dataset Contract.
+Rule 4
+Historical datasets are immutable.
+Rule 5
+Every dataset shall preserve complete lineage linking features, labels, configurations, governance records, and source metadata.
+Rule 6
+Raw market data shall never be consumed directly by AI training engines.
+Rule 7
+Swing and Instant Scalping datasets shall remain completely isolated unless explicitly approved by dataset governance.
+Rule 8
+Every published dataset shall successfully pass leakage detection before publication.
+Rule 9
+Dataset splitting shall preserve chronological ordering.
+Rule 10
+Random shuffling across future timestamps is prohibited for time-series datasets.
+Rule 11
+Historical datasets shall support deterministic replay.
+Rule 12
+Dataset methodologies shall remain independently configurable.
+Rule 13
+Dataset publication failures shall never publish partial datasets.
+Rule 14
+Every dataset shall record complete statistical metadata.
+Rule 15
+Every dataset shall preserve deterministic timestamp ordering.
+Rule 16
+Dataset quality reports are immutable.
+Rule 17
+Feature schemas shall remain version controlled.
+Rule 18
+Label generation methodologies shall remain independently version controlled.
+Rule 19
+Weekly research retraining shall consume only immutable published datasets.
+Rule 20
+This chapter governs only dataset orchestration and AI research datasets.
+Model training, hyperparameter optimization, inference, explainability, ensemble intelligence, execution, and portfolio decisions are governed exclusively by their respective AlphaSpot engines.
+
+CHAPTER SUMMARY
+The AI Dataset Orchestration & Research Data Platform establishes AlphaSpot's canonical foundation for producing institutionally governed, reproducible, and AI-ready datasets. By separating dataset construction from model training while enforcing dual research pipelines for Swing Trading and Instant Scalping, immutable versioning, comprehensive quality validation, leakage prevention, deterministic lineage, and governance-driven publication, the architecture guarantees that every downstream AI model is trained using trustworthy, statistically sound, and fully auditable research data. Through the Canonical Dataset Contract, this engine provides the single authoritative source of training data for the entire AlphaSpot AI ecosystem, enabling reliable experimentation, reproducible research, and production-grade machine learning while avoiding data leakage, uncontrolled retraining, and architectural coupling.
+
+END OF CHAPTER 6.1
