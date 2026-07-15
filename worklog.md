@@ -1365,3 +1365,57 @@ Stage Summary:
 - 15 construction methods, 11 partitioning types, 11 validation checks, 7 storage formats.
 - 16 subsystems covering: collection, config validation, temporal alignment, window construction, chronological partitioning (purged+embargo), validation, registry (persistent+transient+promotion), statistics, manifest, versioning, governance, lineage, integrity, recovery, observability, contract generation.
 - Next: Chapter 6.3 (if provided) — continuation of AI Training Pipeline.
+
+---
+Task ID: MDS-CH6.3
+Agent: main (Z.ai Code)
+Task: Chapter 6.3 of the MDS — AI Label Engineering & Target Generation Engine (AILETGE). The exclusive target generation layer between the AI Dataset Construction & Dataset Registry Engine (Chapter 6.2) and every downstream AI Training Engine. No AI model may construct labels independently. Establishes dual label ecosystems with Dynamic Triple Barrier (Swing) and Micro Triple Barrier (Scalping) methods, all thresholds externally configurable (Rule 21 — no hard-coding).
+
+Work Log:
+- Appended Chapter 6.3 verbatim to full_prompt.md (now 9433 lines, 55 chapters).
+- Created src/lib/alphaspot/v2/label-engineering-engine/ with 4 modules (301 V2 files total):
+  • types.ts — CanonicalLabelContract (§5, Rule 3). ResearchPipeline (2 §3 Rule 7). PredictionHorizon (10 §8 — 1_MINUTE to 10_DAYS, HORIZON_MS map). LabelType (17 §7). BarrierMethod (5 §3 — PERCENTAGE_RETURN/ATR_MULTIPLE/VOLATILITY_ADJUSTED/VOLATILITY_BASED/TICK_BASED). BarrierConfiguration (Rule 21 — upperBarrierMethod/upperBarrierValue/lowerBarrierMethod/lowerBarrierValue/verticalBarrierHorizon, all externally configurable, no hard-coding). TargetDefinition (Rule 19 — targetVersion version controlled, Rule 21 barrierConfig). ExitReason (4 — UPPER_BARRIER/LOWER_BARRIER/VERTICAL_BARRIER/NO_EXIT). LabelStatistics (Rule 14 — per-target mean/stdDev/min/max/median/nullCount, qualityScore). ClassDistribution (per-target classCounts+classImbalance, overallImbalance). LabelManifest (Rule 14 — complete manifest with contentHash). LabelValidationReport (§9 — 10 checks, leakageDetected, Rule 16 immutable=true). LabelIntegrityReport (Rule 6 sourceDatasetsModified=false, Rule 16 immutable=true). LabelLineage (Rule 5 — complete lineage: source datasets/registry/features/research config/horizon config/calendar/manifests/governance/registry/publication; Rule 6 sourceDatasetsModified=false). LabelVersionBundle (§11 — 6 versions). LabelGovernanceMetadata (§12 — crossPipelineApproved). LabelRegistryEntry (§10 — Rule 16 immutable=true). LabelConfiguration (§3 — Rule 21 barrierConfig externally configured, Rule 7 crossPipelineApproved). LabelInput (§4 — 10 governed input types, predictionsConsumed=false, modelOutputsConsumed=false, tradingOrdersConsumed=false). AILETGEConfiguration (§3 — enforceEcosystemIsolation, enforceNoFutureLeakage, enforceHorizonNonOverlap, rejectHardcodedThresholds, defaultSwingHorizon=3_DAYS, defaultScalpingHorizon=20_MINUTES). DEFAULT_AILETGE_CONFIG. LABEL_GENERATION_STAGES (15 §6). AILETGE_VERSION='1.0.0'.
+  • subsystems.ts — 16 subsystems:
+    - GovernedDatasetRetriever (Rule 1 — only governed datasets; §4 never consumes predictions/model outputs/trading orders).
+    - ConfigurationValidator (Rule 7/21 — validates config, Rule 21 rejects hard-coded zero thresholds, requires explicit barrier values).
+    - DynamicTripleBarrierConstructor (§3 Pipeline A — Dynamic Triple Barrier for Swing: upper profit barrier configurable, lower risk barrier configurable, vertical barrier configurable expiration; generates 9 targets: Trade Success, Expected Return, Risk-Adjusted Return, MFE, MAE, Holding Duration, Trade Quality, Market Regime, Exit Reason; Rule 8 — future window strictly after feature T; Rule 21 — computeThreshold from config method, no hard-coding).
+    - MicroTripleBarrierConstructor (§3 Pipeline B — Micro Triple Barrier for Scalping: upper/lower barriers configurable, vertical barrier configurable; generates 9 targets: Trade Success, Expected Return, Expected Slippage, Fill Probability, Momentum Continuation, Liquidity Absorption, Order Book Alpha, Trade Quality, Execution Quality).
+    - LeakageValidator (Rule 8/9/10 — verifies future window starts strictly after feature timestamp T; verifies prediction horizon doesn't overlap feature windows; returns violations list).
+    - LabelValidator (§9 — 10 checks: Temporal Correctness, Future Leakage, Class Balance, Distribution Stability, Missing Labels, Duplicate Labels, Outlier Targets, Prediction Horizon Consistency, Target Integrity, Statistical Consistency; Rule 16 immutable=true; skips non-numeric targets in class balance and statistical consistency checks).
+    - StatisticalAnalyzer (Rule 14 — per-target mean/stdDev/min/max/median/nullCount; per-target classCounts+classImbalance; overallImbalance; qualityScore).
+    - LabelRegistry (§10, Rule 16 — immutable entries, deterministic replay, history).
+    - ManifestGenerator (Rule 14 — complete label manifest with contentHash, targetDefinitions, predictionHorizons).
+    - VersionManager (Rule 4/11/19 — version assignment, content hash for deterministic replay, target definition version controlled).
+    - LabelGovernanceManager (§12 — approval, validation, review/audit history, cross-pipeline approval).
+    - LabelLineageTracker (Rule 5/6 — complete lineage: 5 source version types + feature metadata + research config + horizon config + calendar + manifests + governance + registry + publication; sourceDatasetsModified=false).
+    - IntegrityVerifier (Rule 6/16 — content hash verified, manifest hash verified, target definitions valid, lineage complete, sourceDatasetsModified=false; immutable=true).
+    - LabelFailureRecovery (§16, Rule 13 — quarantine, replay, incomplete labels never published).
+    - AILETGEObservabilityCollector (§14 — 10 metrics: Labels Generated, Generation Time, Validation Failures, Registry Publications, Label Distribution, Class Imbalance, Leakage Events, Governance Events, Publication Failures, Quality Score + stage timings).
+    - LabelContractGenerator (Rule 2/3 — unique Label Event ID, Canonical Label Contract).
+  • engine.ts — AILabelEngineeringTargetGenerationEngine:
+    - generateLabels (§6 — 15-stage pipeline: GOVERNED_DATASET_RETRIEVAL Rule 1 → CONFIGURATION_VALIDATION Rule 7/21 → PREDICTION_HORIZON_SELECTION Rule 7 (pipeline-appropriate horizon) → TARGET_DEFINITION Rule 19/21 → FUTURE_WINDOW_CONSTRUCTION Rule 8 → LABEL_GENERATION Rule 8/21 (Dynamic/Micro Triple Barrier, future prices filtered strictly after feature T, futureWindowStartTimestamps tracked) → LEAKAGE_VALIDATION Rule 8/9/10 → STATISTICAL_VALIDATION Rule 16 → CLASS_BALANCE_ANALYSIS §9 → VERSION_ASSIGNMENT Rule 4/11/19 → GOVERNANCE_VALIDATION §12 → IMMUTABLE_PUBLICATION Rule 3/4/13 → REGISTRY_REGISTRATION Rule 16 → METADATA_RECORDING §12 → LABEL_COMPLETION). Rule 8 — future window starts strictly after feature T. Rule 21 — all thresholds from config. Contract frozen at publication (Rule 4).
+    - generateSwingLabels (§3 Pipeline A — Dynamic Triple Barrier, default 3_DAYS/72h, 5% upper/1.5 ATR lower, generates 9 swing targets).
+    - generateScalpingLabels (§3 Pipeline B — Micro Triple Barrier, default 20_MINUTES, configurable barriers, generates 9 scalping targets, includes order book data for microstructure labels).
+    - replayLabels (Rule 11/16 — deterministic replay from immutable registry).
+    - getLabelHistory (Rule 16 — immutable history).
+    - observability (§14 — 10 metrics + registry count).
+    - listQuarantined (§16 — Rule 13 quarantine).
+  • index.ts — Barrel export.
+- Smoke-tested all 11 scenarios: (1) Pipeline stages — 15 generation stages verified. (2) SWING LABELS — 15 stages all ✓, Dynamic Triple Barrier, 50 labels, 9 targets (tradeSuccess/expectedReturn/riskAdjustedReturn/mfe/mae/holdingDuration/tradeQualityScore/marketRegime/exitReason), horizon=3_DAYS (72h), barrier upper=PERCENTAGE_RETURN/0.05 lower=ATR_MULTIPLE/1.5, leakage detected=false ✓, validation passed=true ✓, Rule 6 sourceDatasetsModified=false ✓, Rule 16 immutable ✓, Rule 4 frozen=true ✓. (3) SCALPING LABELS — 15 stages all ✓, Micro Triple Barrier, 100 labels, 9 targets (tradeSuccess/expectedReturn/expectedSlippage/fillProbability/momentumContinuation/liquidityAbsorption/orderBookAlpha/tradeQualityScore/executionQuality), horizon=20_MINUTES, frozen=true ✓. (4) Rule 8/9/10 — future window strictly after features: passed ✓; label before feature: detected ✓. (5) Rule 21 — hard-coded zero thresholds rejected: 2 errors ✓. (6) Rule 7 — ecosystem isolation enforced in engine stage 3 ✓. (7) Rule 11 — deterministic replay: recovered=true, immutable=true ✓. (8) Rule 13 — empty data quarantined: 1 quarantine ✓. (9) Dynamic Triple Barrier direct test — tradeSuccess=0.5, exitReason=VERTICAL_BARRIER, MFE=4.16%, holding=72h ✓. (10) Micro Triple Barrier direct test — tradeSuccess=1, exitReason=UPPER_BARRIER, slippage/fillProbability/executionQuality computed ✓. (11) §14 observability — 2 labels generated, 2 registry publications, 0 validation failures, 0 leakage events, 1 publication failure, 2 registry entries, avg quality 0.635, 15 stage timings ✓.
+- Lint clean. Committed (7e0820a). Pushed to GitHub.
+
+Stage Summary:
+- Chapter 6.3 (AILETGE) fully implemented following the established V2 workflow pattern.
+- 301 V2 source files in src/lib/alphaspot/v2/ (4 new: types.ts, subsystems.ts, engine.ts, index.ts).
+- full_prompt.md now 9433 lines (55 chapters accumulated — Ch 1, 2.1-2.5, 3.1-3.10, 4.1-4.12, 5.1-5.24, 6.1-6.3).
+- Third chapter of Layer 4 (AI Training Pipeline). The exclusive label generation layer.
+- Dual label ecosystems (Swing Dynamic TB + Scalping Micro TB) fully isolated per Rule 7.
+- Rule 8/9/10 — no future leakage: labels generated strictly from observations after feature T, future window starts tracked and validated.
+- Rule 21 — no hard-coded thresholds: all barriers (percentage/ATR/volatility/tick) externally configurable through governed research configurations.
+- Rule 6 — labels never modify source datasets (sourceDatasetsModified=false enforced).
+- 15-stage label generation pipeline with no stage skippable.
+- 21 architectural rules (§17) enforced and verified via smoke test.
+- Canonical Label Contract (Rule 3) produced with 16 canonical fields per §5.
+- 17 label types, 10 prediction horizons, 5 barrier methods, 10 validation checks.
+- 16 subsystems covering: retrieval, config validation, Dynamic TB, Micro TB, leakage validation, label validation, statistical analysis, registry, manifest, versioning, governance, lineage, integrity, recovery, observability, contract generation.
+- Next: Chapter 6.4 (if provided) — continuation of AI Training Pipeline.
