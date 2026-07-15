@@ -1310,3 +1310,58 @@ Stage Summary:
 - Quality reports immutable (Rule 16).
 - Local Retraining Philosophy (§15) — no autonomous online retraining; weekly manual refresh → offline retrain → governance approval → production.
 - Next: Chapter 6.2 (if provided) — continuation of AI Training Pipeline.
+
+---
+Task ID: MDS-CH6.2
+Agent: main (Z.ai Code)
+Task: Chapter 6.2 of the MDS — AI Dataset Construction & Dataset Registry Engine (ADCDRE). The exclusive dataset production layer between the governed Data Platform (Chapter 3) and every downstream AI engine in Chapter 6. Establishes dual dataset ecosystems (Swing persistent + Instant Scalping transient) with purged/embargo validation, transient→persistent promotion, and immutable registry management.
+
+Work Log:
+- Appended Chapter 6.2 verbatim to full_prompt.md (now 9016 lines, 54 chapters).
+- Created src/lib/alphaspot/v2/dataset-construction-registry-engine/ with 4 modules (297 V2 files total):
+  • types.ts — CanonicalDatasetContract (§5, Rule 3). ResearchPipeline (2 §3 — SWING/INSTANT_SCALPING, Rule 7 isolation). StoragePolicy (2 §3 — PERSISTENT/TRANSIENT). RegistryPromotionTrigger (6 §3/§16 — GOVERNANCE_APPROVED_SNAPSHOT/SCHEDULED_WEEKLY_CHECKPOINT/MANUAL_EXPORT/VALIDATION_ANOMALY/CRITICAL_AUDIT_EVENT/CHECKPOINT_POLICY, Rule 7A). ConstructionMethod (15 §7). PartitionType (11 §8). StorageFormat (7 Rule 19 — PARQUET/ARROW/FEATHER/SQL/JSON/CSV/CUSTOM). DatasetSchema (Rule 19 — storageFormat independently configurable). DatasetManifest (Rule 14 — complete manifest with contentHash). DatasetStatistics (Rule 14 — partitionCounts, featureStats, completeness, qualityScore). PartitionMetadata (Rule 8 chronological=true, Rule 9 randomShuffled=false, Rule 9A temporalIsolationEnforced, Rule 9B purgeGapMs+embargoMs). PartitionSet (Rule 9A — noBoundaryOverlaps, validationFollowsTraining, testingFollowsValidation; Rule 9B — purgedObservationCount+embargoedObservationCount). DatasetValidationReport (§11 — 11 checks, Rule 16 immutable=true). DatasetIntegrityReport (Rule 16 immutable=true). DatasetLineage (Rule 5 — complete lineage: feature store/historical/alt data/order book/trade flow/microstructure/market state/paper trading/backtesting/configs/governance/registry/publication; Rule 6 labelsGenerated=false; Rule 7A sourceTransientDatasetId). DatasetVersionBundle (§10 — 6 versions). DatasetGovernanceMetadata (§12 — crossPipelineMixingApproved, promotionApproved, promotionTrigger). DatasetRegistryEntry (§9 — 14 fields, Rule 16 immutable=true, Rule 7A promotedFromTransient). DatasetConfiguration (§3 — partitioning with purgeGapMs/embargoMs/walkForward, Rule 19 storageFormat, §3 transientRetentionMs+autoExpire). DatasetInput (§4 — 16 governed input types, Rule 6 labelsConsumed=false). ADCDREConfiguration (§3 — enforceEcosystemIsolation, enforceTemporalIsolation, requirePurgeGap, requireEmbargo, defaultTransientRetentionMs, defaultCheckpointIntervalMs, validationThresholds). DEFAULT_ADCDRE_CONFIG. DATASET_CONSTRUCTION_STAGES (16 §6). ADCDRE_VERSION='1.0.0'.
+  • subsystems.ts — 16 subsystems:
+    - GovernedDataCollector (Rule 1/6 — only governed feature stores, never labels; tracks 7 upstream engines).
+    - ConfigurationValidator (Rule 7/9/12 — validates dataset config, holdout fractions sum to 1.0, purge/embargo non-negative).
+    - TemporalAligner (Rule 8/15 — chronological sorting, verifies monotonically increasing).
+    - WindowConstructor (Rule 17 — sliding/rolling/walk-forward/expanding window construction, pluggable methodologies).
+    - ChronologicalPartitioner (Rule 8/9/9A/9B — chronological split with purge gap + embargo period; verifies noBoundaryOverlaps, validationFollowsTraining, testingFollowsValidation; counts purged + embargoed observations; supports walk-forward partitions).
+    - DatasetValidator (§11 — 11 checks: schema consistency, temporal ordering, duplicate records, missing records, feature availability, timestamp integrity, cross-timeframe alignment, statistical consistency, distribution stability, dataset completeness, manifest integrity; Rule 16 immutable=true).
+    - DatasetRegistry (§9, Rule 16 — persistent registry with immutable entries; §3 transient dataset pool with auto-expiry; Rule 7A promoteTransient() creates new immutable registry entry from transient, 6 promotion triggers).
+    - StatisticalGenerator (Rule 14 — per-feature mean/stdDev/min/max/median/null%, partitionCounts, completeness, qualityScore).
+    - ManifestGenerator (Rule 14 — complete manifest with contentHash, schema, partitionTypes, recordCount, dateRange, symbols).
+    - VersionManager (Rule 4/11/18 — version assignment, content hash for deterministic replay).
+    - DatasetGovernanceManager (§12 — approval, validation, review/audit history, cross-pipeline approval, Rule 7A promotion approval).
+    - DatasetLineageTracker (Rule 5/6/7A — complete lineage: 7 source version types + paper trading + backtesting + configs + governance + registry + publication; labelsGenerated=false; sourceTransientDatasetId for promoted datasets).
+    - IntegrityVerifier (Rule 16 — content hash verified, manifest hash verified, schema valid, partition integrity verified, lineage complete; immutable=true).
+    - DatasetFailureRecovery (§16, Rule 13 — quarantine, replay, incomplete datasets never published).
+    - ADCDREObservabilityCollector (§14 — 10 metrics: Datasets Constructed, Construction Time, Validation Failures, Registry Publications, Dataset Size, Freshness, Completeness, Governance Events, Publication Failures, Quality Score + stage timings).
+    - DatasetContractGenerator (Rule 2/3 — unique Dataset Event ID, Canonical Dataset Contract).
+  • engine.ts — AIDatasetConstructionRegistryEngine:
+    - constructDataset (§6 — 16-stage pipeline: GOVERNED_DATA_COLLECTION Rule 1/6 → CONFIGURATION_VALIDATION Rule 7/9/12 → TEMPORAL_ALIGNMENT Rule 8/15 → FEATURE_RESOLUTION → TIMEFRAME_SYNCHRONIZATION → SLIDING_ROLLING_WINDOW_CONSTRUCTION Rule 17 → DATASET_VALIDATION Rule 10/16 → CHRONOLOGICAL_PARTITIONING Rule 8/9/9A/9B → DATASET_STATISTICS_GENERATION Rule 14 → MANIFEST_GENERATION Rule 14 → VERSION_ASSIGNMENT Rule 4/11/18 → GOVERNANCE_VALIDATION §12 → IMMUTABLE_PUBLICATION Rule 3/4/13 → REGISTRY_REGISTRATION Rule 16 → METADATA_RECORDING §12 → DATASET_COMPLETION). Rule 9A — verifies noBoundaryOverlaps, validationFollowsTraining, testingFollowsValidation. Rule 10 — validation must pass. §3 — storage policy determined by pipeline (Swing=PERSISTENT, Scalping=TRANSIENT). Contract frozen at publication (Rule 4) — deep freeze of contract + all nested objects. Swing → persistent registry entry; Scalping → transient pool with auto-expiry.
+    - constructSwingDataset (§3 Pipeline A — HISTORICAL method, multi-timeframe, 1-day purge+embargo, 30-day walk-forward windows, persistent registry).
+    - constructScalpingDataset (§3 Pipeline B — ROLLING_WINDOW method, 1-minute timeframe, 1-minute purge+embargo, 1-hour walk-forward windows, transient with 24h retention + auto-expire).
+    - promoteTransientDataset (Rule 7A — promotes transient to persistent registry via governance-approved trigger; creates NEW immutable registry entry without mutating frozen historical contract; 6 triggers supported).
+    - replayDataset (Rule 11/16 — deterministic replay from immutable registry).
+    - getRegistryHistory (Rule 16 — immutable history).
+    - expireTransientDatasets (§3 Pipeline B — auto-expire past retention).
+    - observability (§14 — 10 metrics + persistent/transient counts).
+    - listQuarantined (§16 — Rule 13 quarantine).
+  • index.ts — Barrel export.
+- Smoke-tested all 9 scenarios: (1) Pipeline stages — 16 construction stages verified. (2) SWING DATASET — 16 stages all ✓, 4 features, 100 records (daily), PERSISTENT storage, partitions train=70/val=15/test=15, Rule 9A noBoundaryOverlaps=true ✓, validationFollowsTraining=true ✓, testingFollowsValidation=true ✓, Rule 9B purged=1 embargoed=1 ✓, Rule 10 validation passed ✓, Rule 14 manifest complete ✓, Rule 16 validation+integrity immutable ✓, Rule 6 labelsGenerated=false ✓, Rule 4 frozen=true ✓, registry entry immutable=true promotedFromTransient=false ✓. (3) SCALPING DATASET — 16 stages all ✓, 4 features, 500 records (1-minute), TRANSIENT storage, transientExpiresAt set, not in persistent registry ✓, frozen=true ✓. (4) Rule 7A — transient promoted to persistent, promotedFromTransient=true, immutable=true, historical contract untouched (Rule 4/16) ✓. (5) Rule 9A/9B — partitions verified: no overlaps ✓, validation follows training ✓, testing follows validation ✓, 1 purged + 1 embargoed observation ✓. (6) Rule 11 — deterministic replay recovered=true, entry found, immutable=true ✓. (7) Rule 13 — empty dataset quarantined, not published ✓. (8) Registry counts — 2 persistent entries (1 original swing + 1 promoted scalping), 0 transient (promoted), 2 datasets constructed, avg quality 1.000, avg completeness 1.000, 16 stage timings ✓. (9) Rule 3 — Canonical Contract integrity: all 9 required fields present, content hash computed, all 16 stages successful ✓.
+- Lint clean. Committed (8d8fa3e). Pushed to GitHub.
+
+Stage Summary:
+- Chapter 6.2 (ADCDRE) fully implemented following the established V2 workflow pattern.
+- 297 V2 source files in src/lib/alphaspot/v2/ (4 new: types.ts, subsystems.ts, engine.ts, index.ts).
+- full_prompt.md now 9016 lines (54 chapters accumulated — Ch 1, 2.1-2.5, 3.1-3.10, 4.1-4.12, 5.1-5.24, 6.1-6.2).
+- Second chapter of Layer 4 (AI Training Pipeline). The exclusive dataset production layer.
+- Dual dataset ecosystems (Swing persistent + Scalping transient) fully isolated per Rule 7.
+- Rule 7A — transient→persistent promotion via 6 governance-approved triggers, creates new immutable registry entry without mutating frozen historical contract.
+- Rule 9A/9B — absolute temporal isolation (no boundary overlaps) + purged/embargo validation removes leakage-capable observations.
+- 16-stage construction pipeline with no stage skippable.
+- 22 architectural rules (§17) enforced and verified via smoke test.
+- Canonical Dataset Contract (Rule 3) produced with 16 canonical fields per §5.
+- 15 construction methods, 11 partitioning types, 11 validation checks, 7 storage formats.
+- 16 subsystems covering: collection, config validation, temporal alignment, window construction, chronological partitioning (purged+embargo), validation, registry (persistent+transient+promotion), statistics, manifest, versioning, governance, lineage, integrity, recovery, observability, contract generation.
+- Next: Chapter 6.3 (if provided) — continuation of AI Training Pipeline.
