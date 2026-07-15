@@ -8582,3 +8582,435 @@ CHAPTER SUMMARY
 The AI Dataset Orchestration & Research Data Platform establishes AlphaSpot's canonical foundation for producing institutionally governed, reproducible, and AI-ready datasets. By separating dataset construction from model training while enforcing dual research pipelines for Swing Trading and Instant Scalping, immutable versioning, comprehensive quality validation, leakage prevention, deterministic lineage, and governance-driven publication, the architecture guarantees that every downstream AI model is trained using trustworthy, statistically sound, and fully auditable research data. Through the Canonical Dataset Contract, this engine provides the single authoritative source of training data for the entire AlphaSpot AI ecosystem, enabling reliable experimentation, reproducible research, and production-grade machine learning while avoiding data leakage, uncontrolled retraining, and architectural coupling.
 
 END OF CHAPTER 6.1
+
+
+ALPHASPOT QUANT V2
+CHAPTER 6.2
+AI DATASET CONSTRUCTION & DATASET REGISTRY ENGINE
+Version 1.0
+
+1. PURPOSE
+The AI Dataset Construction & Dataset Registry Engine (ADCDRE) establishes the canonical architecture for constructing, validating, versioning, registering, governing, and publishing every research dataset consumed by AlphaSpot artificial intelligence models.
+The ADCDRE transforms institutionally governed historical market data, feature stores, alternative data, market intelligence, order book intelligence, trade flow analytics, paper trading records, and research metadata into immutable AI-ready datasets while preserving deterministic reproducibility, complete lineage, statistical integrity, governance compliance, and temporal correctness.
+The ADCDRE serves as the exclusive dataset production layer between the governed Data Platform (Chapter 3) and every downstream AI engine implemented throughout Chapter 6.
+No AI model may directly consume raw market data or feature stores.
+Every AI model shall consume only governance-approved datasets published by this engine.
+The ADCDRE performs:
+Dataset Construction
+Dataset Registration
+Dataset Validation
+Dataset Versioning
+Dataset Publication
+Dataset Registry Management
+Dataset Metadata Management
+Dataset Manifest Generation
+Dataset Lineage
+Dataset Governance
+Historical Dataset Construction
+Research Dataset Construction
+Walk-Forward Dataset Construction
+Rolling Window Dataset Construction
+Sliding Window Dataset Construction
+Time-Series Dataset Construction
+Swing Dataset Construction
+Instant Scalping Dataset Construction
+Dataset Splitting
+Dataset Statistics
+Dataset Catalog Management
+Dataset Lifecycle Management
+Dataset Replay
+Dataset Reproducibility
+The ADCDRE performs NO:
+Label Generation
+Feature Engineering
+Feature Selection
+Model Training
+Hyperparameter Optimization
+Prediction
+Trading Decisions
+Execution Management
+Portfolio Optimization
+Risk Management
+Model Governance
+
+2. DESIGN PHILOSOPHY
+Datasets are institutional assets.
+Every dataset shall remain
+immutable
+deterministic
+reproducible
+statistically validated
+temporally consistent
+lineage preserving
+governance approved
+version controlled
+Dataset construction shall remain completely independent of
+AI Training
+Label Generation
+Prediction
+Execution
+Portfolio Decisions
+Trading Strategies
+Identical configurations shall always generate identical datasets.
+
+3. DUAL DATASET ARCHITECTURE
+The ADCDRE maintains two completely independent dataset ecosystems.
+Pipeline A
+Swing Trading Dataset Platform
+Purpose
+Capture medium-term structural market opportunities.
+Primary Timeframes
+Daily
+4H
+1H
+Typical Holding Period
+2-10 days
+Dataset Characteristics
+Multi-Timeframe
+Macro-Aware
+Cross-Asset
+Lower-Frequency
+Long-Horizon
+Storage Policy
+Datasets are permanently persisted within the Dataset Registry.
+Every published dataset shall receive:
+Dataset Identifier
+Dataset Version
+Dataset Manifest
+Schema Version
+Validation Report
+Lineage Metadata
+Governance Metadata
+Historical Swing datasets remain immutable and fully reproducible.
+Typical Usage
+Offline Research
+Model Training
+Walk-Forward Validation
+Historical Backtesting
+Benchmark Evaluation
+Paper Trading Research
+
+Pipeline B
+Instant Scalping Dataset Platform
+Purpose
+Capture short-term liquidity imbalances, order book dynamics, and momentum opportunities.
+Primary Timeframe
+1 Minute
+Typical Holding Period
+1-20 minutes
+Dataset Characteristics
+High-Frequency
+Order Book Driven
+Trade Flow Driven
+Market Microstructure Aware
+Ultra-Low Latency
+Storage Policy
+The Instant Scalping research pipeline operates primarily through transient in-memory rolling ring buffers.
+Continuous persistence of every generated microstructure dataset is prohibited.
+Only the following events may generate immutable Dataset Registry publications:
+Governance-approved research snapshots
+Scheduled weekly research checkpoints
+Explicit manual dataset exports
+Validation anomalies
+Critical audit events
+All transient rolling datasets shall automatically expire according to configurable retention policies without affecting published immutable datasets.
+Typical Usage
+Online Feature Generation
+Real-Time Research
+Instant Model Inference
+Microstructure Analysis
+Latency Benchmarking
+Streaming Validation
+
+Architectural Isolation
+The Swing Trading and Instant Scalping dataset ecosystems shall remain permanently isolated.
+Feature engineering, window generation, temporal alignment, partitioning methodologies, validation policies, storage strategies, and lifecycle management shall be independently configurable for each pipeline.
+Cross-pipeline dataset mixing is prohibited unless explicitly approved through governance-controlled research methodologies.
+Neither pipeline may modify or overwrite datasets published by the other.
+
+4. INPUT CONTRACT
+Consumes only
+Canonical Feature Store
+Historical Data Store
+Alternative Data Store
+Order Book Intelligence
+Trade Flow Intelligence
+Market Microstructure
+Market State Store
+Paper Trading Results
+Backtesting Results
+Research Configuration
+Calendar Metadata
+Dataset Policies
+Governance Metadata
+Configuration Metadata
+Exchange Metadata
+Asset Metadata
+The engine never consumes
+Labels
+Prediction Results
+Trading Orders
+Execution Commands
+Portfolio Decisions
+Exchange APIs
+User Decisions
+Secrets
+
+5. OUTPUT CONTRACT
+Every published dataset produces
+Dataset Event ID
+Dataset Identifier
+Dataset Version
+Research Pipeline
+Dataset Category
+Dataset Manifest
+Dataset Schema
+Dataset Statistics
+Dataset Configuration Version
+Dataset Partition Metadata
+Dataset Validation Report
+Dataset Integrity Report
+Lineage Metadata
+Governance Metadata
+Publication Status
+Outputs remain immutable.
+Every published dataset shall conform to the Canonical Dataset Contract defined by this chapter.
+
+6. DATASET CONSTRUCTION PIPELINE
+Every dataset follows
+Governed Data Collection
+↓
+Configuration Validation
+↓
+Temporal Alignment
+↓
+Feature Resolution
+↓
+Timeframe Synchronization
+↓
+Sliding/Rolling Window Construction
+↓
+Dataset Validation
+↓
+Chronological Partitioning
+↓
+Dataset Statistics Generation
+↓
+Manifest Generation
+↓
+Version Assignment
+↓
+Governance Validation
+↓
+Immutable Publication
+↓
+Registry Registration
+↓
+Metadata Recording
+↓
+Dataset Completion
+No stage may be skipped.
+
+7. DATASET CONSTRUCTION METHODS
+Supports
+Historical Dataset Construction
+Sliding Window Construction
+Rolling Window Construction
+Walk-Forward Dataset Construction
+Expanding Window Construction
+Incremental Dataset Construction
+Research Snapshot Construction
+Cross-Asset Dataset Construction
+Multi-Timeframe Dataset Construction
+Synthetic Dataset Construction
+Benchmark Dataset Construction
+Stress Testing Dataset Construction
+Shadow Evaluation Dataset Construction
+Paper Trading Dataset Construction
+Offline Research Dataset Construction
+Methodologies remain independently configurable.
+
+8. DATASET PARTITIONING
+Supports
+Training Dataset
+Validation Dataset
+Testing Dataset
+Walk-Forward Validation
+Rolling Validation
+Purged Cross Validation
+Embargo Validation
+Chronological Holdout
+Shadow Evaluation Dataset
+Benchmark Dataset
+Historical Replay Dataset
+Partitioning methodologies remain independently configurable.
+
+9. DATASET REGISTRY
+Every dataset is registered with
+Dataset Identifier
+Dataset Version
+Pipeline Identifier
+Schema Version
+Feature Manifest
+Configuration Version
+Creation Timestamp
+Owner
+Governance Status
+Storage Location
+Quality Score
+Lineage Identifier
+Approval Status
+Historical registry entries remain immutable.
+
+10. DATASET VERSIONING
+Every dataset records
+Dataset Version
+Schema Version
+Configuration Version
+Feature Version
+Pipeline Version
+Governance Version
+Historical datasets remain immutable.
+
+11. DATASET VALIDATION
+Validates
+Schema Consistency
+Temporal Ordering
+Duplicate Records
+Missing Records
+Feature Availability
+Timestamp Integrity
+Cross-Timeframe Alignment
+Statistical Consistency
+Distribution Stability
+Dataset Completeness
+Manifest Integrity
+Validation methodologies remain independently configurable.
+
+12. DATASET GOVERNANCE
+Every dataset records
+Approval Status
+Validation Status
+Review History
+Audit History
+Creation Timestamp
+Publication Timestamp
+Governance Metadata
+Complete governance history is mandatory.
+
+13. PERFORMANCE
+Supports
+Optional Distributed Dataset Construction
+Single-Process Asynchronous Dataset Construction
+Native Filesystem Storage
+Parallel Window Generation
+Incremental Dataset Updates
+Dataset Caching
+Streaming Metadata Collection
+Optional Cloud Deployment
+High Availability
+
+14. OBSERVABILITY
+Metrics include
+Datasets Constructed
+Construction Time
+Validation Failures
+Registry Publications
+Dataset Size
+Dataset Freshness
+Dataset Completeness
+Governance Events
+Publication Failures
+Quality Score
+
+15. SCALABILITY
+Supports
+Additional Exchanges
+Additional Assets
+Additional Timeframes
+Additional Dataset Types
+Additional AI Models
+Additional Research Pipelines
+Single-Node Deployment
+Optional Distributed Infrastructure
+Optional Multi-Region Deployment
+without architectural redesign.
+without architectural redesign.
+
+16. FAILURE RECOVERY
+Supports
+Dataset Replay
+Historical Reconstruction
+Registry Recovery
+Configuration Reload
+Failure Logging
+Graceful Degradation
+Dataset Quarantine
+Incomplete datasets shall never be published.
+
+Persistent research datasets shall generate immutable registry entries.
+Streaming Instant Pipeline datasets shall remain transient in memory and shall generate registry entries only when:
+- governance-approved snapshots are published
+- validation failures occur
+- anomalies are detected
+- research exports are explicitly requested
+- periodic checkpoint policies require publication
+Transient inference datasets shall never require permanent registration.
+
+17. ARCHITECTURAL RULES
+Rule 1
+Only institutionally governed feature stores may construct research datasets.
+Rule 2
+Every dataset shall generate a unique Dataset Event ID.
+Rule 3
+Every dataset shall conform to the Canonical Dataset Contract.
+Rule 4
+Historical datasets are immutable.
+Rule 5
+Every dataset shall preserve complete lineage linking source features, configurations, governance metadata, registry records, and publication metadata.
+Rule 6
+Dataset construction shall never generate AI labels.
+Rule 7
+Swing and Instant Scalping dataset ecosystems shall remain permanently isolated.
+Rule 7A
+Instant Scalping datasets shall never be reused for future AI training unless explicitly promoted into the Research Dataset Registry through governance-approved export workflows.
+
+Rule 8
+Chronological ordering shall never be violated.
+Rule 9
+Random shuffling of time-series observations is prohibited.
+Rule 9A
+Every chronological dataset partition shall enforce absolute temporal isolation between Training, Validation, Testing, Walk-Forward, and Shadow Evaluation windows.
+Dataset boundaries shall never overlap.
+Validation windows shall begin strictly after the final timestamp of the corresponding training window.
+Testing windows shall begin strictly after the final timestamp of the validation window.
+Rule 9B
+Purged Walk-Forward Validation and Embargo Validation shall remove all observations capable of introducing temporal leakage through overlapping feature windows, rolling statistics, future-derived labels, or shared market events.
+
+Rule 10
+Every published dataset shall successfully complete validation before publication.
+Rule 11
+Historical datasets shall support deterministic replay.
+Rule 12
+Dataset construction methodologies shall remain independently configurable.
+Rule 13
+Dataset publication failures shall never generate partially published datasets.
+Rule 14
+Every published dataset shall generate a complete Dataset Manifest.
+Rule 15
+Every dataset shall preserve deterministic timestamp ordering.
+Rule 16
+Dataset Registry entries shall remain immutable after publication.
+Rule 17
+Walk-forward, rolling-window, and purged-validation dataset methodologies shall remain independently pluggable without architectural redesign.
+Rule 18
+Every dataset shall remain reproducible solely from immutable feature versions, configuration versions, governance metadata, and construction methodologies.
+Rule 19
+Dataset storage formats shall remain independently configurable (Parquet, Arrow, Feather, SQL, or future formats) without affecting downstream AI engines.
+Rule 20
+This chapter governs only dataset construction and dataset registry management. Label engineering, feature engineering, AI training, prediction, model governance, portfolio management, execution, and risk management are governed exclusively by their respective AlphaSpot engines.
+
+18. CHAPTER SUMMARY
+The AI Dataset Construction & Dataset Registry Engine establishes AlphaSpot's canonical architecture for constructing, validating, registering, and publishing institutionally governed AI datasets. By separating dataset construction from label engineering, model training, and prediction while enforcing immutable versioning, deterministic reproducibility, dual Swing Trading and Instant Scalping dataset ecosystems, comprehensive validation, registry management, lineage preservation, and governance-driven publication, the architecture guarantees that every downstream AI model consumes trustworthy, reproducible, and statistically consistent datasets. Through the Canonical Dataset Contract and Dataset Registry, the ADCDRE provides the single authoritative source of AI-ready datasets across the AlphaSpot ecosystem, enabling reliable research, reproducible experimentation, scalable machine learning, and enterprise-grade quantitative intelligence.
+
+END OF CHAPTER 6.2
