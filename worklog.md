@@ -1475,3 +1475,53 @@ Stage Summary:
 - 16 subsystems covering: retrieval, config validation, quality evaluation, correlation analysis, redundancy elimination, importance ranking, stability evaluation, feature selection, validation, registry, manifest generation, versioning, governance, lineage, recovery, observability, contract generation.
 - The AI data preparation pipeline is now complete: 6.1 (orchestration) → 6.2 (construction+registry) → 6.3 (label engineering) → 6.4 (feature selection). Ready for model training (6.5+).
 - Next: Chapter 6.5 (if provided) — continuation of AI Training Pipeline.
+
+---
+Task ID: MDS-CH6.5
+Agent: main (Z.ai Code)
+Task: Chapter 6.5 of the MDS — AI Data Quality, Leakage Prevention & Research Validation Engine (AIDQLPRVE). The final research certification gateway between the AI Feature Selection Engine (Chapter 6.4) and the AI Model Training Engine (Chapter 6.6). No model training may begin unless every validation stage has completed. Establishes three execution environments (Runtime verify / Offline Research validate / Registry store) with 24 architectural rules — the most of any chapter.
+
+Work Log:
+- Appended Chapter 6.5 verbatim to full_prompt.md (now 10259 lines, 57 chapters).
+- Created src/lib/alphaspot/v2/research-validation-engine/ with 4 modules (309 V2 files total):
+  • types.ts — CanonicalValidationContract (§5, Rule 2/3/4). ResearchPipeline (2 §3 Rule 7). ExecutionEnvironment (3 §7/§13 — RUNTIME/OFFLINE_RESEARCH/REGISTRY). CertificationStatus (5 §10 — PASS/PASS_WITH_WARNINGS/REJECTED_LEAKAGE/REJECTED_CORRUPTED/FAIL). LeakageType (14 §8). LeakageFinding (Rule 16/17/18 invalidatesArtifact). LeakageAssessment (Rule 16 immutable, lookaheadBiasDetected/featureLeakageDetected/targetLeakageDetected). DataQualityScores (§9 — 12 dimensions: datasetQuality/labelQuality/featureQuality/partitionIntegrity/windowIntegrity/chronologicalIntegrity/leakageRisk/statisticalStability/researchIntegrity/temporalIntegrity/certificationConfidence/researchReadinessScore). ValidationCheckResult (§7 — 5 modules). ValidationReport (§7 — 28 checks across 5 modules, Rule 16 immutable). IntegrityReport (Rule 5/16). StatisticalReport (§7B — PSI, KS test p-value, covariate shift, distribution shift, Rule 16 immutable). ValidationCertificate (Rule 3/19/24 — certificationStatus, trainingApproved, runtimeAdmissionApproved, artifactFingerprint for Rule 24 invalidation, invalidated flag, immutable). ValidationLineage (Rule 5 — sourceDatasetsModified/sourceLabelsModified/sourceFeaturesModified/sourceManifestsModified all false). ValidationGovernanceMetadata (§12 — crossPipelineApproved, warningsApproved for PASS_WITH_WARNINGS). ValidationRegistryEntry (§11 — 16 fields, Rule 4/16 immutable). ValidationConfiguration (§3 — partitions with train/validation/test, walkForwardWindows, gitCommitHash, researchExperimentId). ValidationInput (§4 — sourceArtifactsModified=false, predictionsConsumed=false, liveMarketDataConsumed=false, tradingOrdersConsumed=false). AIDQLPRVEConfiguration (§3 — enforceEcosystemIsolation, enforceLeakagePrevention, enforcePartitionExclusivity, enforceWalkForwardNonOverlap, enforcePassRequiredForTraining, enforceRuntimeNoHeavyComputation, enforceModificationInvalidation). DEFAULT_AIDQLPRVE_CONFIG. VALIDATION_STAGES (15 §6). AIDQLPRVE_VERSION='1.0.0'.
+  • subsystems.ts — 14 subsystems:
+    - ArtifactRetriever (Rule 1/5 — only governance-approved artifacts, never modifies source, §4 never consumes predictions/live data/orders).
+    - ConfigurationValidator (Rule 7/12/13 — ecosystem isolation, partition mutual exclusivity, walk-forward non-overlap).
+    - LeakageDetector (§8, Rule 8-18 — 14 leakage types: LOOKAHEAD_BIAS/FEATURE_LEAKAGE/TARGET_LEAKAGE/LABEL_LEAKAGE/WINDOW_OVERLAP/TRAIN_TEST_LEAKAGE/VALIDATION_TEST_LEAKAGE/WALK_FORWARD_LEAKAGE/ROLLING_WINDOW_LEAKAGE/INDEX_ALIGNMENT/TIMESTAMP_BOUNDARY/DATA_SNOOPING_BIAS/MULTIPLE_HYPOTHESIS_TESTING/RESEARCH_OVERFITTING; Rule 8 features at/before T; Rule 9 labels strictly after T; Rule 10 labels at K+1; Rule 12 partition exclusivity; Rule 13 walk-forward non-overlap; Rule 11 no shuffling; Rule 16/17/18 any leakage invalidates).
+    - ValidationModuleRunner (§7 — 5 modules, 28 checks: Dataset Validation 6 + Feature Validation 7 + Label Validation 5 + Statistical Validation 6 + Research Validation 4; Rule 16 immutable).
+    - QualityScorer (§9 — 12 independent quality scores, weighted aggregate → researchReadinessScore).
+    - StatisticalValidator (§7B, Rule 22 — Offline Research Environment B: PSI, KS test, covariate shift, distribution shift; heavy computation only in Environment B).
+    - IntegrityVerifier (§5, Rule 5/16 — schema/temporal/partition/manifest/registry integrity verified; source artifacts not modified; immutable).
+    - CertificationGenerator (§10, Rule 3/19/24 — generates Validation Certificate with 5 certification statuses; Rule 19 only PASS allows training; Rule 24 artifactFingerprint for invalidation; trainingApproved + runtimeAdmissionApproved flags).
+    - ValidationRegistry (§11, Rule 4/16/24 — immutable entries; deterministic replay; Environment A runtime certificate verification via verifyCertificate() — Rule 23 only verifies, no heavy computation; Rule 24 invalidateByArtifactFingerprint() invalidates all certificates for modified artifacts).
+    - ValidationGovernanceManager (§12 — approval, validation history, audit history; §10 PASS_WITH_WARNINGS requires explicit governance approval via approveWarnings()).
+    - ValidationLineageTracker (Rule 5 — complete lineage: datasets/labels/manifests/registry/features/research config/governance; sourceDatasetsModified/sourceLabelsModified/sourceFeaturesModified/sourceManifestsModified all false).
+    - ValidationFailureRecovery (§16 — quarantine, replay, failed artifacts never certified).
+    - AIDQLPRVEObservabilityCollector (§14 — 9 metrics: Validation Time, Failures, Leakage Events, Dataset/Feature/Label Quality Scores, Research Readiness, Certification Success Rate, Registry Publications + stage timings).
+    - ValidationContractGenerator (Rule 2/3 — unique Validation Event ID, Canonical Validation Contract).
+  • engine.ts — AIDataQualityLeakagePreventionResearchValidationEngine:
+    - validateResearch (§6 — 15-stage pipeline: DATASET_RETRIEVAL Rule 1/5 → LABEL_RETRIEVAL Rule 1 → FEATURE_MANIFEST_RETRIEVAL Rule 1 → CONFIGURATION_VALIDATION Rule 7/12/13 → SCHEMA_VALIDATION → TEMPORAL_VALIDATION Rule 8/9/10/11/15 → DATA_QUALITY_VALIDATION → LEAKAGE_DETECTION Rule 8-18 (14 leakage types, any leakage invalidates) → PARTITION_VALIDATION Rule 12/13 → STATISTICAL_VALIDATION Rule 22 (Environment B) → RESEARCH_INTEGRITY_VALIDATION §7 (28 checks) → RESEARCH_READINESS_SCORING §9 (12 scores) → GOVERNANCE_VALIDATION §12 → VALIDATION_CERTIFICATE_GENERATION Rule 3/19/24 → REGISTRY_PUBLICATION Rule 4/16). Contract frozen at publication (Rule 4) — deep freeze of contract + certificate + governance + lineage + reports + scores.
+    - verifyCertificateForRuntime (§13 Environment A, Rule 23 — runtime ONLY verifies PASS certificate, NEVER does heavy computation; Rule 19 only PASS allows model loading).
+    - replayValidation (Rule 11 — deterministic replay from immutable registry).
+    - getCertificate (§13 Environment C — registry lookup).
+    - invalidateCertificates (Rule 24 — artifact modification invalidates all linked certificates).
+    - observability (§14 — 9 metrics + registry/certificate counts).
+    - listQuarantined (§16 — quarantine).
+  • index.ts — Barrel export.
+- Smoke-tested all 7 scenarios: (1) Pipeline stages — 15 validation stages verified. (2) FULL VALIDATION — 15 stages all ✓, PASS certification, readiness 0.975, 28 validation checks all passed, leakage not detected, Rule 16 lookahead/feature/target all false ✓, Rule 19 training approved + runtime admission ✓, Rule 5 source not modified ✓, Rule 16 immutable ✓, Rule 4 frozen=true ✓, artifact fingerprint computed ✓. (3) RUNTIME VERIFICATION (Environment A) — PASS certificate verified=true, Rule 23 runtime verify only ✓. (4) RULE 24 — artifact modification invalidated 1 certificate, re-verification valid=false, reason='Rule 24: certificate invalidated by artifact modification' ✓. (5) RULE 16/17/18 — leakage detection: labels before features → 3 findings (LOOKAHEAD_BIAS CRITICAL, TARGET_LEAKAGE CRITICAL, INDEX_ALIGNMENT CRITICAL), all invalidate artifact ✓. (6) RULE 13 — empty datasets quarantined: 'Rule 1: no approved datasets provided' ✓. (7) §14 observability — 2 validations, 1 failure, 0 leakage events, 1 registry publication, 1 registry entry, 1 certificate, avg readiness 0.975, 100% certification success rate, 15 stage timings ✓.
+- Lint clean. Committed (a409f3d). Pushed to GitHub.
+
+Stage Summary:
+- Chapter 6.5 (AIDQLPRVE) fully implemented following the established V2 workflow pattern.
+- 309 V2 source files in src/lib/alphaspot/v2/ (4 new: types.ts, subsystems.ts, engine.ts, index.ts).
+- full_prompt.md now 10259 lines (57 chapters accumulated — Ch 1, 2.1-2.5, 3.1-3.10, 4.1-4.12, 5.1-5.24, 6.1-6.5).
+- Fifth chapter of Layer 4 (AI Training Pipeline). The final research certification gateway.
+- Three execution environments: A (Runtime verify only — Rule 23), B (Offline Research heavy computation — Rule 22), C (Registry immutable storage).
+- Rule 24 — artifact modification invalidates all linked certificates (via artifactFingerprint).
+- 24 architectural rules (§17) — most of any chapter. All enforced and verified via smoke test.
+- Validation Certificate is the mandatory admission ticket for every downstream AI model.
+- 14 leakage types, 12 quality scores, 28 validation checks across 5 modules, 5 certification statuses.
+- 14 subsystems covering: artifact retrieval, config validation, leakage detection (14 types), validation module runner (28 checks), quality scoring (12 dimensions), statistical validation (offline PSI/KS), integrity verification, certification generation, registry (immutable + runtime verify + invalidation), governance, lineage, recovery, observability, contract generation.
+- The AI research preparation pipeline is now complete: 6.1 (orchestration) → 6.2 (construction+registry) → 6.3 (label engineering) → 6.4 (feature selection) → 6.5 (validation+certification). Ready for model training (6.6+).
+- Next: Chapter 6.6 (if provided) — AI Model Training & Experiment Orchestration.
