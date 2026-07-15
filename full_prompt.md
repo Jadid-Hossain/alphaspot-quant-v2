@@ -9014,3 +9014,420 @@ This chapter governs only dataset construction and dataset registry management. 
 The AI Dataset Construction & Dataset Registry Engine establishes AlphaSpot's canonical architecture for constructing, validating, registering, and publishing institutionally governed AI datasets. By separating dataset construction from label engineering, model training, and prediction while enforcing immutable versioning, deterministic reproducibility, dual Swing Trading and Instant Scalping dataset ecosystems, comprehensive validation, registry management, lineage preservation, and governance-driven publication, the architecture guarantees that every downstream AI model consumes trustworthy, reproducible, and statistically consistent datasets. Through the Canonical Dataset Contract and Dataset Registry, the ADCDRE provides the single authoritative source of AI-ready datasets across the AlphaSpot ecosystem, enabling reliable research, reproducible experimentation, scalable machine learning, and enterprise-grade quantitative intelligence.
 
 END OF CHAPTER 6.2
+
+
+ALPHASPOT QUANT V2
+CHAPTER 6.3
+AI LABEL ENGINEERING & TARGET GENERATION ENGINE
+Version 1.0
+
+1. PURPOSE
+The AI Label Engineering & Target Generation Engine (AILETGE) establishes the canonical architecture for constructing, validating, versioning, governing, and publishing every supervised learning target consumed by AlphaSpot artificial intelligence models.
+The AILETGE transforms institutionally governed research datasets into deterministic, reproducible, leakage-free, strategy-specific AI learning targets while preserving complete temporal correctness, statistical validity, governance compliance, and research reproducibility.
+The Label Engineering Engine serves as the exclusive target generation layer between the AI Dataset Construction & Dataset Registry Engine (Chapter 6.2) and every downstream AI Training Engine implemented throughout Chapter 6.
+No AI model may construct labels independently.
+Every AI model shall consume only governance-approved labels published by this engine.
+The AILETGE performs:
+Label Engineering
+Target Generation
+Multi-Horizon Label Generation
+Binary Classification Labels
+Multi-Class Labels
+Regression Targets
+Probability Targets
+Expected Return Targets
+Risk-Adjusted Return Targets
+Maximum Drawdown Targets
+Volatility Targets
+Trade Quality Targets
+Confidence Targets
+Market Regime Targets
+Label Validation
+Label Versioning
+Label Registry
+Label Metadata Management
+Label Lineage
+Label Governance
+Label Replay
+Label Publication
+Research Target Management
+The AILETGE performs NO:
+Feature Engineering
+Dataset Construction
+Model Training
+Hyperparameter Optimization
+Prediction
+Portfolio Optimization
+Trading Decisions
+Execution Management
+Risk Management
+Model Governance
+
+2. DESIGN PHILOSOPHY
+Labels define AI intelligence.
+Every label shall remain
+immutable
+deterministic
+reproducible
+temporally correct
+strategy specific
+governance approved
+version controlled
+Label engineering shall remain completely independent of
+Feature Engineering
+Model Training
+Prediction
+Execution
+Portfolio Decisions
+Trading Strategies
+Identical datasets and identical configurations shall always generate identical labels.
+
+3. DUAL LABEL ARCHITECTURE
+The AILETGE maintains two completely independent label ecosystems.
+Pipeline A — Swing Trading Labels
+Purpose
+Capture medium-term structural trading opportunities for spot trading.
+Primary Holding Horizon
+Configurable
+Default Research Configuration:
+72 Hours
+Supported Horizons:
+2 Days
+3 Days
+5 Days
+7 Days
+10 Days
+Primary Labeling Method
+Dynamic Triple Barrier Method
+Upper Profit Barrier
+Configuration-driven
+Examples:
+Percentage Return
+ATR Multiple
+Volatility-Adjusted Threshold
+Lower Risk Barrier
+Configuration-driven
+Examples:
+Percentage Loss
+ATR Multiple
+Volatility-Based Stop
+Vertical Barrier
+Configurable expiration horizon.
+Typical default:
+72 Hours
+Generated Targets
+Trade Success
+Expected Return
+Risk-Adjusted Return
+Maximum Favorable Excursion (MFE)
+Maximum Adverse Excursion (MAE)
+Holding Duration
+Trade Quality Score
+Market Regime
+Exit Reason
+
+Pipeline B — Instant Scalping Labels
+Purpose
+Capture ultra-short-term liquidity and momentum opportunities.
+Primary Holding Horizon
+Configurable
+Default Research Configuration:
+20 Minutes
+Supported Horizons
+5 Minutes
+10 Minutes
+15 Minutes
+20 Minutes
+30 Minutes
+Primary Labeling Method
+Micro Triple Barrier Method
+Upper Barrier
+Configuration-driven
+Examples:
+Percentage Return
+Volatility-Based Return
+Tick-Based Threshold
+Lower Barrier
+Configuration-driven
+Examples:
+Percentage Loss
+Volatility-Based Loss
+Vertical Barrier
+Configurable expiration horizon.
+Typical default:
+20 Minutes
+Generated Targets
+Trade Success
+Expected Return
+Expected Slippage
+Fill Probability
+Momentum Continuation
+Liquidity Absorption
+Order Book Alpha
+Trade Quality Score
+Execution Quality
+This is much better than hardcoding +5% forever.
+
+The two label ecosystems shall remain permanently isolated.
+Cross-pipeline label generation is prohibited unless explicitly approved through governance.
+
+4. INPUT CONTRACT
+Consumes only
+Governed AI Datasets
+Dataset Registry
+Feature Metadata
+Research Configuration
+Trading Horizon Configuration
+Market Calendar
+Dataset Manifest
+Governance Metadata
+Configuration Metadata
+Asset Metadata
+The engine never consumes
+Predictions
+Model Outputs
+Trading Orders
+Execution Results
+Portfolio Decisions
+Exchange APIs
+User Decisions
+Secrets
+
+5. OUTPUT CONTRACT
+Every published label set produces
+Label Event ID
+Label Identifier
+Label Version
+Research Pipeline
+Label Category
+Target Definition
+Prediction Horizon
+Label Statistics
+Class Distribution
+Configuration Version
+Validation Report
+Integrity Report
+Lineage Metadata
+Governance Metadata
+Publication Status
+Outputs remain immutable.
+Every published label set shall conform to the Canonical Label Contract defined by this chapter.
+
+6. LABEL GENERATION PIPELINE
+Every label follows
+Governed Dataset Retrieval
+↓
+Configuration Validation
+↓
+Prediction Horizon Selection
+↓
+Target Definition
+↓
+Future Window Construction
+↓
+Label Generation
+↓
+Leakage Validation
+↓
+Statistical Validation
+↓
+Class Balance Analysis
+↓
+Version Assignment
+↓
+Governance Validation
+↓
+Immutable Publication
+↓
+Registry Registration
+↓
+Metadata Recording
+↓
+Label Completion
+No stage may be skipped.
+
+7. LABEL TYPES
+Supports
+Binary Classification
+Multi-Class Classification
+Regression
+Probability Targets
+Future Return
+Log Return
+Volatility Targets
+Maximum Drawdown
+Maximum Favorable Excursion
+Maximum Adverse Excursion
+Trade Success Labels
+Expected Value Labels
+Trade Quality Score
+Risk Score
+Holding Time
+Market Regime
+Multi-Horizon Labels
+Methodologies remain independently configurable.
+
+8. PREDICTION HORIZONS
+Supports
+1 Minute
+5 Minutes
+15 Minutes
+20 Minutes
+1 Hour
+4 Hours
+1 Day
+3 Days
+5 Days
+10 Days
+Multiple prediction horizons may coexist simultaneously.
+
+9. LABEL VALIDATION
+Validates
+Temporal Correctness
+Future Leakage
+Class Balance
+Distribution Stability
+Missing Labels
+Duplicate Labels
+Outlier Targets
+Prediction Horizon Consistency
+Target Integrity
+Statistical Consistency
+Validation methodologies remain independently configurable.
+
+10. LABEL REGISTRY
+Every published label set records
+Label Identifier
+Label Version
+Dataset Version
+Target Definition
+Prediction Horizon
+Configuration Version
+Creation Timestamp
+Governance Status
+Quality Score
+Storage Location
+Historical registry entries remain immutable.
+
+11. LABEL VERSIONING
+Every label records
+Label Version
+Dataset Version
+Target Version
+Configuration Version
+Pipeline Version
+Governance Version
+Historical labels remain immutable.
+
+12. LABEL GOVERNANCE
+Every label records
+Approval Status
+Validation Status
+Review History
+Audit History
+Creation Timestamp
+Publication Timestamp
+Governance Metadata
+Complete governance history is mandatory.
+
+13. PERFORMANCE
+The AI Label Engineering & Target Generation Engine supports:
+Single-Process Asynchronous Label Generation
+Parallel CPU Label Construction
+Streaming Label Generation
+Native Filesystem Storage
+SQLite Metadata Registry
+Local Batch Processing
+Incremental Label Updates
+Memory-Efficient Window Processing
+High Throughput Sequential Processing
+The engine is optimized for a single-node research workstation operating under a zero-cost deployment model.
+Distributed processing, cluster computing, cloud-native execution, and multi-region deployment are intentionally excluded from the canonical architecture and may only be introduced through future architectural extensions.
+
+14. OBSERVABILITY
+Metrics include
+Labels Generated
+Generation Time
+Validation Failures
+Registry Publications
+Label Distribution
+Class Imbalance
+Leakage Detection Events
+Governance Events
+Publication Failures
+Quality Score
+
+15. SCALABILITY
+Supports
+Additional Exchanges
+Additional Spot Assets
+Additional Label Types
+Additional Prediction Horizons
+Additional Trading Strategies
+Additional AI Models
+Additional Research Pipelines
+Additional Market Features
+Additional Alternative Data Sources
+Scalability shall be achieved through modular engine decomposition, asynchronous processing, efficient memory management, and streaming computation rather than distributed infrastructure.
+The architecture shall remain fully functional on a single research workstation without requiring cluster computing or cloud infrastructure.
+
+16. FAILURE RECOVERY
+Supports
+Label Replay
+Historical Reconstruction
+Registry Recovery
+Configuration Reload
+Failure Logging
+Graceful Degradation
+Label Quarantine
+Incomplete label publications shall never be published.
+
+17. ARCHITECTURAL RULES
+Rule 1
+Only institutionally governed datasets may generate AI labels.
+Rule 2
+Every label publication shall generate a unique Label Event ID.
+Rule 3
+Every published label shall conform to the Canonical Label Contract.
+Rule 4
+Historical labels are immutable.
+Rule 5
+Every label shall preserve complete lineage linking datasets, configurations, governance metadata, registry records, and publication metadata.
+Rule 6
+Labels shall never modify source datasets.
+Rule 7
+Swing and Instant Scalping label ecosystems shall remain permanently isolated.
+Rule 8
+Every label shall be generated exclusively from observations occurring strictly after the final timestamp of the corresponding feature vector. During implementation, feature indices may reference observations only up to timestamp T, while label generation shall begin strictly from the first observation after T. Under no circumstances may feature windows and future label windows overlap.
+Rule 9
+Temporal leakage is strictly prohibited.
+Rule 10
+Prediction horizons shall never overlap historical feature windows.
+Rule 11
+Historical labels shall support deterministic replay.
+Rule 12
+Label generation methodologies shall remain independently configurable.
+Rule 13
+Publication failures shall never generate partially published label sets.
+Rule 14
+Every published label shall generate a complete Label Manifest.
+Rule 15
+Every label shall preserve deterministic timestamp ordering.
+Rule 16
+Label Registry entries shall remain immutable after publication.
+Rule 17
+Binary, multi-class, regression, probability, and multi-horizon targets shall remain independently pluggable without architectural redesign.
+Rule 18
+Every published label shall remain reproducible solely from immutable datasets, configuration versions, governance metadata, and label generation methodologies.
+Rule 19
+Target definitions shall be independently version controlled and shall never overwrite historical label versions.
+Rule 20
+This chapter governs only AI label engineering and target generation. Dataset construction, feature engineering, model training, prediction, model governance, execution, portfolio management, and risk management are governed exclusively by their respective AlphaSpot engines.
+
+Rule 21
+All label-generation thresholds, prediction horizons, barrier methodologies, holding periods, ATR multipliers, percentage targets, volatility adjustments, and research parameters shall remain externally configurable through governed research configurations. No production implementation shall hard-code trading thresholds into the Label Engineering Engine.
+
+18. CHAPTER SUMMARY
+The AI Label Engineering & Target Generation Engine establishes AlphaSpot's canonical architecture for constructing, validating, versioning, and publishing institutionally governed AI learning targets. By separating label engineering from dataset construction, feature engineering, model training, and prediction while enforcing immutable versioning, deterministic reproducibility, dual Swing Trading and Instant Scalping label ecosystems, comprehensive validation, complete lineage, and governance-driven publication, the architecture guarantees that every downstream AI model learns from trustworthy, leakage-free, strategy-specific targets. Through the Canonical Label Contract and Label Registry, the AILETGE provides the single authoritative source of supervised learning targets across the AlphaSpot ecosystem, enabling reproducible quantitative research, robust machine learning, and high-quality AI decision support for profitable spot trading.
+
+END OF CHAPTER 6.3
